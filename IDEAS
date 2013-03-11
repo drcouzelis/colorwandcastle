@@ -1,6 +1,8 @@
 Resolution: 1280x800
-Tile size: 40x40 blocks -> 32x20
+Block size: 80x80 blocks -> 16x10
 Makayla hit box: 60x120
+Game play area border: 1 block, all sides
+Max vertical blocks: 8
 
 Name:
 Makayla Ray
@@ -8,7 +10,6 @@ Makayla Ruth
 Fairy Princess
 Colorwand
 *Colorwand Castle
-
 
 Makayla is in a room.
 Makayla stands on the left, facing right.
@@ -29,10 +30,13 @@ As the player clears rooms, obstacles begin to appear.
 
 Obstacles
 ---------
-. A snake walks around the border of the play area.
-. Fireballs bounce around the room.
-. A monkey bounces back and forth in place.
-. The colored blocks shift positions.
+. A snake walks around the border of the play area
+. A fireball bounces around the room
+. A monkey bounces back and forth in place
+. A spider slowly moves up and down the screen on his web
+[. The colored blocks shift positions]
 
 Makayla can only shoot horizontally.
 Enemies cannot be killed.
+The number and position of the blocks varies from room to room.
+
