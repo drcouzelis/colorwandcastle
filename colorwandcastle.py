@@ -6,6 +6,7 @@ from pyglet.window import key
 WIDTH = 1280
 HEIGHT = 800
 FPS = 120.0
+WALK_SPEED = 240
 
 pyglet.resource.path = ['res']
 pyglet.resource.reindex()
@@ -22,15 +23,20 @@ character_group = pyglet.graphics.OrderedGroup(2)
 
 class Player(pyglet.window.key.KeyStateHandler):
     def __init__(self):
-        makayla_img = 
-        center_anchor(makayla_img)
-        self.sprite = pyglet.sprite.Sprite(center_anchor(pyglet.resource.image('makayla.png')), batch=batch, group=character_group)
+        img = center_anchor(pyglet.resource.image('makayla.png'))
+        self.sprite = pyglet.sprite.Sprite(img, batch=batch, group=character_group)
+        self.sprite.x = WIDTH // 2
+        self.sprite.y = HEIGHT // 2
 
     def update(self, dt):
+        if self[key.UP]:
+            self.sprite.y += WALK_SPEED * dt
+        if self[key.DOWN]:
+            self.sprite.y -= WALK_SPEED * dt
         if self[key.LEFT]:
-            sprite.x -= 10 * dt
+            self.sprite.x -= WALK_SPEED * dt
         if self[key.RIGHT]:
-            sprite.x += 10 * dt
+            self.sprite.x += WALK_SPEED * dt
 
 player = Player()
 window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
@@ -48,6 +54,5 @@ def update(dt):
     player.update(dt)
 
 pyglet.clock.schedule_interval(update, 1 / FPS)
-window.set_visible(True)
 pyglet.app.run()
 
