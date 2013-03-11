@@ -13,6 +13,7 @@ pyglet.resource.reindex()
 def center_anchor(img):
     img.anchor_x = img.width // 2
     img.anchor_y = img.height // 2
+    return img
 
 batch = pyglet.graphics.Batch()
 background_group = pyglet.graphics.OrderedGroup(0)
@@ -21,19 +22,18 @@ character_group = pyglet.graphics.OrderedGroup(2)
 
 class Player(pyglet.window.key.KeyStateHandler):
     def __init__(self):
-        makayla_img = pyglet.resource.image('makayla.png')
+        makayla_img = 
         center_anchor(makayla_img)
-        self.makayla = pyglet.sprite.Sprite(img=makayla_img, x=WIDTH / 2, y=HEIGHT / 2)
+        self.sprite = pyglet.sprite.Sprite(center_anchor(pyglet.resource.image('makayla.png')), batch=batch, group=character_group)
 
     def update(self, dt):
         if self[key.LEFT]:
-            print('Left!')
-
-    def draw(self):
-        self.makayla.draw()
+            sprite.x -= 10 * dt
+        if self[key.RIGHT]:
+            sprite.x += 10 * dt
 
 player = Player()
-window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Doctor Who', visible=False)
+window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
 window.push_handlers(player)
 
 fps_display = pyglet.clock.ClockDisplay()
@@ -41,7 +41,7 @@ fps_display = pyglet.clock.ClockDisplay()
 @window.event
 def on_draw():
     window.clear()
-    player.draw()
+    batch.draw()
     fps_display.draw()
 
 def update(dt):
