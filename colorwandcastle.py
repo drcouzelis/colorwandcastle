@@ -12,13 +12,6 @@ WALK_SPEED = 240
 pyglet.resource.path = ['res']
 pyglet.resource.reindex()
 
-def center_anchor(img):
-    '''Change the image anchor to be the center of the image.
-       Returns the image.'''
-    img.anchor_x = img.width // 2
-    img.anchor_y = img.height // 2
-    return img
-
 # Put all sprites into a single batch to speed up drawing
 batch = pyglet.graphics.Batch()
 
@@ -27,27 +20,38 @@ background_group = pyglet.graphics.OrderedGroup(0)
 walkground_group = pyglet.graphics.OrderedGroup(1)
 character_group = pyglet.graphics.OrderedGroup(2)
 
+class Bounds:
+    def __init__(self, u=0, l=0, d=0, r=0):
+        self.u, self.l, self.d, self.r = u, l, d, r
+
+playfield_bounds = Bounds(HEIGHT - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, WIDTH - BLOCK_SIZE)
+
 class Player(pyglet.window.key.KeyStateHandler):
     def __init__(self):
-        img = center_anchor(pyglet.resource.image('makayla.png'))
-        self.sprite = pyglet.sprite.Sprite(img, batch=batch, group=character_group)
-        self.sprite.x = WIDTH // 2
-        self.sprite.y = HEIGHT // 2
+        self.fly_img = pyglet.resource.image('makayla_fly_1.png')
+        self.stand_img = pyglet.image.resource('makayla_stand_1.png')
+        self.bounds = Bounds(60, 30, 60, 30)
+        self.to_flying()
 
-    def update(self, dt):
-        if self[key.UP]:
-            self.sprite.y += WALK_SPEED * dt
-        if self[key.DOWN]:
-            self.sprite.y -= WALK_SPEED * dt
-        if self[key.LEFT]:
-            self.sprite.x -= WALK_SPEED * dt
-        if self[key.RIGHT]:
-            self.sprite.x += WALK_SPEED * dt
+    def to_flying(self):
+        self.sprite = pyglet.sprite.Sprite(fly_img, batch=batch, group=character_group)
+        self.update = self.update_flying
 
-player = Player()
+    def update_flying(self, dt):
+        self.sprite.y += WALK_SPEED * dt if self[key.UP]
+        self.sprite.y -= WALK_SPEED * dt if self[key.DOWN]
+        self.sprite.x -= WALK_SPEED * dt if self[key.LEFT]
+        self.sprite.x += WALK_SPEED * dt if self[key.RIGHT]
+        bound(self.sprite, playfield_bounds)
+        if self.sprite.y == playfield.d:
+            self.to_standing()
 
 # Create the window
 window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
+
+player = Player()
+player.sprite.x = WIDTH // 2
+player.sprite.y = HEIGHT // 2
 
 # Allow the player to receive keyboard input
 window.push_handlers(player)
