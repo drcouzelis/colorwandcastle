@@ -6,7 +6,6 @@ from pyglet.window import key
 WIDTH = 1280
 HEIGHT = 800
 FPS = 120.0
-BLOCK_SIZE = 80
 
 # Define resource directories
 pyglet.resource.path = ['res']
@@ -20,11 +19,20 @@ background_group = pyglet.graphics.OrderedGroup(0)
 walkground_group = pyglet.graphics.OrderedGroup(1)
 character_group = pyglet.graphics.OrderedGroup(2)
 
+def load_img(filename):
+    img = pyglet.resource.image(filename)
+    img.anchor_x = img.width // 2
+    img.anchor_y = img.height // 2
+    return img
+
 class Bounds:
     def __init__(self, u=0, l=0, d=0, r=0):
         self.u, self.l, self.d, self.r = u, l, d, r
 
-playfield_bounds = Bounds(HEIGHT - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, WIDTH - BLOCK_SIZE)
+playfield_bounds = Bounds(HEIGHT - Block.size, Block.size, Block.size, WIDTH - Block.size)
+
+class Block(pyglet.sprite.Sprite):
+    size = 80
 
 class Player(pyglet.window.key.KeyStateHandler):
 
@@ -183,7 +191,6 @@ walls = pyglet.sprite.Sprite(walls_img, batch=batch, group=walkground_group)
 
 @window.event
 def on_draw():
-    window.clear() # Renove when unnecessary
     batch.draw() # Draw all sprites
     fps_display.draw() # Should be able to be toggled
 
