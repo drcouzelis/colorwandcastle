@@ -39,24 +39,25 @@ class Player(pyglet.window.key.KeyStateHandler):
     speed = 300
 
     def __init__(self):
-        self.flip = False # True for facing right, false to face left
-        self.fly_anm = pyglet.image.Animation((
-            pyglet.image.AnimationFrame(load_img('makayla_fly_1.png'), 1/4),
-            pyglet.image.AnimationFrame(load_img('makayla_fly_2.png'), 1/4)
-            ))
-        self.stand_anm = pyglet.image.Animation((
+        self.forward = True # True for facing right, false to face left
+        self.anims = dict()
+        self.anims['stand_r'] = pyglet.image.Animation((
             pyglet.image.AnimationFrame(load_img('makayla_stand_1.png'), 1/4),
             pyglet.image.AnimationFrame(load_img('makayla_stand_2.png'), 1/4),
             pyglet.image.AnimationFrame(load_img('makayla_stand_3.png'), 1/4),
-            pyglet.image.AnimationFrame(load_img('makayla_stand_2.png'), 1/4)
-            ))
-        self.walk_anm = pyglet.image.Animation((
+            pyglet.image.AnimationFrame(load_img('makayla_stand_2.png'), 1/4)))
+        self.anims['walk_r'] = pyglet.image.Animation((
             pyglet.image.AnimationFrame(load_img('makayla_walk_1.png'), 1/6),
             pyglet.image.AnimationFrame(load_img('makayla_walk_2.png'), 1/6),
-            pyglet.image.AnimationFrame(load_img('makayla_walk_3.png'), 1/6),
-            ))
+            pyglet.image.AnimationFrame(load_img('makayla_walk_3.png'), 1/6),))
+        self.anims['fly_r'] = pyglet.image.Animation((
+            pyglet.image.AnimationFrame(load_img('makayla_fly_1.png'), 1/4),
+            pyglet.image.AnimationFrame(load_img('makayla_fly_2.png'), 1/4)))
+        self.anims['stand_l'] = self.anims['stand_r'].get_transform(flip_x=True)
+        self.anims['walk_l'] = self.anims['walk_r'].get_transform(flip_x=True)
+        self.anims['fly_l'] = self.anims['fly_r'].get_transform(flip_x=True)
         self.bounds = Bounds(60, 30, 60, 30)
-        self.sprite = pyglet.sprite.Sprite(self.fly_anm)
+        self.sprite = pyglet.sprite.Sprite(self.anims['fly_r'])
         self.to_flying()
 
     @property
@@ -108,21 +109,22 @@ class Player(pyglet.window.key.KeyStateHandler):
         self.sprite.x = value - self.bounds.r
 
     def to_flying(self):
-        self.sprite.delete()
-        anm = self.fly_anm.get_transform(flip_x=self.flip)
-        self.sprite = pyglet.sprite.Sprite(anm, x=self.x, y=self.y, batch=batch, group=character_group)
+        if self.sprite:
+            self.sprite.delete()
+        anim = self.anims['fly_r'] if self.forward else self.anims['fly_l']
+        self.sprite = pyglet.sprite.Sprite(anim, x=self.x, y=self.y, batch=batch, group=character_group)
         self.update = self.update_flying
 
     def to_standing(self):
         self.sprite.delete()
-        anm = self.stand_anm.get_transform(flip_x=self.flip)
-        self.sprite = pyglet.sprite.Sprite(anm, x=self.x, y=self.y, batch=batch, group=character_group)
+        anim = self.anims['stand_r'] if self.forward else self.anims['stand_l']
+        self.sprite = pyglet.sprite.Sprite(anim, x=self.x, y=self.y, batch=batch, group=character_group)
         self.update = self.update_standing
 
     def to_walking(self):
         self.sprite.delete()
-        anm = self.walk_anm.get_transform(flip_x=self.flip)
-        self.sprite = pyglet.sprite.Sprite(anm, x=self.x, y=self.y, batch=batch, group=character_group)
+        anim = self.anims['walk_r'] if self.forward else self.anims['walk_l']
+        self.sprite = pyglet.sprite.Sprite(anim, x=self.x, y=self.y, batch=batch, group=character_group)
         self.update = self.update_walking
 
     def update_flying(self, dt):
@@ -132,13 +134,13 @@ class Player(pyglet.window.key.KeyStateHandler):
             self.y -= Player.speed * dt
         if self[key.LEFT]:
             self.x -= Player.speed * dt
-            if not self.flip:
-                self.flip = True
+            if self.forward:
+                self.forward = False
                 self.to_flying()
         if self[key.RIGHT]:
             self.x += Player.speed * dt
-            if self.flip:
-                self.flip = False
+            if not self.forward:
+                self.forward = True
                 self.to_flying()
         self.bound(playfield_bounds)
         if self.on_floor():
@@ -150,11 +152,11 @@ class Player(pyglet.window.key.KeyStateHandler):
             self.to_flying()
         if self[key.LEFT]:
             self.x -= Player.speed * dt
-            self.flip = True
+            self.forward = False
             self.to_walking()
         if self[key.RIGHT]:
             self.x += Player.speed * dt
-            self.flip = False
+            self.forward = True
             self.to_walking()
         self.bound(playfield_bounds)
 
@@ -164,13 +166,13 @@ class Player(pyglet.window.key.KeyStateHandler):
             self.y += Player.speed * dt
         if self[key.LEFT]:
             self.x -= Player.speed * dt
-            if not self.flip:
-                self.flip = True
+            if self.forward:
+                self.forward = False
                 self.to_walking()
         if self[key.RIGHT]:
             self.x += Player.speed * dt
-            if self.flip:
-                self.flip = False
+            if not self.forward:
+                self.forward = True
                 self.to_walking()
         self.bound(playfield_bounds)
         if not self[key.LEFT] and not self[key.RIGHT]:
