@@ -57,7 +57,7 @@ class Player(pyglet.window.key.KeyStateHandler):
         self.anims['walk_l'] = self.anims['walk_r'].get_transform(flip_x=True)
         self.anims['fly_l'] = self.anims['fly_r'].get_transform(flip_x=True)
         self.bounds = Bounds(60, 30, 60, 30)
-        self.sprite = pyglet.sprite.Sprite(self.anims['fly_r'])
+        self.sprite = pyglet.sprite.Sprite(self.anims['fly_r'], batch=batch, group=character_group)
         self.to_flying()
 
     @property
@@ -109,22 +109,17 @@ class Player(pyglet.window.key.KeyStateHandler):
         self.sprite.x = value - self.bounds.r
 
     def to_flying(self):
-        if self.sprite:
-            self.sprite.delete()
-        anim = self.anims['fly_r'] if self.forward else self.anims['fly_l']
-        self.sprite = pyglet.sprite.Sprite(anim, x=self.x, y=self.y, batch=batch, group=character_group)
+        self.sprite.image = self.anims['fly_r'] if self.forward else self.anims['fly_l']
         self.update = self.update_flying
 
     def to_standing(self):
         self.sprite.delete()
-        anim = self.anims['stand_r'] if self.forward else self.anims['stand_l']
-        self.sprite = pyglet.sprite.Sprite(anim, x=self.x, y=self.y, batch=batch, group=character_group)
+        self.sprite.image = self.anims['stand_r'] if self.forward else self.anims['stand_l']
         self.update = self.update_standing
 
     def to_walking(self):
         self.sprite.delete()
-        anim = self.anims['walk_r'] if self.forward else self.anims['walk_l']
-        self.sprite = pyglet.sprite.Sprite(anim, x=self.x, y=self.y, batch=batch, group=character_group)
+        self.sprite.image = self.anims['walk_r'] if self.forward else self.anims['walk_l']
         self.update = self.update_walking
 
     def update_flying(self, dt):
@@ -195,8 +190,8 @@ class Player(pyglet.window.key.KeyStateHandler):
 window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
 
 player = Player()
-player.sprite.x = WIDTH // 2
-player.sprite.y = HEIGHT // 2
+player.x = WIDTH // 2
+player.y = HEIGHT // 2
 
 # Allow the player to receive keyboard input
 window.push_handlers(player)
