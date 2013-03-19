@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import pyglet
+from pyglet.image import Animation, AnimationFrame
+from pyglet.sprite import Sprite
 from pyglet.window import key
 
 WIDTH = 1280
@@ -17,7 +19,7 @@ batch = pyglet.graphics.Batch()
 # Groups allow sprite to be drawn in the correct layer
 background_group = pyglet.graphics.OrderedGroup(0)
 walkground_group = pyglet.graphics.OrderedGroup(1)
-character_group = pyglet.graphics.OrderedGroup(2)
+hero_group = pyglet.graphics.OrderedGroup(2)
 
 def load_img(filename):
     img = pyglet.resource.image(filename)
@@ -29,96 +31,99 @@ class Bounds:
     def __init__(self, u=0, l=0, d=0, r=0):
         self.u, self.l, self.d, self.r = u, l, d, r
 
-class Block(pyglet.sprite.Sprite):
+class BoundSprite(Sprite):
+
+    def __init__(self, bounds, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self._bounds = bounds
+
+    @property
+    def u(self):
+        return self.y + self._bounds.u
+
+    @u.setter
+    def u(self, value):
+        self.y = value - self._bounds.u
+
+    @property
+    def d(self):
+        return self.y - self._bounds.d
+
+    @d.setter
+    def d(self, value):
+        self.y = value + self._bounds.d
+
+    @property
+    def l(self):
+        return self.x - self._bounds.l
+
+    @l.setter
+    def l(self, value):
+        self.x = value + self._bounds.l
+
+    @property
+    def r(self):
+        return self.x + self._bounds.r
+
+    @r.setter
+    def r(self, value):
+        self.x = value - self._bounds.r
+
+class Block(Sprite):
     size = 80
 
 playfield_bounds = Bounds(HEIGHT - Block.size, Block.size, Block.size, WIDTH - Block.size)
 
-class Player(pyglet.window.key.KeyStateHandler):
+class Player(BoundSprite, key.KeyStateHandler):
 
+    bounds = Bounds(60, 30, 60, 30)
     speed = 300
 
     def __init__(self):
         self.forward = True # True for facing right, false to face left
+        self._init_anims()
+        self.sprite = Sprite(self.anims['fly_r'], batch=batch, group=hero_group)
+        self.to_flying()
+
+    def _init_anims(self):
         self.anims = dict()
-        self.anims['stand_r'] = pyglet.image.Animation((
-            pyglet.image.AnimationFrame(load_img('makayla_stand_1.png'), 1/4),
-            pyglet.image.AnimationFrame(load_img('makayla_stand_2.png'), 1/4),
-            pyglet.image.AnimationFrame(load_img('makayla_stand_3.png'), 1/4),
-            pyglet.image.AnimationFrame(load_img('makayla_stand_2.png'), 1/4)))
-        self.anims['walk_r'] = pyglet.image.Animation((
-            pyglet.image.AnimationFrame(load_img('makayla_walk_1.png'), 1/6),
-            pyglet.image.AnimationFrame(load_img('makayla_walk_2.png'), 1/6),
-            pyglet.image.AnimationFrame(load_img('makayla_walk_3.png'), 1/6),))
-        self.anims['fly_r'] = pyglet.image.Animation((
-            pyglet.image.AnimationFrame(load_img('makayla_fly_1.png'), 1/4),
-            pyglet.image.AnimationFrame(load_img('makayla_fly_2.png'), 1/4)))
+        self.anims['stand_r'] = Animation((
+            AnimationFrame(load_img('makayla_stand_1.png'), 1/4),
+            AnimationFrame(load_img('makayla_stand_2.png'), 1/4),
+            AnimationFrame(load_img('makayla_stand_3.png'), 1/4),
+            AnimationFrame(load_img('makayla_stand_2.png'), 1/4)))
+        self.anims['walk_r'] = Animation((
+            AnimationFrame(load_img('makayla_walk_1.png'), 1/6),
+            AnimationFrame(load_img('makayla_walk_2.png'), 1/6),
+            AnimationFrame(load_img('makayla_walk_3.png'), 1/6),))
+        self.anims['fly_r'] = Animation((
+            AnimationFrame(load_img('makayla_fly_1.png'), 1/4),
+            AnimationFrame(load_img('makayla_fly_2.png'), 1/4)))
         self.anims['stand_l'] = self.anims['stand_r'].get_transform(flip_x=True)
         self.anims['walk_l'] = self.anims['walk_r'].get_transform(flip_x=True)
         self.anims['fly_l'] = self.anims['fly_r'].get_transform(flip_x=True)
-        self.bounds = Bounds(60, 30, 60, 30)
-        self.sprite = pyglet.sprite.Sprite(self.anims['fly_r'], batch=batch, group=character_group)
-        self.to_flying()
 
-    @property
-    def x(self):
-        return self.sprite.x
-
-    @x.setter
-    def x(self, value):
-        self.sprite.x = value
-
-    @property
-    def y(self):
-        return self.sprite.y
-
-    @y.setter
-    def y(self, value):
-        self.sprite.y = value
-
-    @property
-    def u(self):
-        return self.sprite.y + self.bounds.u
-
-    @u.setter
-    def u(self, value):
-        self.sprite.y = value - self.bounds.u
-
-    @property
-    def d(self):
-        return self.sprite.y - self.bounds.d
-
-    @d.setter
-    def d(self, value):
-        self.sprite.y = value + self.bounds.d
-
-    @property
-    def l(self):
-        return self.sprite.x - self.bounds.l
-
-    @l.setter
-    def l(self, value):
-        self.sprite.x = value + self.bounds.l
-
-    @property
-    def r(self):
-        return self.sprite.x + self.bounds.r
-
-    @r.setter
-    def r(self, value):
-        self.sprite.x = value - self.bounds.r
 
     def to_flying(self):
-        self.sprite.image = self.anims['fly_r'] if self.forward else self.anims['fly_l']
         self.update = self.update_flying
+        if self.forward:
+            self.image = self.anims['fly_r']
+        else:
+            self.image = self.anims['fly_l']
 
     def to_standing(self):
-        self.sprite.image = self.anims['stand_r'] if self.forward else self.anims['stand_l']
         self.update = self.update_standing
+        if self.forward:
+            self.image = self.anims['stand_r']
+        else:
+            self.image = self.anims['stand_l']
 
     def to_walking(self):
-        self.sprite.image = self.anims['walk_r'] if self.forward else self.anims['walk_l']
         self.update = self.update_walking
+        if self.forward:
+            self.image = self.anims['walk_r']
+        else:
+            self.image = self.anims['walk_l']
 
     def update_flying(self, dt):
         if self[key.UP]:
@@ -198,9 +203,9 @@ fps_display = pyglet.clock.ClockDisplay()
 
 # Create the backgrounds
 background_img = pyglet.resource.image('background.png')
-background = pyglet.sprite.Sprite(background_img, batch=batch, group=background_group)
+background = Sprite(background_img, batch=batch, group=background_group)
 walls_img = pyglet.resource.image('walls.png')
-walls = pyglet.sprite.Sprite(walls_img, batch=batch, group=walkground_group)
+walls = Sprite(walls_img, batch=batch, group=walkground_group)
 
 @window.event
 def on_draw():
