@@ -113,12 +113,10 @@ class Player(pyglet.window.key.KeyStateHandler):
         self.update = self.update_flying
 
     def to_standing(self):
-        self.sprite.delete()
         self.sprite.image = self.anims['stand_r'] if self.forward else self.anims['stand_l']
         self.update = self.update_standing
 
     def to_walking(self):
-        self.sprite.delete()
         self.sprite.image = self.anims['walk_r'] if self.forward else self.anims['walk_l']
         self.update = self.update_walking
 
