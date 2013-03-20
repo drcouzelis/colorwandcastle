@@ -76,6 +76,9 @@ class BoundSprite(Sprite):
 
 class Room:
 
+    ROWS = 10
+    COLS = 16
+
     def __init__(self):
         self.block_imgs = dict()
         self.block_imgs['red'] = pyglet.resource.image('block-red.png')
@@ -84,9 +87,8 @@ class Room:
         self.block_imgs['green'] = pyglet.resource.image('block-green.png')
         self.block_imgs['blue'] = pyglet.resource.image('block-blue.png')
         self.block_imgs['purple'] = pyglet.resource.image('block-purple.png')
-        #self.block_grid = list(10)
-        #for row in range(0, 9):
-        #    self.block_grid[row] = list(16)
+        # Access with grid[row][col]
+        self.grid = [[None] * Room.ROWS for i in range(Room.COLS)]
         self.generate_blocks()
 
     def generate_blocks(self):
