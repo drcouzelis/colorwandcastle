@@ -83,7 +83,7 @@ class Player:
         self.forward = True # True for facing right, false to face left
         self._init_anims()
         bounds = Bounds(60, 30, 60, 30)
-        self.sprite = BoundSprite(self.anims['fly_r'], bounds=bounds, batch=batch, group=hero_group)
+        self.sprite = BoundSprite(self.anims['stand_r'], bounds=bounds, batch=batch, group=hero_group)
         self.keys = key.KeyStateHandler()
         self.to_flying()
 
@@ -195,8 +195,8 @@ class Player:
 window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
 
 player = Player()
-player.sprite.x = WIDTH // 2
-player.sprite.y = HEIGHT // 2
+player.sprite.x = WIDTH // 4
+player.sprite.d = playfield_bounds.d
 
 # Allow the player to receive keyboard input
 window.push_handlers(player.keys)
