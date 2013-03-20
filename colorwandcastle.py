@@ -31,10 +31,15 @@ class Bounds:
     def __init__(self, u=0, l=0, d=0, r=0):
         self.u, self.l, self.d, self.r = u, l, d, r
 
+class Block(Sprite):
+    size = 80
+
+playfield_bounds = Bounds(HEIGHT - Block.size, Block.size, Block.size, WIDTH - Block.size)
+
 class BoundSprite(Sprite):
 
-    def __init__(self, bounds, *args, **kwargs):
-        super().__init__(args, kwargs)
+    def __init__(self, img, bounds, *args, **kwargs):
+        super().__init__(img, *args, **kwargs)
         self._bounds = bounds
 
     @property
@@ -69,12 +74,7 @@ class BoundSprite(Sprite):
     def r(self, value):
         self.x = value - self._bounds.r
 
-class Block(Sprite):
-    size = 80
-
-playfield_bounds = Bounds(HEIGHT - Block.size, Block.size, Block.size, WIDTH - Block.size)
-
-class Player(BoundSprite, key.KeyStateHandler):
+class Player:
 
     bounds = Bounds(60, 30, 60, 30)
     speed = 300
@@ -82,7 +82,9 @@ class Player(BoundSprite, key.KeyStateHandler):
     def __init__(self):
         self.forward = True # True for facing right, false to face left
         self._init_anims()
-        self.sprite = Sprite(self.anims['fly_r'], batch=batch, group=hero_group)
+        bounds = Bounds(60, 30, 60, 30)
+        self.sprite = BoundSprite(self.anims['fly_r'], bounds=bounds, batch=batch, group=hero_group)
+        self.keys = key.KeyStateHandler()
         self.to_flying()
 
     def _init_anims(self):
@@ -107,36 +109,36 @@ class Player(BoundSprite, key.KeyStateHandler):
     def to_flying(self):
         self.update = self.update_flying
         if self.forward:
-            self.image = self.anims['fly_r']
+            self.sprite.image = self.anims['fly_r']
         else:
-            self.image = self.anims['fly_l']
+            self.sprite.image = self.anims['fly_l']
 
     def to_standing(self):
         self.update = self.update_standing
         if self.forward:
-            self.image = self.anims['stand_r']
+            self.sprite.image = self.anims['stand_r']
         else:
-            self.image = self.anims['stand_l']
+            self.sprite.image = self.anims['stand_l']
 
     def to_walking(self):
         self.update = self.update_walking
         if self.forward:
-            self.image = self.anims['walk_r']
+            self.sprite.image = self.anims['walk_r']
         else:
-            self.image = self.anims['walk_l']
+            self.sprite.image = self.anims['walk_l']
 
     def update_flying(self, dt):
-        if self[key.UP]:
-            self.y += Player.speed * dt
-        if self[key.DOWN]:
-            self.y -= Player.speed * dt
-        if self[key.LEFT]:
-            self.x -= Player.speed * dt
+        if self.keys[key.UP]:
+            self.sprite.y += Player.speed * dt
+        if self.keys[key.DOWN]:
+            self.sprite.y -= Player.speed * dt
+        if self.keys[key.LEFT]:
+            self.sprite.x -= Player.speed * dt
             if self.forward:
                 self.forward = False
                 self.to_flying()
-        if self[key.RIGHT]:
-            self.x += Player.speed * dt
+        if self.keys[key.RIGHT]:
+            self.sprite.x += Player.speed * dt
             if not self.forward:
                 self.forward = True
                 self.to_flying()
@@ -145,59 +147,59 @@ class Player(BoundSprite, key.KeyStateHandler):
             self.to_standing()
 
     def update_standing(self, dt):
-        if self[key.UP]:
-            self.y += Player.speed * dt
+        if self.keys[key.UP]:
+            self.sprite.y += Player.speed * dt
             self.to_flying()
-        if self[key.LEFT]:
-            self.x -= Player.speed * dt
+        if self.keys[key.LEFT]:
+            self.sprite.x -= Player.speed * dt
             self.forward = False
             self.to_walking()
-        if self[key.RIGHT]:
-            self.x += Player.speed * dt
+        if self.keys[key.RIGHT]:
+            self.sprite.x += Player.speed * dt
             self.forward = True
             self.to_walking()
         self.bound(playfield_bounds)
 
     def update_walking(self, dt):
-        if self[key.UP]:
+        if self.keys[key.UP]:
             self.to_flying()
-            self.y += Player.speed * dt
-        if self[key.LEFT]:
-            self.x -= Player.speed * dt
+            self.sprite.y += Player.speed * dt
+        if self.keys[key.LEFT]:
+            self.sprite.x -= Player.speed * dt
             if self.forward:
                 self.forward = False
                 self.to_walking()
-        if self[key.RIGHT]:
-            self.x += Player.speed * dt
+        if self.keys[key.RIGHT]:
+            self.sprite.x += Player.speed * dt
             if not self.forward:
                 self.forward = True
                 self.to_walking()
         self.bound(playfield_bounds)
-        if not self[key.LEFT] and not self[key.RIGHT]:
+        if not self.keys[key.LEFT] and not self.keys[key.RIGHT]:
             self.to_standing()
 
     def on_floor(self):
-        return self.d == playfield_bounds.d
+        return self.sprite.d == playfield_bounds.d
 
     def bound(self, bounds):
-        if self.d < bounds.d:
-            self.d = bounds.d
-        if self.l < bounds.l:
-            self.l = bounds.l
-        if self.u > bounds.u:
-            self.u = bounds.u
-        if self.r > bounds.r:
-            self.r = bounds.r
+        if self.sprite.d < bounds.d:
+            self.sprite.d = bounds.d
+        if self.sprite.l < bounds.l:
+            self.sprite.l = bounds.l
+        if self.sprite.u > bounds.u:
+            self.sprite.u = bounds.u
+        if self.sprite.r > bounds.r:
+            self.sprite.r = bounds.r
 
 # Create the window
 window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
 
 player = Player()
-player.x = WIDTH // 2
-player.y = HEIGHT // 2
+player.sprite.x = WIDTH // 2
+player.sprite.y = HEIGHT // 2
 
 # Allow the player to receive keyboard input
-window.push_handlers(player)
+window.push_handlers(player.keys)
 
 fps_display = pyglet.clock.ClockDisplay()
 
