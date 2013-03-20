@@ -74,6 +74,24 @@ class BoundSprite(Sprite):
     def r(self, value):
         self.x = value - self._bounds.r
 
+class Room:
+
+    def __init__(self):
+        self.block_imgs = dict()
+        self.block_imgs['red'] = pyglet.resource.image('block-red.png')
+        self.block_imgs['orange'] = pyglet.resource.image('block-orange.png')
+        self.block_imgs['yellow'] = pyglet.resource.image('block-yellow.png')
+        self.block_imgs['green'] = pyglet.resource.image('block-green.png')
+        self.block_imgs['blue'] = pyglet.resource.image('block-blue.png')
+        self.block_imgs['purple'] = pyglet.resource.image('block-purple.png')
+        #self.block_grid = list(10)
+        #for row in range(0, 9):
+        #    self.block_grid[row] = list(16)
+        self.generate_blocks()
+
+    def generate_blocks(self):
+        pass
+
 class Player:
 
     bounds = Bounds(60, 30, 60, 30)
@@ -82,8 +100,8 @@ class Player:
     def __init__(self):
         self.forward = True # True for facing right, false to face left
         self._init_anims()
-        bounds = Bounds(60, 30, 60, 30)
-        self.sprite = BoundSprite(self.anims['stand_r'], bounds=bounds, batch=batch, group=hero_group)
+        self.sprite = BoundSprite(self.anims['stand_r'], Bounds(60, 30, 60, 30),
+            batch=batch, group=hero_group)
         self.keys = key.KeyStateHandler()
         self.to_flying()
 
@@ -197,6 +215,8 @@ window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Cas
 player = Player()
 player.sprite.x = WIDTH // 4
 player.sprite.d = playfield_bounds.d
+
+room = Room()
 
 # Allow the player to receive keyboard input
 window.push_handlers(player.keys)
