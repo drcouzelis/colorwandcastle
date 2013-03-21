@@ -4,6 +4,7 @@ import pyglet
 from pyglet.image import Animation, AnimationFrame
 from pyglet.sprite import Sprite
 from pyglet.window import key
+import random
 
 WIDTH = 1280
 HEIGHT = 800
@@ -19,7 +20,8 @@ batch = pyglet.graphics.Batch()
 # Groups allow sprite to be drawn in the correct layer
 background_group = pyglet.graphics.OrderedGroup(0)
 walkground_group = pyglet.graphics.OrderedGroup(1)
-hero_group = pyglet.graphics.OrderedGroup(2)
+block_group = pyglet.graphics.OrderedGroup(2)
+hero_group = pyglet.graphics.OrderedGroup(3)
 
 def load_img(filename):
     img = pyglet.resource.image(filename)
@@ -76,8 +78,8 @@ class BoundSprite(Sprite):
 
 class Room:
 
-    ROWS = 10
-    COLS = 16
+    ROWS = HEIGHT // Block.size
+    COLS = WIDTH // Block.size
 
     def __init__(self):
         self.block_imgs = dict()
@@ -88,11 +90,16 @@ class Room:
         self.block_imgs['blue'] = pyglet.resource.image('block-blue.png')
         self.block_imgs['purple'] = pyglet.resource.image('block-purple.png')
         # Access with grid[row][col]
-        self.grid = [[None] * Room.ROWS for i in range(Room.COLS)]
+        self.blocks = dict()
+        #self.grid = [[None] * Room.ROWS for i in range(Room.COLS)]
         self.generate_blocks()
 
     def generate_blocks(self):
-        pass
+        #self.grid[3][5] = Block(self.block_imgs['red'], x=5*Block.size, y=3*Block.size, batch=batch, group=block_group)
+        for y in range(1, Room.ROWS - 1):
+            for x in range(Room.COLS - 5, Room.COLS - 1):
+                color = random.choice(('red', 'orange', 'yellow', 'green', 'blue', 'purple'))
+                self.blocks[(x, y)] = Block(self.block_imgs[color], x=x*Block.size, y=y*Block.size, batch=batch, group=block_group)
 
 class Player:
 
