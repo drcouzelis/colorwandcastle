@@ -34,7 +34,23 @@ class Bounds:
         self.u, self.l, self.d, self.r = u, l, d, r
 
 class Block(Sprite):
+
     size = 80
+
+    colors = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
+
+    imgs = dict()
+    for color in colors:
+        imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
+
+
+class BlockPile:
+
+    def __init__(self, num_colors, num_cols):
+        pass
+
+    def closest_block(self, row):
+        pass
 
 playfield_bounds = Bounds(HEIGHT - Block.size, Block.size, Block.size, WIDTH - Block.size)
 
@@ -89,13 +105,10 @@ class Room:
         self.block_imgs['green'] = pyglet.resource.image('block-green.png')
         self.block_imgs['blue'] = pyglet.resource.image('block-blue.png')
         self.block_imgs['purple'] = pyglet.resource.image('block-purple.png')
-        # Access with grid[row][col]
         self.blocks = dict()
-        #self.grid = [[None] * Room.ROWS for i in range(Room.COLS)]
         self.generate_blocks()
 
     def generate_blocks(self):
-        #self.grid[3][5] = Block(self.block_imgs['red'], x=5*Block.size, y=3*Block.size, batch=batch, group=block_group)
         for y in range(1, Room.ROWS - 1):
             for x in range(Room.COLS - 5, Room.COLS - 1):
                 color = random.choice(('red', 'orange', 'yellow', 'green', 'blue', 'purple'))
