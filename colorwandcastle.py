@@ -98,21 +98,14 @@ class Room:
     COLS = WIDTH // Block.size
 
     def __init__(self):
-        self.block_imgs = dict()
-        self.block_imgs['red'] = pyglet.resource.image('block-red.png')
-        self.block_imgs['orange'] = pyglet.resource.image('block-orange.png')
-        self.block_imgs['yellow'] = pyglet.resource.image('block-yellow.png')
-        self.block_imgs['green'] = pyglet.resource.image('block-green.png')
-        self.block_imgs['blue'] = pyglet.resource.image('block-blue.png')
-        self.block_imgs['purple'] = pyglet.resource.image('block-purple.png')
         self.blocks = dict()
         self.generate_blocks()
 
     def generate_blocks(self):
         for y in range(1, Room.ROWS - 1):
             for x in range(Room.COLS - 5, Room.COLS - 1):
-                color = random.choice(('red', 'orange', 'yellow', 'green', 'blue', 'purple'))
-                self.blocks[(x, y)] = Block(self.block_imgs[color], x=x*Block.size, y=y*Block.size, batch=batch, group=block_group)
+                color = random.choice(Block.colors)
+                self.blocks[(x, y)] = Block(Block.imgs[color], x=x*Block.size, y=y*Block.size, batch=batch, group=block_group)
 
 class Player:
 
