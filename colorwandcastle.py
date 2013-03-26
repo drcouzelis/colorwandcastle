@@ -47,7 +47,17 @@ class Block(Sprite):
 class BlockPile:
 
     def __init__(self, num_colors, num_cols):
-        pass
+        self.blocks = list()
+        for r in range(Room.ROWS):
+            col = list()
+            for c in range(Room.COLS):
+                if r > 0 and r < Room.ROWS and
+                   c < Room.COLS and c > Room.COLS - num_cols:
+                    img = Block.imgs[random.choice(Block.colors[num_colors:])]
+                    col.append(Block(img, x=x*Block.size, y=y*Block.size, batch=batch, group=block_group))
+                else:
+                    col.append(None)
+            self.blocks.append(col)
 
     def closest_block(self, row):
         pass
@@ -99,7 +109,8 @@ class Room:
 
     def __init__(self):
         self.blocks = dict()
-        self.generate_blocks()
+        #self.generate_blocks()
+        self.pile = BlockPile(num_colors=3, num_cols=2)
 
     def generate_blocks(self):
         for y in range(1, Room.ROWS - 1):
