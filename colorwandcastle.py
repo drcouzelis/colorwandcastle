@@ -43,21 +43,19 @@ class Block(Sprite):
     for color in colors:
         imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
 
+    def __init__(self, batch=batch, group=block_group, *args, **kwargs):
+        super().__init__(batch, group, *args, **kwargs)
 
 class BlockPile:
 
     def __init__(self, num_colors, num_cols):
-        self.blocks = list()
-        for r in range(Room.ROWS):
-            col = list()
-            for c in range(Room.COLS):
-                if r > 0 and r < Room.ROWS and
-                   c < Room.COLS and c > Room.COLS - num_cols:
-                    img = Block.imgs[random.choice(Block.colors[num_colors:])]
-                    col.append(Block(img, x=x*Block.size, y=y*Block.size, batch=batch, group=block_group))
-                else:
-                    col.append(None)
-            self.blocks.append(col)
+        def init_blocks(c, r):
+            if r > 0 and r < Room.ROWS and c < Room.COLS and c > Room.COLS - num_cols:
+                img = Block.imgs[random.choice(Block.colors[num_colors:])]
+                return Block(img, x=c*Block.size, y=r*Block.size)
+            else:
+                return None
+        self.blocks = [[init_blocks(c, r) for c in range(Room.COLS)] for r in range(Room.ROWS)]
 
     def closest_block(self, row):
         pass
