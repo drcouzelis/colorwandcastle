@@ -58,7 +58,9 @@ class BlockPile:
         self.blocks = [[init_blocks(c, r) for c in range(Room.COLS)] for r in range(Room.ROWS)]
 
     def closest_block(self, row):
-        pass
+        for c in Room.COLS:
+            if self.blocks[row][c] is not None:
+                return self.blocks[row][c]
 
 playfield_bounds = Bounds(HEIGHT - Block.size, Block.size, Block.size, WIDTH - Block.size)
 
