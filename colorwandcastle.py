@@ -43,14 +43,14 @@ class Block(Sprite):
     for color in colors:
         imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
 
-    def __init__(self, batch=batch, group=block_group, *args, **kwargs):
-        super().__init__(batch, group, *args, **kwargs)
+    def __init__(self, img, batch=batch, group=block_group, *args, **kwargs):
+        super().__init__(img, batch=batch, group=group, *args, **kwargs)
 
 class BlockPile:
 
     def __init__(self, num_colors, num_cols):
         def init_blocks(c, r):
-            if r > 0 and r < Room.ROWS and c < Room.COLS and c > Room.COLS - num_cols:
+            if r > 0 and r < Room.ROWS -1 and c > Room.COLS - 1 - (num_cols + 1) and c < Room.COLS - 1:
                 img = Block.imgs[random.choice(Block.colors[num_colors:])]
                 return Block(img, x=c*Block.size, y=r*Block.size)
             else:
