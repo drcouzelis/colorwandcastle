@@ -1,15 +1,10 @@
-Resolution: 1280x800
-Block size: 80x80 blocks -> 16x10
-Makayla hit box: 60x120
-Game play area border: 1 block, all sides
-Max vertical blocks: 8
+Title: Colorwand Castle
 
-Name:
-Makayla Ray
-Makayla Ruth
-Fairy Princess
-Colorwand
-*Colorwand Castle
+Resolution: 320x240
+Block size: 20x20 blocks -> 16x12
+Makayla hit box: 20x20
+Game play area border: 1 block, all sides
+Max vertical blocks: 10
 
 Makayla is in a room.
 Makayla stands on the left, facing right.
@@ -22,10 +17,11 @@ There are colored blocks on the right.
   Purple
 The blocks are blocking the exit.
 Makayla must clear all of the blocks.
-Makayla's wand displays is randomly colored to match one of the block colors.
+Makayla's wand is randomly colored to match one of the block colors.
 Makayla waves the wand to shoot a colored star.
+Stars only appear lined up with rows of blocks.
 If the star hits a block of the same color, the block disappears.
-[If the star hits anything else, a new block appears with the star color.]
+If the star hits anything else, it bounces back and can kill the player.
 As the player clears rooms, obstacles begin to appear.
 
 Obstacles
