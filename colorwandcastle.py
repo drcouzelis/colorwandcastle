@@ -28,6 +28,58 @@ def load_img(filename):
     img.anchor_y = img.height // 2
     return img
 
+class Bounds:
+
+    def __init__(self, u=0, l=0, d=0, r=0):
+        self.u, self.l, self.d, self.r = u, l, d, r
+
+class BoundSprite(Sprite):
+
+    def __init__(self, img, bounds, *args, **kwargs):
+        super().__init__(img, *args, **kwargs)
+        self._bounds = bounds
+
+    @property
+    def u(self):
+        return self.y + self._bounds.u
+
+    @u.setter
+    def u(self, value):
+        self.y = value - self._bounds.u
+
+    @property
+    def d(self):
+        return self.y - self._bounds.d
+
+    @d.setter
+    def d(self, value):
+        self.y = value + self._bounds.d
+
+    @property
+    def l(self):
+        return self.x - self._bounds.l
+
+    @l.setter
+    def l(self, value):
+        self.x = value + self._bounds.l
+
+    @property
+    def r(self):
+        return self.x + self._bounds.r
+
+    @r.setter
+    def r(self, value):
+        self.x = value - self._bounds.r
+
+class Player(BoundSprite):
+    pass
+
+class Room:
+    pass
+
+class Block(Sprite):
+    pass
+
 #class Bounds:
 #    def __init__(self, u=0, l=0, d=0, r=0):
 #        self.u, self.l, self.d, self.r = u, l, d, r
