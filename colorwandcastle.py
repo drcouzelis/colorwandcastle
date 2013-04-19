@@ -33,175 +33,141 @@ class Bounds:
     def __init__(self, u=0, l=0, d=0, r=0):
         self.u, self.l, self.d, self.r = u, l, d, r
 
-class BoundSprite(Sprite):
+class Actor:
+    '''An actor is a sprite with a body. The default bounds are set
+       to the dimensions of the image.'''
 
-    def __init__(self, img, bounds, *args, **kwargs):
-        super().__init__(img, *args, **kwargs)
-        self._bounds = bounds
+    def __init__(self, sprite, bounds):
+        self.sprite = sprite
+            # A visual representation of the actor
+        self.bounds = bounds
+            # The collision area boundary
 
     @property
     def u(self):
-        return self.y + self._bounds.u
+        return self.sprite.y + self.bounds.u
 
     @u.setter
     def u(self, value):
-        self.y = value - self._bounds.u
+        self.sprite.y = value - self.bounds.u
 
     @property
     def d(self):
-        return self.y - self._bounds.d
+        return self.sprite.y - self.bounds.d
 
     @d.setter
     def d(self, value):
-        self.y = value + self._bounds.d
+        self.sprite.y = value + self.bounds.d
 
     @property
     def l(self):
-        return self.x - self._bounds.l
+        return self.sprite.x - self.bounds.l
 
     @l.setter
     def l(self, value):
-        self.x = value + self._bounds.l
+        self.sprite.x = value + self.bounds.l
 
     @property
     def r(self):
-        return self.x + self._bounds.r
+        return self.sprite.x + self.bounds.r
 
     @r.setter
     def r(self, value):
-        self.x = value - self._bounds.r
+        self.sprite.x = value - self.bounds.r
 
-class Player(BoundSprite):
-    pass
+class Controller:
+
+    def __init__(self, puppet):
+        self.puppet = puppet
+        # Use an update method to control the puppet
+
+class Player:
+
+    speed = 300
+
+    def __init__(self):
+        anim = Animation((
+            AnimationFrame(load_img('makayla-01.png'), 1/4),
+            AnimationFrame(load_img('makayla-02.png'), 1/4)))
+        sprite = Sprite(anim, batch=batch, group=fg_group)
+        bounds = Bounds(u=5, l=10, d=15, r=10)
+        self.actor = Actor(sprite, bounds)
+        self.controller = None
+        self.keys = key.KeyStateHandler()
+
+    @property
+    def x(self):
+        return self.actor.sprite.x
+
+    @x.setter
+    def x(self, value):
+        self.actor.sprite.x = value
+
+    @property
+    def y(self):
+        return self.actor.sprite.y
+
+    @y.setter
+    def y(self, value):
+        self.actor.sprite.y = value
+
+    def update(self, dt):
+        if self.controller:
+            self.controller.update(dt)
 
 class Room:
-    pass
 
-class Block(Sprite):
-    pass
+    def __init__(self, columns, colors):
+        self.blocks = dict()
+            # Access with a (r, c) tuple
+        self.enemies = list()
 
-#class Bounds:
-#    def __init__(self, u=0, l=0, d=0, r=0):
-#        self.u, self.l, self.d, self.r = u, l, d, r
+class Block:
 
-#class Block(Sprite):
-#
-#    size = 20
-#
-#    colors = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
-#
-#    imgs = dict()
-#    for color in colors:
-#        imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
-#
-#    def __init__(self, color, passable=False, *args, **kwargs):
-#        super().__init__(imgs[color], batch=batch, group=fg_group, *args, **kwargs)
-#        self.color = color
-#        self.passable = passable
-#
-#class BoundSprite(Sprite):
-#
-#    def __init__(self, img, bounds, *args, **kwargs):
-#        super().__init__(img, *args, **kwargs)
-#        self._bounds = bounds
-#
-#    @property
-#    def u(self):
-#        return self.y + self._bounds.u
-#
-#    @u.setter
-#    def u(self, value):
-#        self.y = value - self._bounds.u
-#
-#    @property
-#    def d(self):
-#        return self.y - self._bounds.d
-#
-#    @d.setter
-#    def d(self, value):
-#        self.y = value + self._bounds.d
-#
-#    @property
-#    def l(self):
-#        return self.x - self._bounds.l
-#
-#    @l.setter
-#    def l(self, value):
-#        self.x = value + self._bounds.l
-#
-#    @property
-#    def r(self):
-#        return self.x + self._bounds.r
-#
-#    @r.setter
-#    def r(self, value):
-#        self.x = value - self._bounds.r
-#
-#class Room:
-#
-#    ROWS = HEIGHT // Block.size
-#    COLS = WIDTH // Block.size
-#
-#    def __init__(self):
-#        self.blocks = dict()
-#        self.generate_blocks(num_colors=3, num_cols=2)
-#
-#    def generate_blocks(self, num_colors, num_cols):
-#        def init_blocks(c, r):
-#            if 
-#            if r > 0 and r < Room.ROWS - 1 and c > Room.COLS - num_cols - 2 and c < Room.COLS - 1:
-#                img = Block.imgs[random.choice(Block.colors[num_colors:])]
-#                return Block(img, x=c*Block.size, y=r*Block.size)
-#            else:
-#                return None
-#        self.blocks = [[init_blocks(c, r) for c in range(Room.COLS)] for r in range(Room.ROWS)]
-#
-#class Player:
-#
-#    speed = 300
-#
-#    def __init__(self):
-#        self.forward = True # True for facing right, false to face left
-#        self._init_anims()
-#        self.sprite = BoundSprite(self.anims['stand_r'], Bounds(60, 30, 60, 30),
-#            batch=batch, group=fg_group)
-#        self.keys = key.KeyStateHandler()
-#        self.to_flying()
-#
-#    def _init_anims(self):
-#        self.anims = dict()
-#        self.anims['fly'] = Animation((
-#            AnimationFrame(load_img('makayla-01.png'), 1/4),
-#            AnimationFrame(load_img('makayla-02.png'), 1/4)))
-#
-#    def to_flying(self):
-#        self.update = self._update_flying
-#        self.sprite.image = self.anims['fly']
-#
-#    def _update_flying(self, dt):
-#        self._apply_movement_keys(dt)
-#
-#    def _apply_movement_keys(self, dt):
-#        if self.keys[key.UP]:
-#            self.sprite.y += Player.speed * dt
-#        if self.keys[key.DOWN]:
-#            self.sprite.y -= Player.speed * dt
-#        if self.keys[key.LEFT]:
-#            self.sprite.x -= Player.speed * dt
-#        if self.keys[key.RIGHT]:
-#            self.sprite.x += Player.speed * dt
+    size = 20
+        # Square block width and height
+
+    colors = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
+
+    imgs = dict()
+    for color in colors:
+        imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
+
+    def __init__(self, color, x, y):
+        if color not in Block.colors:
+            raise
+        self.sprite = Sprite(imgs[color], x=x, y=y, batch=batch, group=fg_group)
+        self.color = color
+
+class KeyboardPlayerController:
+
+    def __init__(self, player):
+        self.player = player
+
+    def update(self, dt):
+        sprite = self.player.sprite
+        keys = self.player.keys
+        if keys[key.UP]:
+            sprite.y += Player.speed * dt
+        if keys[key.DOWN]:
+            sprite.y -= Player.speed * dt
+        if keys[key.LEFT]:
+            sprite.x -= Player.speed * dt
+        if keys[key.RIGHT]:
+            sprite.x += Player.speed * dt
 
 # Create the window
 window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
 
-#player = Player()
-#player.sprite.x = WIDTH // 4
-#player.sprite.y = HEIGHT // 2
-
-#room = Room()
+player = Player()
+player.x = WIDTH // 4
+player.y = HEIGHT // 2
+player.controller = KeyboardPlayerController(player)
 
 # Allow the player to receive keyboard input
-#window.push_handlers(player.keys)
+window.push_handlers(player.keys)
+
+room = Room(columns=3, colors=4)
 
 fps_display = pyglet.clock.ClockDisplay()
 
@@ -213,12 +179,11 @@ fps_display = pyglet.clock.ClockDisplay()
 
 @window.event
 def on_draw():
-    #batch.draw() # Draw all sprites
+    batch.draw() # Draw all sprites
     fps_display.draw() # Should be able to be toggled
 
 def update(dt):
-    #player.update(dt)
-    pass
+    player.update(dt)
 
 # Update the game once every frame
 pyglet.clock.schedule_interval(update, 1 / FPS)
