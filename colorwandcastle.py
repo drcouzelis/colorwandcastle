@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pyglet
+from pyglet.gl import *
 from pyglet.image import Animation, AnimationFrame
 from pyglet.sprite import Sprite
 from pyglet.window import key
@@ -20,6 +21,7 @@ batch = pyglet.graphics.Batch()
 # Groups allow sprite to be drawn in the correct layer
 bg_group = pyglet.graphics.OrderedGroup(0)
 fg_group = pyglet.graphics.OrderedGroup(1)
+char_group = pyglet.graphics.OrderedGroup(2)
 
 def load_img(filename):
     '''Load the image named "filename" with the anchor centered.'''
@@ -75,21 +77,15 @@ class Actor:
     def r(self, value):
         self.sprite.x = value - self.bounds.r
 
-class Controller:
-
-    def __init__(self, puppet):
-        self.puppet = puppet
-        # Use an update method to control the puppet
-
 class Player:
 
-    speed = 300
+    speed = 80
 
     def __init__(self):
         anim = Animation((
-            AnimationFrame(load_img('makayla-01.png'), 1/4),
-            AnimationFrame(load_img('makayla-02.png'), 1/4)))
-        sprite = Sprite(anim, batch=batch, group=fg_group)
+            AnimationFrame(load_img('makayla-01.png'), 1/8),
+            AnimationFrame(load_img('makayla-02.png'), 1/8)))
+        sprite = Sprite(anim, batch=batch, group=char_group)
         bounds = Bounds(u=5, l=10, d=15, r=10)
         self.actor = Actor(sprite, bounds)
         self.controller = None
@@ -115,13 +111,6 @@ class Player:
         if self.controller:
             self.controller.update(dt)
 
-class Room:
-
-    def __init__(self, columns, colors):
-        self.blocks = dict()
-            # Access with a (r, c) tuple
-        self.enemies = list()
-
 class Block:
 
     size = 20
@@ -136,8 +125,43 @@ class Block:
     def __init__(self, color, x, y):
         if color not in Block.colors:
             raise
-        self.sprite = Sprite(imgs[color], x=x, y=y, batch=batch, group=fg_group)
+        self.sprite = Sprite(Block.imgs[color], x=x, y=y, batch=batch, group=fg_group)
         self.color = color
+
+class Room:
+
+    cols = WIDTH // Block.size
+    rows = HEIGHT // Block.size
+
+    def __init__(self, columns, colors):
+        self._add_bg()
+        self._add_walls()
+        self._add_blocks(columns, colors)
+        self.enemies = list()
+
+    def _add_bg(self):
+        self.bg = list()
+        for c in range(Room.cols):
+            for r in range(Room.rows):
+                self.bg.append(Sprite(pyglet.resource.image('background.png'),
+                    x=c * Block.size, y=r * Block.size, batch=batch, group=bg_group))
+
+    def _add_walls(self):
+        self.walls = list()
+        for c in range(Room.cols):
+            for r in range(Room.rows):
+                if c == 0 or c == Room.cols - 1 or r == 0 or r == Room.rows - 1:
+                    self.walls.append(Sprite(pyglet.resource.image('bricks.png'),
+                        x=c * Block.size, y=r * Block.size, batch=batch, group=fg_group))
+
+    def _add_blocks(self, columns, colors):
+        self.blocks = dict()
+            # Access with a (r, c) tuple
+        for c in range(Room.cols - columns - 1, Room.cols - 1):
+            for r in range(1, Room.rows - 1):
+                color = random.choice(Block.colors[:colors])
+                block = Block(color, c * Block.size, r * Block.size)
+                self.blocks[(r, c)] = block
 
 class KeyboardPlayerController:
 
@@ -145,7 +169,7 @@ class KeyboardPlayerController:
         self.player = player
 
     def update(self, dt):
-        sprite = self.player.sprite
+        sprite = self.player.actor.sprite
         keys = self.player.keys
         if keys[key.UP]:
             sprite.y += Player.speed * dt
@@ -157,7 +181,11 @@ class KeyboardPlayerController:
             sprite.x += Player.speed * dt
 
 # Create the window
-window = pyglet.window.Window(width=WIDTH, height=HEIGHT, caption='Colorwand Castle')
+window = pyglet.window.Window(width=WIDTH * 4, height=HEIGHT * 4, caption='Colorwand Castle')
+
+# These arguments are x, y and z respectively
+# This scales your window
+glScalef(4.0, 4.0, 4.0)
 
 player = Player()
 player.x = WIDTH // 4
@@ -179,8 +207,10 @@ fps_display = pyglet.clock.ClockDisplay()
 
 @window.event
 def on_draw():
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     batch.draw() # Draw all sprites
-    fps_display.draw() # Should be able to be toggled
+    #fps_display.draw() # Should be able to be toggled
 
 def update(dt):
     player.update(dt)
