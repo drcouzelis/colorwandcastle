@@ -21,7 +21,7 @@ batch = pyglet.graphics.Batch()
 # Groups allow sprite to be drawn in the correct layer
 bg_group = pyglet.graphics.OrderedGroup(0)
 fg_group = pyglet.graphics.OrderedGroup(1)
-char_group = pyglet.graphics.OrderedGroup(2)
+act_group = pyglet.graphics.OrderedGroup(2)
 
 def load_img(filename):
     '''Load the image named "filename" with the anchor centered.'''
@@ -85,11 +85,16 @@ class Player:
         anim = Animation((
             AnimationFrame(load_img('makayla-01.png'), 1/8),
             AnimationFrame(load_img('makayla-02.png'), 1/8)))
-        sprite = Sprite(anim, batch=batch, group=char_group)
+        sprite = Sprite(anim, batch=batch, group=act_group)
         bounds = Bounds(u=5, l=10, d=15, r=10)
         self.actor = Actor(sprite, bounds)
         self.controller = None
         self.keys = key.KeyStateHandler()
+        img = load_img('star-purple.png')
+        anim = Animation((
+            AnimationFrame(img, 1/4),
+            AnimationFrame(img.get_transform(flip_y=True), 1/4)))
+        self.star = Sprite(anim, batch=batch, group=act_group, x=self.x + Block.size, y=self.y)
 
     @property
     def x(self):
@@ -98,6 +103,7 @@ class Player:
     @x.setter
     def x(self, value):
         self.actor.sprite.x = value
+        self.star.x = value + 25
 
     @property
     def y(self):
@@ -106,6 +112,7 @@ class Player:
     @y.setter
     def y(self, value):
         self.actor.sprite.y = value
+        self.star.y = ((value // Block.size) * Block.size) + 10
 
     def update(self, dt):
         if self.controller:
@@ -169,16 +176,17 @@ class KeyboardPlayerController:
         self.player = player
 
     def update(self, dt):
-        sprite = self.player.actor.sprite
         keys = self.player.keys
         if keys[key.UP]:
-            sprite.y += Player.speed * dt
+            player.y += Player.speed * dt
         if keys[key.DOWN]:
-            sprite.y -= Player.speed * dt
+            player.y -= Player.speed * dt
         if keys[key.LEFT]:
-            sprite.x -= Player.speed * dt
+            player.x -= Player.speed * dt
         if keys[key.RIGHT]:
-            sprite.x += Player.speed * dt
+            player.x += Player.speed * dt
+        if keys[key.SPACE]:
+            print('Pretending to shoot a star!')
 
 # Create the window
 window = pyglet.window.Window(width=WIDTH * 4, height=HEIGHT * 4, caption='Colorwand Castle')
@@ -197,13 +205,7 @@ window.push_handlers(player.keys)
 
 room = Room(columns=3, colors=4)
 
-fps_display = pyglet.clock.ClockDisplay()
-
-# Create the backgrounds
-#background_img = pyglet.resource.image('background.png')
-#background = Sprite(background_img, batch=batch, group=bg_group)
-#walls_img = pyglet.resource.image('walls.png')
-#walls = Sprite(walls_img, batch=batch, group=fg_group)
+#fps_display = pyglet.clock.ClockDisplay()
 
 @window.event
 def on_draw():
