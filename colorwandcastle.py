@@ -170,12 +170,19 @@ class Room:
                 block = Block(color, c * Block.size, r * Block.size)
                 self.blocks[(r, c)] = block
 
+def to_tile(pos):
+    return pos // Block.size
+
 class KeyboardPlayerController:
 
-    def __init__(self, player):
+    def __init__(self, player, room):
         self.player = player
+        self.room = room
+        self.star_shot = False
 
     def update(self, dt):
+        orig_x = player.x
+        orig_y = player.y
         keys = self.player.keys
         if keys[key.UP]:
             player.y += Player.speed * dt
@@ -185,25 +192,69 @@ class KeyboardPlayerController:
             player.x -= Player.speed * dt
         if keys[key.RIGHT]:
             player.x += Player.speed * dt
-        if keys[key.SPACE]:
+        # Bound the player inside the screen
+        if player.actor.l < Block.size or player.actor.r > WIDTH - Block.size:
+            player.x = orig_x
+        if player.actor.d < Block.size or player.actor.u > HEIGHT - Block.size:
+            player.y = orig_y
+        # Don't fly through blocks
+        # TODO: Allow the player to "slide" against the blocks
+        u = to_tile(player.actor.u)
+        l = to_tile(player.actor.l)
+        d = to_tile(player.actor.d)
+        r = to_tile(player.actor.r)
+        if (u, l) in room.blocks or (u, r) in room.blocks or (d, l) in room.blocks or (d, r) in room.blocks:
+            player.x = orig_x
+            player.y = orig_y
+        # Shoot a star!
+        if keys[key.SPACE] and not self.star_shot:
             print('Pretending to shoot a star!')
+            self.star_shot = True
+        if self.star_shot and not keys[key.SPACE]:
+            self.star_shot = False
+
+#class PlayEnvironment:
+#
+#    def __init__(self, player=None, room=None):
+#        self.room = room
+#        self.player = player
+#
+#    def move_possible(self, to_move, x, y):
+#        if not room:
+#            return True
+#        if isinstance(to_move, Player):
+#            u = (y + to_move.actor.bounds.u) // Block.size
+#            l = (x + to_move.actor.bounds.l) // Block.size
+#            d = (y + to_move.actor.bounds.d) // Block.size
+#            r = (x + to_move.actor.bounds.r) // Block.size
+#            print('{} {} {} {}'.format(u, l, d, r))
+#            #if (u, l) or (u, r) or (d, l) or (d, r) in room.blocks:
+#            if (u, l) in room.blocks:
+#                return False
+#        return True
+#
+#    def update_collisions(self):
+#        pass
+
+scale = 3
 
 # Create the window
-window = pyglet.window.Window(width=WIDTH * 4, height=HEIGHT * 4, caption='Colorwand Castle')
+window = pyglet.window.Window(width=WIDTH * scale, height=HEIGHT * scale, caption='Colorwand Castle')
 
 # These arguments are x, y and z respectively
 # This scales your window
-glScalef(4.0, 4.0, 4.0)
+glScalef(scale, scale, scale)
 
 player = Player()
 player.x = WIDTH // 4
 player.y = HEIGHT // 2
-player.controller = KeyboardPlayerController(player)
 
 # Allow the player to receive keyboard input
 window.push_handlers(player.keys)
 
 room = Room(columns=3, colors=4)
+
+player.controller = KeyboardPlayerController(player, room)
 
 #fps_display = pyglet.clock.ClockDisplay()
 
