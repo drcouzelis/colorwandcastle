@@ -30,6 +30,12 @@ def load_img(filename):
     img.anchor_y = img.height // 2
     return img
 
+def to_tile(pos):
+    return pos // Block.size
+
+def to_pos(tile):
+    return tile * Block.size
+
 class Bounds:
 
     def __init__(self, u=0, l=0, d=0, r=0):
@@ -172,9 +178,6 @@ class Room:
                 block = Block(color, c * Block.size, r * Block.size)
                 blocks[(r, c)] = block
         return blocks
-
-def to_tile(pos):
-    return pos // Block.size
 
 class KeyboardPlayerController:
 
