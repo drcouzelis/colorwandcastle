@@ -141,34 +141,37 @@ class Room:
     rows = HEIGHT // Block.size
 
     def __init__(self, columns, colors):
-        self._add_bg()
-        self._add_walls()
-        self._add_blocks(columns, colors)
+        self.bg = self.create_bg()
+        self.walls = self.create_walls()
+        self.blocks = self.create_blocks(columns, colors)
         self.enemies = list()
 
-    def _add_bg(self):
-        self.bg = list()
+    def create_bg(self):
+        bg = list()
         for c in range(Room.cols):
             for r in range(Room.rows):
                 self.bg.append(Sprite(pyglet.resource.image('background.png'),
                     x=c * Block.size, y=r * Block.size, batch=batch, group=bg_group))
+        return bg
 
-    def _add_walls(self):
-        self.walls = list()
+    def create_walls(self):
+        walls = list()
         for c in range(Room.cols):
             for r in range(Room.rows):
                 if c == 0 or c == Room.cols - 1 or r == 0 or r == Room.rows - 1:
-                    self.walls.append(Sprite(pyglet.resource.image('bricks.png'),
+                    walls.append(Sprite(pyglet.resource.image('bricks.png'),
                         x=c * Block.size, y=r * Block.size, batch=batch, group=fg_group))
+        return walls
 
-    def _add_blocks(self, columns, colors):
-        self.blocks = dict()
+    def create_blocks(self, columns, colors):
+        blocks = dict()
             # Access with a (r, c) tuple
         for c in range(Room.cols - columns - 1, Room.cols - 1):
             for r in range(1, Room.rows - 1):
                 color = random.choice(Block.colors[:colors])
                 block = Block(color, c * Block.size, r * Block.size)
-                self.blocks[(r, c)] = block
+                blocks[(r, c)] = block
+        return blocks
 
 def to_tile(pos):
     return pos // Block.size
