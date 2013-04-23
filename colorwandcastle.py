@@ -83,6 +83,19 @@ class Actor:
     def r(self, value):
         self.sprite.x = value - self.bounds.r
 
+class Star:
+
+    imgs = dict()
+    for color in Block.colors:
+        imgs[color] = pyglet.resource.image('star-{}.png'.format(color))
+
+    def __init__(self, x, y):
+        img = load_img('star-purple.png')
+        anim = Animation((
+            AnimationFrame(img, 1/4),
+            AnimationFrame(img.get_transform(flip_y=True), 1/4)))
+        self.sprite = Sprite(anim, batch=batch, group=act_group, x=x + Block.size, y=y)
+
 class Player:
 
     speed = 80
