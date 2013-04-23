@@ -161,12 +161,13 @@ class Room:
         return bg
 
     def create_walls(self):
-        walls = list()
+        walls = dict()
         for c in range(Room.cols):
             for r in range(Room.rows):
                 if c == 0 or c == Room.cols - 1 or r == 0 or r == Room.rows - 1:
-                    walls.append(Sprite(pyglet.resource.image('bricks.png'),
-                        x=c * Block.size, y=r * Block.size, batch=batch, group=fg_group))
+                    sprite = Sprite(pyglet.resource.image('bricks.png'),
+                        x=c * Block.size, y=r * Block.size, batch=batch, group=fg_group)
+                    walls[(r, c)] = sprite
         return walls
 
     def create_blocks(self, columns, colors):
@@ -187,37 +188,46 @@ class KeyboardPlayerController:
         self.star_shot = False
 
     def update(self, dt):
-        orig_x = player.x
-        orig_y = player.y
+        orig_x = self.player.x
+        orig_y = self.player.y
         keys = self.player.keys
         if keys[key.UP]:
-            player.y += Player.speed * dt
+            self.player.y += Player.speed * dt
+            if not self.good_move():
+                self.player.y = orig_y
         if keys[key.DOWN]:
-            player.y -= Player.speed * dt
+            self.player.y -= Player.speed * dt
+            if not self.good_move():
+                self.player.y = orig_y
         if keys[key.LEFT]:
-            player.x -= Player.speed * dt
+            self.player.x -= Player.speed * dt
+            if not self.good_move():
+                self.player.x = orig_x
         if keys[key.RIGHT]:
-            player.x += Player.speed * dt
-        # Bound the player inside the screen
-        if player.actor.l < Block.size or player.actor.r > WIDTH - Block.size:
-            player.x = orig_x
-        if player.actor.d < Block.size or player.actor.u > HEIGHT - Block.size:
-            player.y = orig_y
-        # Don't fly through blocks
-        # TODO: Allow the player to "slide" against the blocks
-        u = to_tile(player.actor.u)
-        l = to_tile(player.actor.l)
-        d = to_tile(player.actor.d)
-        r = to_tile(player.actor.r)
-        if (u, l) in room.blocks or (u, r) in room.blocks or (d, l) in room.blocks or (d, r) in room.blocks:
-            player.x = orig_x
-            player.y = orig_y
+            self.player.x += Player.speed * dt
+            if not self.good_move():
+                self.player.x = orig_x
         # Shoot a star!
         if keys[key.SPACE] and not self.star_shot:
             print('Pretending to shoot a star!')
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
             self.star_shot = False
+
+    def good_move(self):
+        walls = self.room.walls
+        blocks = self.room.blocks
+        u = to_tile(self.player.actor.u)
+        l = to_tile(self.player.actor.l)
+        d = to_tile(self.player.actor.d)
+        r = to_tile(self.player.actor.r)
+        # Don't fly through walls!
+        if (u, l) in walls or (u, r) in walls or (d, l) in walls or (d, r) in walls:
+            return False
+        # Don't fly through blocks!
+        if (u, l) in blocks or (u, r) in blocks or (d, l) in blocks or (d, r) in blocks:
+            return False
+        return True
 
 #class PlayEnvironment:
 #
