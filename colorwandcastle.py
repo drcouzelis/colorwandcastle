@@ -156,7 +156,7 @@ class Room:
         bg = list()
         for c in range(Room.cols):
             for r in range(Room.rows):
-                self.bg.append(Sprite(pyglet.resource.image('background.png'),
+                bg.append(Sprite(pyglet.resource.image('background.png'),
                     x=c * Block.size, y=r * Block.size, batch=batch, group=bg_group))
         return bg
 
