@@ -83,11 +83,28 @@ class Actor:
     def r(self, value):
         self.sprite.x = value - self.bounds.r
 
+class Block:
+
+    size = 20
+        # Square block width and height
+
+    colors = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
+
+    imgs = dict()
+    for color in colors:
+        imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
+
+    def __init__(self, color, x, y):
+        if color not in Block.colors:
+            raise
+        self.sprite = Sprite(Block.imgs[color], x=x, y=y, batch=batch, group=fg_group)
+        self.color = color
+
 class Star:
 
     imgs = dict()
-    for color in Block.colors:
-        imgs[color] = pyglet.resource.image('star-{}.png'.format(color))
+    #for color in Block.colors:
+    #    imgs[color] = pyglet.resource.image('star-{}.png'.format(color))
 
     def __init__(self, x, y):
         img = load_img('star-purple.png')
@@ -99,6 +116,7 @@ class Star:
 class Player:
 
     speed = 80
+    star_offset = 25
 
     def __init__(self):
         anim = Animation((
@@ -122,7 +140,7 @@ class Player:
     @x.setter
     def x(self, value):
         self.actor.sprite.x = value
-        self.star.x = value + 25
+        self.star.x = value + Player.star_offset
 
     @property
     def y(self):
@@ -136,23 +154,6 @@ class Player:
     def update(self, dt):
         if self.controller:
             self.controller.update(dt)
-
-class Block:
-
-    size = 20
-        # Square block width and height
-
-    colors = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
-
-    imgs = dict()
-    for color in colors:
-        imgs[color] = pyglet.resource.image('block-{}.png'.format(color))
-
-    def __init__(self, color, x, y):
-        if color not in Block.colors:
-            raise
-        self.sprite = Sprite(Block.imgs[color], x=x, y=y, batch=batch, group=fg_group)
-        self.color = color
 
 class Room:
 
