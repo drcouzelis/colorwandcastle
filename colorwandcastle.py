@@ -129,8 +129,6 @@ class Star:
 class Player:
 
     speed = 80
-    star_offset_x = 25
-    star_offset_y = 10
 
     def __init__(self):
         anim = Animation((
@@ -142,6 +140,7 @@ class Player:
         self.controller = None
         self.keys = key.KeyStateHandler()
         self.star = Star('red', x=self.x + Block.size, y=self.y)
+        self.star.controller = FollowPlayerStarController(star=self.star, player=self)
 
     @property
     def x(self):
@@ -150,7 +149,6 @@ class Player:
     @x.setter
     def x(self, value):
         self.actor.sprite.x = value
-        self.star.x = value + Player.star_offset_x
 
     @property
     def y(self):
@@ -159,11 +157,12 @@ class Player:
     @y.setter
     def y(self, value):
         self.actor.sprite.y = value
-        self.star.y = ((value // Block.size) * Block.size) + Player.star_offset_y
 
     def update(self, dt):
         if self.controller:
             self.controller.update(dt)
+        if self.star:
+            self.star.update(dt)
 
 class Room:
 
@@ -206,7 +205,16 @@ class Room:
 
 class FollowPlayerStarController:
 
-    pass
+    offset_x = 25
+    offset_y = 10
+	
+    def __init__(self, star, player):
+        self.star = star
+        self.player = player
+
+    def update(self, dt):
+        self.star.x = self.player.x + FollowPlayerStarController.offset_x
+        self.star.y = ((self.player.y // Block.size) * Block.size) + FollowPlayerStarController.offset_y
 
 class ShootingStarController:
 
