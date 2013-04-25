@@ -213,8 +213,8 @@ class FollowPlayerStarController:
         self.player = player
 
     def update(self, dt):
-        self.star.x = self.player.x + FollowPlayerStarController.offset_x
-        self.star.y = ((self.player.y // Block.size) * Block.size) + FollowPlayerStarController.offset_y
+        self.star.actor.sprite.x = self.player.x + FollowPlayerStarController.offset_x
+        self.star.actor.sprite.y = ((self.player.y // Block.size) * Block.size) + FollowPlayerStarController.offset_y
 
 class ShootingStarController:
 
