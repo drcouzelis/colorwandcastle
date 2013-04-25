@@ -102,6 +102,8 @@ class Block:
 
 class Star:
 
+    speed = 200
+
     imgs = dict()
     for color in Block.colors:
         imgs[color] = load_img('star-{}.png'.format(color))
@@ -115,7 +117,14 @@ class Star:
         anim = Animation((
             AnimationFrame(Star.imgs[color], 1/4),
             AnimationFrame(Star.imgs_flip[color], 1/4)))
-        self.sprite = Sprite(anim, batch=batch, group=act_group, x=x + Block.size, y=y)
+        sprite = Sprite(anim, batch=batch, group=act_group, x=x + Block.size, y=y)
+        bounds = Bounds(5, 5, 5, 5)
+        self.actor = Actor(sprite, bounds)
+        self.controller = None
+
+    def update(self, dt):
+        if self.controller:
+            self.controller.update(dt)
 
 class Player:
 
@@ -132,11 +141,7 @@ class Player:
         self.actor = Actor(sprite, bounds)
         self.controller = None
         self.keys = key.KeyStateHandler()
-        img = load_img('star-purple.png')
-        anim = Animation((
-            AnimationFrame(img, 1/4),
-            AnimationFrame(img.get_transform(flip_y=True), 1/4)))
-        self.star = Sprite(anim, batch=batch, group=act_group, x=self.x + Block.size, y=self.y)
+        self.star = Star('red', x=self.x + Block.size, y=self.y)
 
     @property
     def x(self):
@@ -198,6 +203,14 @@ class Room:
                 block = Block(color, c * Block.size, r * Block.size)
                 blocks[(r, c)] = block
         return blocks
+
+class FollowPlayerStarController:
+
+    pass
+
+class ShootingStarController:
+
+    pass
 
 class KeyboardPlayerController:
 
