@@ -103,20 +103,25 @@ class Block:
 class Star:
 
     imgs = dict()
-    #for color in Block.colors:
-    #    imgs[color] = pyglet.resource.image('star-{}.png'.format(color))
+    for color in Block.colors:
+        imgs[color] = load_img('star-{}.png'.format(color))
+    imgs_flip = dict()
+    for color in Block.colors:
+        imgs_flip[color] = imgs[color].get_transform(flip_y=True)
 
-    def __init__(self, x, y):
-        img = load_img('star-purple.png')
+    def __init__(self, color, x, y):
+        if color not in Block.colors:
+            raise
         anim = Animation((
-            AnimationFrame(img, 1/4),
-            AnimationFrame(img.get_transform(flip_y=True), 1/4)))
+            AnimationFrame(Star.imgs[color], 1/4),
+            AnimationFrame(Star.imgs_flip[color], 1/4)))
         self.sprite = Sprite(anim, batch=batch, group=act_group, x=x + Block.size, y=y)
 
 class Player:
 
     speed = 80
-    star_offset = 25
+    star_offset_x = 25
+    star_offset_y = 10
 
     def __init__(self):
         anim = Animation((
@@ -140,7 +145,7 @@ class Player:
     @x.setter
     def x(self, value):
         self.actor.sprite.x = value
-        self.star.x = value + Player.star_offset
+        self.star.x = value + Player.star_offset_x
 
     @property
     def y(self):
@@ -149,7 +154,7 @@ class Player:
     @y.setter
     def y(self, value):
         self.actor.sprite.y = value
-        self.star.y = ((value // Block.size) * Block.size) + 10
+        self.star.y = ((value // Block.size) * Block.size) + Player.star_offset_y
 
     def update(self, dt):
         if self.controller:
@@ -282,7 +287,7 @@ player.y = HEIGHT // 2
 # Allow the player to receive keyboard input
 window.push_handlers(player.keys)
 
-room = Room(columns=3, colors=4)
+room = Room(columns=4, colors=6)
 
 player.controller = KeyboardPlayerController(player, room)
 
