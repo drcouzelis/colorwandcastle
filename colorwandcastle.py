@@ -218,7 +218,12 @@ class FollowPlayerStarController:
 
 class ShootingStarController:
 
-    pass
+    def __init__(self, star, room):
+        self.star = star
+        self.room = room
+
+    def update(self, dt):
+        pass
 
 class KeyboardPlayerController:
 
@@ -249,7 +254,7 @@ class KeyboardPlayerController:
                 self.player.x = orig_x
         # Shoot a star!
         if keys[key.SPACE] and not self.star_shot:
-            print('Pretending to shoot a star!')
+            self.player.star.controller = ShootingStarController(self.player.star, self.room)
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
             self.star_shot = False
