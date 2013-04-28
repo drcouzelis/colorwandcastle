@@ -111,13 +111,13 @@ class Star:
     for color in Block.colors:
         imgs_flip[color] = imgs[color].get_transform(flip_y=True)
 
-    def __init__(self, color, x, y):
+    def __init__(self, color):
         if color not in Block.colors:
             raise
         anim = Animation((
             AnimationFrame(Star.imgs[color], 1/4),
             AnimationFrame(Star.imgs_flip[color], 1/4)))
-        sprite = Sprite(anim, batch=batch, group=act_group, x=x + Block.size, y=y)
+        sprite = Sprite(anim, batch=batch, group=act_group)
         bounds = Bounds(5, 5, 5, 5)
         self.actor = Actor(sprite, bounds)
         self.controller = None
@@ -139,7 +139,10 @@ class Player:
         self.actor = Actor(sprite, bounds)
         self.controller = None
         self.keys = key.KeyStateHandler()
-        self.star = Star('red', x=self.x + Block.size, y=self.y)
+        self.new_star()
+
+    def new_star(self):
+        self.star = Star('red')
         self.star.controller = FollowPlayerStarController(star=self.star, player=self)
 
     @property
@@ -258,6 +261,7 @@ class ShootingStarController:
             else:
                 self.player.star = None
                 actor.sprite.delete()
+                self.player.new_star()
 
 class KeyboardPlayerController:
 
@@ -287,24 +291,14 @@ class KeyboardPlayerController:
             if not self.good_move():
                 self.player.x = orig_x
         # Shoot a star!
-        if keys[key.SPACE] and not self.star_shot:
+        if keys[key.SPACE] and not self.star_shot and isinstance(self.player.star.controller, FollowPlayerStarController):
             self.player.star.controller = ShootingStarController(self.player.star, self.player, self.room)
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
             self.star_shot = False
 
     def good_move(self):
-        walls = self.room.walls
-        blocks = self.room.blocks
-        u = to_tile(self.player.actor.u)
-        l = to_tile(self.player.actor.l)
-        d = to_tile(self.player.actor.d)
-        r = to_tile(self.player.actor.r)
-        # Don't fly through walls!
-        if (u, l) in walls or (u, r) in walls or (d, l) in walls or (d, r) in walls:
-            return False
-        # Don't fly through blocks!
-        if (u, l) in blocks or (u, r) in blocks or (d, l) in blocks or (d, r) in blocks:
+        if hit_wall(self.player.actor, self.room) or hit_blocks(self.player.actor, self.room):
             return False
         return True
 
