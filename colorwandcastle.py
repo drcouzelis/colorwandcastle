@@ -218,12 +218,15 @@ class FollowPlayerStarController:
 
 class ShootingStarController:
 
+    speed = 200
+
     def __init__(self, star, room):
         self.star = star
         self.room = room
+        self.speed = ShootingStarController.speed
 
     def update(self, dt):
-        pass
+        self.star.actor.sprite.x += self.speed * dt
 
 class KeyboardPlayerController:
 
