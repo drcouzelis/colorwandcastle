@@ -203,6 +203,26 @@ class Room:
                 blocks[(r, c)] = block
         return blocks
 
+def hit_wall(actor, room):
+    walls = room.walls
+    u = to_tile(actor.u)
+    l = to_tile(actor.l)
+    d = to_tile(actor.d)
+    r = to_tile(actor.r)
+    if (u, l) in walls or (u, r) in walls or (d, l) in walls or (d, r) in walls:
+        return True
+    return False
+
+def hit_blocks(actor, room):
+    blocks = room.blocks
+    u = to_tile(actor.u)
+    l = to_tile(actor.l)
+    d = to_tile(actor.d)
+    r = to_tile(actor.r)
+    if (u, l) in blocks or (u, r) in blocks or (d, l) in blocks or (d, r) in blocks:
+        return True
+    return False
+
 class FollowPlayerStarController:
 
     offset_x = 25
@@ -220,13 +240,24 @@ class ShootingStarController:
 
     speed = 200
 
-    def __init__(self, star, room):
+    def __init__(self, star, player, room):
         self.star = star
+        self.player = player
         self.room = room
         self.speed = ShootingStarController.speed
+        self.bounces = 0
 
     def update(self, dt):
-        self.star.actor.sprite.x += self.speed * dt
+        actor = self.star.actor
+        orig_y = actor.sprite.y
+        actor.sprite.x += self.speed * dt
+        if hit_wall(actor, self.room) or hit_blocks(actor, self.room):
+            if self.bounces == 0:
+                self.speed *= -1
+                self.bounces += 1
+            else:
+                self.player.star = None
+                actor.sprite.delete()
 
 class KeyboardPlayerController:
 
@@ -257,7 +288,7 @@ class KeyboardPlayerController:
                 self.player.x = orig_x
         # Shoot a star!
         if keys[key.SPACE] and not self.star_shot:
-            self.player.star.controller = ShootingStarController(self.player.star, self.room)
+            self.player.star.controller = ShootingStarController(self.player.star, self.player, self.room)
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
             self.star_shot = False
@@ -276,29 +307,6 @@ class KeyboardPlayerController:
         if (u, l) in blocks or (u, r) in blocks or (d, l) in blocks or (d, r) in blocks:
             return False
         return True
-
-#class PlayEnvironment:
-#
-#    def __init__(self, player=None, room=None):
-#        self.room = room
-#        self.player = player
-#
-#    def move_possible(self, to_move, x, y):
-#        if not room:
-#            return True
-#        if isinstance(to_move, Player):
-#            u = (y + to_move.actor.bounds.u) // Block.size
-#            l = (x + to_move.actor.bounds.l) // Block.size
-#            d = (y + to_move.actor.bounds.d) // Block.size
-#            r = (x + to_move.actor.bounds.r) // Block.size
-#            print('{} {} {} {}'.format(u, l, d, r))
-#            #if (u, l) or (u, r) or (d, l) or (d, r) in room.blocks:
-#            if (u, l) in room.blocks:
-#                return False
-#        return True
-#
-#    def update_collisions(self):
-#        pass
 
 scale = 3
 
