@@ -162,13 +162,15 @@ class Player:
 
     speed = 80
 
-    def __init__(self):
+    def __init__(self, x=0, y=0, colors=len(Block.colors)):
         anim = Animation((
             AnimationFrame(load_img('makayla-01.png'), 1/8),
             AnimationFrame(load_img('makayla-02.png'), 1/8)))
         sprite = Sprite(anim, batch=batch, group=act_group)
         bounds = Bounds(u=5, l=10, d=15, r=10)
         self.actor = Actor(sprite, bounds)
+        self.x = x
+        self.y = y
         self.controller = None
         self.keys = key.KeyStateHandler()
         self.new_star()
@@ -209,6 +211,7 @@ class Room:
         self.walls = self.create_walls()
         self.blocks = self.create_blocks(columns, colors)
         self.enemies = list()
+        self.colors = colors
 
     def create_bg(self):
         bg = list()
@@ -344,9 +347,7 @@ window = pyglet.window.Window(width=WIDTH * scale, height=HEIGHT * scale, captio
 # This scales your window
 glScalef(scale, scale, scale)
 
-player = Player()
-player.x = WIDTH // 4
-player.y = HEIGHT // 2
+player = Player(x=WIDTH // 4, y=HEIGHT // 2)
 
 # Allow the player to receive keyboard input
 window.push_handlers(player.keys)
