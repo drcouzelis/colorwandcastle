@@ -282,20 +282,19 @@ class ShootingStarController:
         self.player = player
         self.room = room
         self.speed = ShootingStarController.speed
-        self.bounces = 0
 
     def update(self, dt):
-        actor = self.star.actor
-        orig_y = actor.y
-        actor.sprite.x += self.speed * dt
-        if hit_wall(actor, self.room) or hit_blocks(actor, self.room):
-            if self.bounces == 0:
-                self.speed *= -1
-                self.bounces += 1
-            else:
-                self.player.star = None
-                actor.sprite.delete()
-                self.player.new_star()
+        orig_y = self.star.y
+        self.star.x += self.speed * dt
+        if hit_wall(actor, self.room):
+            self.end_star()
+        if hit_blocks(actor, self.room):
+            self.star.y = orig_y
+            self.speed *= -1
+
+    def end_star(self):
+        self.star.actor.sprite.delete()
+        self.player.new_star()
 
 class KeyboardPlayerController:
 
