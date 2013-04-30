@@ -52,6 +52,22 @@ class Actor:
             # The collision area boundary
 
     @property
+    def x(self):
+        return self.sprite.x
+
+    @x.setter
+    def x(self, value):
+        self.sprite.x = value
+
+    @property
+    def y(self):
+        return self.sprite.y
+
+    @y.setter
+    def y(self, value):
+        self.sprite.y = value
+
+    @property
     def u(self):
         return self.sprite.y + self.bounds.u
 
@@ -122,6 +138,22 @@ class Star:
         self.actor = Actor(sprite, bounds)
         self.controller = None
 
+    @property
+    def x(self):
+        return self.actor.x
+
+    @x.setter
+    def x(self, value):
+        self.actor.x = value
+
+    @property
+    def y(self):
+        return self.actor.y
+
+    @y.setter
+    def y(self, value):
+        self.actor.y = value
+
     def update(self, dt):
         if self.controller:
             self.controller.update(dt)
@@ -147,19 +179,19 @@ class Player:
 
     @property
     def x(self):
-        return self.actor.sprite.x
+        return self.actor.x
 
     @x.setter
     def x(self, value):
-        self.actor.sprite.x = value
+        self.actor.x = value
 
     @property
     def y(self):
-        return self.actor.sprite.y
+        return self.actor.y
 
     @y.setter
     def y(self, value):
-        self.actor.sprite.y = value
+        self.actor.y = value
 
     def update(self, dt):
         if self.controller:
@@ -234,10 +266,12 @@ class FollowPlayerStarController:
     def __init__(self, star, player):
         self.star = star
         self.player = player
+        # Put the star next to the player right now
+        self.update(0)
 
     def update(self, dt):
-        self.star.actor.sprite.x = self.player.x + FollowPlayerStarController.offset_x
-        self.star.actor.sprite.y = ((self.player.y // Block.size) * Block.size) + FollowPlayerStarController.offset_y
+        self.star.x = self.player.x + FollowPlayerStarController.offset_x
+        self.star.y = ((self.player.y // Block.size) * Block.size) + FollowPlayerStarController.offset_y
 
 class ShootingStarController:
 
@@ -252,7 +286,7 @@ class ShootingStarController:
 
     def update(self, dt):
         actor = self.star.actor
-        orig_y = actor.sprite.y
+        orig_y = actor.y
         actor.sprite.x += self.speed * dt
         if hit_wall(actor, self.room) or hit_blocks(actor, self.room):
             if self.bounces == 0:
