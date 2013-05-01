@@ -289,9 +289,9 @@ class ShootingStarController:
     def update(self, dt):
         orig_y = self.star.y
         self.star.x += self.speed * dt
-        if hit_wall(actor, self.room):
+        if hit_wall(self.star.actor, self.room):
             self.end_star()
-        if hit_blocks(actor, self.room):
+        if hit_blocks(self.star.actor, self.room):
             self.star.y = orig_y
             self.speed *= -1
 
