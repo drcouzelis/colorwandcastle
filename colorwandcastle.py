@@ -162,7 +162,7 @@ class Player:
 
     speed = 80
 
-    def __init__(self, x=0, y=0, colors=len(Block.colors)):
+    def __init__(self, x=0, y=0):
         anim = Animation((
             AnimationFrame(load_img('makayla-01.png'), 1/8),
             AnimationFrame(load_img('makayla-02.png'), 1/8)))
