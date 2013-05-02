@@ -212,6 +212,17 @@ class Room:
         self.blocks = self.create_blocks(columns, colors)
         self.enemies = list()
         self.colors = colors
+        self.columns = columns
+        self.front_colors = self.create_front_colors_list()
+
+    def create_front_colors_list(self):
+        colors = list()
+        for coord in self.blocks.keys():
+            if coord[1] == Room.cols - self.columns - 1:
+                color = self.blocks[coord].color
+                if color not in colors:
+                    colors.append(color)
+        return colors
 
     def create_bg(self):
         bg = list()
@@ -347,12 +358,14 @@ window = pyglet.window.Window(width=WIDTH * scale, height=HEIGHT * scale, captio
 # This scales your window
 glScalef(scale, scale, scale)
 
+# Create the room
+room = Room(columns=4, colors=6)
+
+# Create the player
 player = Player(x=WIDTH // 4, y=HEIGHT // 2)
 
 # Allow the player to receive keyboard input
 window.push_handlers(player.keys)
-
-room = Room(columns=4, colors=6)
 
 player.controller = KeyboardPlayerController(player, room)
 
