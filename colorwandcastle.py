@@ -213,7 +213,6 @@ class Room:
         self.enemies = list()
         self.colors = colors
         self.columns = columns
-        self.front_colors = self.create_front_colors_list()
 
     def create_front_colors_list(self):
         colors = list()
@@ -360,6 +359,11 @@ glScalef(scale, scale, scale)
 
 # Create the room
 room = Room(columns=4, colors=6)
+
+star_colors = room.create_front_colors_list()
+
+def get_star_colors():
+    return star_colors
 
 # Create the player
 player = Player(x=WIDTH // 4, y=HEIGHT // 2)
