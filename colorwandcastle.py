@@ -22,6 +22,7 @@ batch = pyglet.graphics.Batch()
 bg_group = pyglet.graphics.OrderedGroup(0)
 fg_group = pyglet.graphics.OrderedGroup(1)
 act_group = pyglet.graphics.OrderedGroup(2)
+hero_group = pyglet.graphics.OrderedGroup(3)
 
 def load_img(filename):
     '''Load the image named "filename" with the anchor centered.'''
@@ -166,7 +167,7 @@ class Player:
         anim = Animation((
             AnimationFrame(load_img('makayla-01.png'), 1/8),
             AnimationFrame(load_img('makayla-02.png'), 1/8)))
-        sprite = Sprite(anim, batch=batch, group=act_group)
+        sprite = Sprite(anim, batch=batch, group=hero_group)
         bounds = Bounds(u=5, l=10, d=15, r=10)
         self.actor = Actor(sprite, bounds)
         self.x = x
