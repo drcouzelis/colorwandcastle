@@ -338,6 +338,7 @@ class KeyboardPlayerController:
                 self.player.x = orig_x
         # Shoot a star!
         if keys[key.SPACE] and not self.star_shot and isinstance(self.player.star.controller, FollowPlayerStarController):
+            self.player.star.x = self.player.x
             self.player.star.controller = ShootingStarController(self.player.star, self.player, self.room)
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
