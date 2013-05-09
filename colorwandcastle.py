@@ -43,8 +43,7 @@ class Bounds:
         self.u, self.l, self.d, self.r = u, l, d, r
 
 class Actor:
-    '''An actor is a sprite with a body. The default bounds are set
-       to the dimensions of the image.'''
+    '''An actor is a sprite with a body.'''
 
     def __init__(self, sprite, bounds):
         self.sprite = sprite
@@ -159,7 +158,7 @@ class Star:
         if self.controller:
             self.controller.update(dt)
 
-class Player:
+class Hero:
 
     speed = 80
 
@@ -178,7 +177,7 @@ class Player:
 
     def new_star(self):
         self.star = Star('red')
-        self.star.controller = FollowPlayerStarController(star=self.star, player=self)
+        self.star.controller = FollowHeroStarController(star=self.star, hero=self)
 
     @property
     def x(self):
@@ -272,28 +271,28 @@ def hit_blocks(actor, room):
         return True
     return False
 
-class FollowPlayerStarController:
+class FollowHeroStarController:
 
     offset_x = 25
     offset_y = 10
 	
-    def __init__(self, star, player):
+    def __init__(self, star, hero):
         self.star = star
-        self.player = player
-        # Put the star next to the player right now
+        self.hero = hero
+        # Put the star next to the hero right now
         self.update(0)
 
     def update(self, dt):
-        self.star.x = self.player.x + FollowPlayerStarController.offset_x
-        self.star.y = ((self.player.y // Block.size) * Block.size) + FollowPlayerStarController.offset_y
+        self.star.x = self.hero.x + FollowHeroStarController.offset_x
+        self.star.y = ((self.hero.y // Block.size) * Block.size) + FollowHeroStarController.offset_y
 
 class ShootingStarController:
 
     speed = 200
 
-    def __init__(self, star, player, room):
+    def __init__(self, star, hero, room):
         self.star = star
-        self.player = player
+        self.hero = hero
         self.room = room
         self.speed = ShootingStarController.speed
 
@@ -308,45 +307,45 @@ class ShootingStarController:
 
     def end_star(self):
         self.star.actor.sprite.delete()
-        self.player.new_star()
+        self.hero.new_star()
 
-class KeyboardPlayerController:
+class KeyboardHeroController:
 
-    def __init__(self, player, room):
-        self.player = player
+    def __init__(self, hero, room):
+        self.hero = hero
         self.room = room
         self.star_shot = False
 
     def update(self, dt):
-        orig_x = self.player.x
-        orig_y = self.player.y
-        keys = self.player.keys
+        orig_x = self.hero.x
+        orig_y = self.hero.y
+        keys = self.hero.keys
         if keys[key.UP]:
-            self.player.y += Player.speed * dt
+            self.hero.y += Hero.speed * dt
             if not self.good_move():
-                self.player.y = orig_y
+                self.hero.y = orig_y
         if keys[key.DOWN]:
-            self.player.y -= Player.speed * dt
+            self.hero.y -= Hero.speed * dt
             if not self.good_move():
-                self.player.y = orig_y
+                self.hero.y = orig_y
         if keys[key.LEFT]:
-            self.player.x -= Player.speed * dt
+            self.hero.x -= Hero.speed * dt
             if not self.good_move():
-                self.player.x = orig_x
+                self.hero.x = orig_x
         if keys[key.RIGHT]:
-            self.player.x += Player.speed * dt
+            self.hero.x += Hero.speed * dt
             if not self.good_move():
-                self.player.x = orig_x
+                self.hero.x = orig_x
         # Shoot a star!
-        if keys[key.SPACE] and not self.star_shot and isinstance(self.player.star.controller, FollowPlayerStarController):
-            self.player.star.x = self.player.x
-            self.player.star.controller = ShootingStarController(self.player.star, self.player, self.room)
+        if keys[key.SPACE] and not self.star_shot and isinstance(self.hero.star.controller, FollowHeroStarController):
+            self.hero.star.x = self.hero.x
+            self.hero.star.controller = ShootingStarController(self.hero.star, self.hero, self.room)
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
             self.star_shot = False
 
     def good_move(self):
-        if hit_wall(self.player.actor, self.room) or hit_blocks(self.player.actor, self.room):
+        if hit_wall(self.hero.actor, self.room) or hit_blocks(self.hero.actor, self.room):
             return False
         return True
 
@@ -367,13 +366,13 @@ star_colors = room.create_front_colors_list()
 def get_star_colors():
     return star_colors
 
-# Create the player
-player = Player(x=WIDTH // 4, y=HEIGHT // 2)
+# Create the hero
+hero = Hero(x=WIDTH // 4, y=HEIGHT // 2)
 
-# Allow the player to receive keyboard input
-window.push_handlers(player.keys)
+# Allow the hero to receive keyboard input
+window.push_handlers(hero.keys)
 
-player.controller = KeyboardPlayerController(player, room)
+hero.controller = KeyboardHeroController(hero, room)
 
 #fps_display = pyglet.clock.ClockDisplay()
 
@@ -385,7 +384,7 @@ def on_draw():
     #fps_display.draw() # Should be able to be toggled
 
 def update(dt):
-    player.update(dt)
+    hero.update(dt)
 
 # Update the game once every frame
 pyglet.clock.schedule_interval(update, 1 / FPS)
