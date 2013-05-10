@@ -136,7 +136,7 @@ class Star:
         sprite = Sprite(anim, batch=batch, group=act_group)
         bounds = Bounds(5, 5, 5, 5)
         self.actor = Actor(sprite, bounds)
-        self.controller = None
+        self.control = None
 
     @property
     def x(self):
@@ -155,8 +155,8 @@ class Star:
         self.actor.y = value
 
     def update(self, dt):
-        if self.controller:
-            self.controller.update(dt)
+        if self.control:
+            self.control.update(dt)
 
 class Hero:
 
@@ -171,13 +171,13 @@ class Hero:
         self.actor = Actor(sprite, bounds)
         self.x = x
         self.y = y
-        self.controller = None
+        self.control = None
         self.keys = key.KeyStateHandler()
         self.new_star()
 
     def new_star(self):
         self.star = Star('red')
-        self.star.controller = FollowHeroStarController(star=self.star, hero=self)
+        self.star.control = FollowHeroStarControl(star=self.star, hero=self)
 
     @property
     def x(self):
@@ -196,8 +196,8 @@ class Hero:
         self.actor.y = value
 
     def update(self, dt):
-        if self.controller:
-            self.controller.update(dt)
+        if self.control:
+            self.control.update(dt)
         if self.star:
             self.star.update(dt)
 
@@ -271,7 +271,7 @@ def hit_blocks(actor, room):
         return True
     return False
 
-class FollowHeroStarController:
+class FollowHeroStarControl:
 
     offset_x = 25
     offset_y = 10
@@ -283,10 +283,10 @@ class FollowHeroStarController:
         self.update(0)
 
     def update(self, dt):
-        self.star.x = self.hero.x + FollowHeroStarController.offset_x
-        self.star.y = ((self.hero.y // Block.size) * Block.size) + FollowHeroStarController.offset_y
+        self.star.x = self.hero.x + FollowHeroStarControl.offset_x
+        self.star.y = ((self.hero.y // Block.size) * Block.size) + FollowHeroStarControl.offset_y
 
-class ShootingStarController:
+class ShootingStarControl:
 
     speed = 200
 
@@ -294,7 +294,7 @@ class ShootingStarController:
         self.star = star
         self.hero = hero
         self.room = room
-        self.speed = ShootingStarController.speed
+        self.speed = ShootingStarControl.speed
 
     def update(self, dt):
         orig_y = self.star.y
@@ -309,7 +309,7 @@ class ShootingStarController:
         self.star.actor.sprite.delete()
         self.hero.new_star()
 
-class KeyboardHeroController:
+class KeyboardHeroControl:
 
     def __init__(self, hero, room):
         self.hero = hero
@@ -337,9 +337,9 @@ class KeyboardHeroController:
             if not self.good_move():
                 self.hero.x = orig_x
         # Shoot a star!
-        if keys[key.SPACE] and not self.star_shot and isinstance(self.hero.star.controller, FollowHeroStarController):
+        if keys[key.SPACE] and not self.star_shot and isinstance(self.hero.star.control, FollowHeroStarControl):
             self.hero.star.x = self.hero.x
-            self.hero.star.controller = ShootingStarController(self.hero.star, self.hero, self.room)
+            self.hero.star.control = ShootingStarControl(self.hero.star, self.hero, self.room)
             self.star_shot = True
         if self.star_shot and not keys[key.SPACE]:
             self.star_shot = False
@@ -372,7 +372,7 @@ hero = Hero(x=WIDTH // 4, y=HEIGHT // 2)
 # Allow the hero to receive keyboard input
 window.push_handlers(hero.keys)
 
-hero.controller = KeyboardHeroController(hero, room)
+hero.control = KeyboardHeroControl(hero, room)
 
 #fps_display = pyglet.clock.ClockDisplay()
 
