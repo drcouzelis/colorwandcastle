@@ -162,7 +162,7 @@ class Hero:
 
     speed = 80
 
-    def __init__(self, x=0, y=0):
+    def __init__(self, x=0, y=0, room=None):
         anim = Animation((
             AnimationFrame(load_img('makayla-01.png'), 1/8),
             AnimationFrame(load_img('makayla-02.png'), 1/8)))
@@ -172,11 +172,16 @@ class Hero:
         self.x = x
         self.y = y
         self.control = None
+        self.room = room
         self.keys = key.KeyStateHandler()
         self.new_star()
 
     def new_star(self):
-        self.star = Star('red')
+        if self.room:
+            color = random.choice(self.room.front_colors)
+        else:
+            color = random.choice(Block.colors)
+        self.star = Star(color)
         self.star.control = FollowHeroStarControl(star=self.star, hero=self)
 
     @property
@@ -201,6 +206,18 @@ class Hero:
         if self.star:
             self.star.update(dt)
 
+def inc_color(colors, color):
+    if color not in colors.keys():
+        colors[color] = 1
+    else:
+        colors[color] += 1
+
+def dec_color(colors, color):
+    if color in colors.keys():
+        colors[color] -= 1
+        if colors[color] <= 0:
+            del colors[color]
+
 class Room:
 
     cols = WIDTH // Block.size
@@ -213,14 +230,15 @@ class Room:
         self.enemies = list()
         self.colors = colors
         self.columns = columns
+        self.front_colors = room.create_front_colors_list()
+
 
     def create_front_colors_list(self):
-        colors = list()
+        colors = dict()
         for coord in self.blocks.keys():
             if coord[1] == Room.cols - self.columns - 1:
                 color = self.blocks[coord].color
-                if color not in colors:
-                    colors.append(color)
+                inc_color(colors, color)
         return colors
 
     def create_bg(self):
@@ -271,6 +289,10 @@ def hit_blocks(actor, room):
         return True
     return False
 
+def hit_actor(actor, other):
+    print('Pretendin to check for hit actor...')
+    return False
+
 class FollowHeroStarControl:
 
     offset_x = 25
@@ -304,6 +326,8 @@ class ShootingStarControl:
         if hit_blocks(self.star.actor, self.room):
             self.star.y = orig_y
             self.speed *= -1
+        if self.speed < 0 and hit_actor(self.star.actor, self.hero.actor):
+            print('Hero hit!')
 
     def end_star(self):
         self.star.actor.sprite.delete()
@@ -361,13 +385,8 @@ glScalef(scale, scale, scale)
 # Create the room
 room = Room(columns=4, colors=6)
 
-star_colors = room.create_front_colors_list()
-
-def get_star_colors():
-    return star_colors
-
 # Create the hero
-hero = Hero(x=WIDTH // 4, y=HEIGHT // 2)
+hero = Hero(x=WIDTH // 4, y=HEIGHT // 2, room)
 
 # Allow the hero to receive keyboard input
 window.push_handlers(hero.keys)
