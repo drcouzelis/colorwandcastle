@@ -178,7 +178,7 @@ class Hero:
 
     def new_star(self):
         if self.room:
-            color = random.choice(self.room.front_colors)
+            color = random.choice(list(self.room.front_colors.keys()))
         else:
             color = random.choice(Block.colors)
         self.star = Star(color)
@@ -230,7 +230,7 @@ class Room:
         self.enemies = list()
         self.colors = colors
         self.columns = columns
-        self.front_colors = room.create_front_colors_list()
+        self.front_colors = self.create_front_colors_list()
 
 
     def create_front_colors_list(self):
@@ -290,7 +290,7 @@ def hit_blocks(actor, room):
     return False
 
 def hit_actor(actor, other):
-    print('Pretendin to check for hit actor...')
+    print('Pretending to check for hit actor...')
     return False
 
 class FollowHeroStarControl:
@@ -386,7 +386,7 @@ glScalef(scale, scale, scale)
 room = Room(columns=4, colors=6)
 
 # Create the hero
-hero = Hero(x=WIDTH // 4, y=HEIGHT // 2, room)
+hero = Hero(x=WIDTH // 4, y=HEIGHT // 2, room=room)
 
 # Allow the hero to receive keyboard input
 window.push_handlers(hero.keys)
