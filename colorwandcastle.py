@@ -323,10 +323,10 @@ class ShootingStarControl:
         self.star.x += self.speed * dt
         if hit_wall(self.star.actor, self.room):
             self.end_star()
-        if hit_blocks(self.star.actor, self.room):
+        elif hit_blocks(self.star.actor, self.room):
             self.star.y = orig_y
             self.speed *= -1
-        if self.speed < 0 and hit_actor(self.star.actor, self.hero.actor):
+        elif self.speed < 0 and hit_actor(self.star.actor, self.hero.actor):
             print('Hero hit!')
 
     def end_star(self):
