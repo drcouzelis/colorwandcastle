@@ -137,6 +137,7 @@ class Star:
         bounds = Bounds(5, 5, 5, 5)
         self.actor = Actor(sprite, bounds)
         self.control = None
+        self.color = color
 
     @property
     def x(self):
@@ -232,7 +233,6 @@ class Room:
         self.columns = columns
         self.front_colors = self.create_front_colors_list()
 
-
     def create_front_colors_list(self):
         colors = dict()
         for coord in self.blocks.keys():
@@ -289,6 +289,22 @@ def hit_blocks(actor, room):
         return True
     return False
 
+def hit_block(actor, room):
+    blocks = room.blocks
+    u = to_tile(actor.u)
+    l = to_tile(actor.l)
+    d = to_tile(actor.d)
+    r = to_tile(actor.r)
+    if (u, l) in blocks:
+        return (u, l)
+    if (u, r) in blocks:
+        return (u, r)
+    if (d, l) in blocks:
+        return (d, l)
+    if (d, r) in blocks:
+        return (d, r)
+    return tuple()
+
 def hit_actor(actor, other):
     print('Pretending to check for hit actor...')
     return False
@@ -317,16 +333,27 @@ class ShootingStarControl:
         self.hero = hero
         self.room = room
         self.speed = ShootingStarControl.speed
+        self.bounces = 0
 
     def update(self, dt):
         orig_y = self.star.y
         self.star.x += self.speed * dt
         if hit_wall(self.star.actor, self.room):
             self.end_star()
-        elif hit_blocks(self.star.actor, self.room):
-            self.star.y = orig_y
-            self.speed *= -1
-        elif self.speed < 0 and hit_actor(self.star.actor, self.hero.actor):
+        elif hit_blocks(self.star.actor, self.room) and self.bounces == 0:
+            # If hit block is the same color as the star...
+            pos = hit_block(self.star.actor, self.room)
+            block = self.room.blocks[pos]
+            if block.color == self.star.color:
+                self.end_star()
+                self.room.blocks[pos].sprite.delete()
+                del self.room.blocks[pos]
+            # Else, just bounce back
+            else:
+                self.bounces += 1
+                self.star.y = orig_y
+                self.speed *= -1
+        elif self.bounces > 0 and hit_actor(self.star.actor, self.hero.actor):
             print('Hero hit!')
 
     def end_star(self):
