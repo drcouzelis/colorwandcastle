@@ -12,7 +12,7 @@ HEIGHT = 240
 FPS = 120.0
 
 # Define resource directories
-pyglet.resource.path = ['res']
+pyglet.resource.path = ['data/images']
 pyglet.resource.reindex()
 
 # Put all sprites into a single batch to speed up drawing

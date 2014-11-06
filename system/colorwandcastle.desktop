@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Colorwand Castle
+GenericName=Colorwand Castle
+Comment=Action puzzle game
+Exec=colorwandcastle
+Icon=/usr/share/pixmaps/colorwandcastle.png
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Application;Game
+
