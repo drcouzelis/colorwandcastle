@@ -18,8 +18,26 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 
 # Check for libraries.
-AC_CHECK_LIB([alleg], [install_allegro], [],
-             [AC_MSG_ERROR([liballeg not found.])])
+AC_CHECK_LIB([allegro], [al_install_system], [],
+             [AC_MSG_ERROR([liballegro not found.])])
+
+AC_CHECK_LIB([allegro_acodec], [al_init_acodec_addon], [],
+             [AC_MSG_ERROR([liballegro_acodec not found.])])
+
+AC_CHECK_LIB([allegro_audio], [al_install_audio], [],
+             [AC_MSG_ERROR([liballegro_audio not found.])])
+
+#AC_CHECK_LIB([allegro_font], [al_init_font_addon], [],
+#             [AC_MSG_ERROR([liballegro_font not found.])])
+
+AC_CHECK_LIB([allegro_image], [al_init_image_addon], [],
+             [AC_MSG_ERROR([liballegro_image not found.])])
+
+#AC_CHECK_LIB([allegro_primitives], [al_init_primitives_addon], [],
+#             [AC_MSG_ERROR([liballegro_primitives not found.])])
+
+#AC_CHECK_LIB([allegro_ttf], [al_init_ttf_addon], [],
+#             [AC_MSG_ERROR([liballegro_ttf not found.])])
 
 # A list of the Makefiles that need to be created.
 AC_CONFIG_FILES([Makefile
