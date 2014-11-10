@@ -33,8 +33,8 @@ AC_CHECK_LIB([allegro_audio], [al_install_audio], [],
 AC_CHECK_LIB([allegro_image], [al_init_image_addon], [],
              [AC_MSG_ERROR([liballegro_image not found.])])
 
-#AC_CHECK_LIB([allegro_primitives], [al_init_primitives_addon], [],
-#             [AC_MSG_ERROR([liballegro_primitives not found.])])
+AC_CHECK_LIB([allegro_primitives], [al_init_primitives_addon], [],
+             [AC_MSG_ERROR([liballegro_primitives not found.])])
 
 #AC_CHECK_LIB([allegro_ttf], [al_init_ttf_addon], [],
 #             [AC_MSG_ERROR([liballegro_ttf not found.])])

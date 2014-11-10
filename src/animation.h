@@ -31,6 +31,8 @@ typedef struct
 } ANIM;
 
 
+FLAG init_anim_system(int ticker);
+
 void init_anim(ANIM *anim, FLAG loop, int speed);
 void copy_anim(ANIM *anim, ANIM *orig);
 

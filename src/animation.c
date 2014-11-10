@@ -5,7 +5,7 @@
 static int anim_ticker = -1;
 
 
-FLAG install_anim(int ticker)
+FLAG init_anim_system(int ticker)
 {
     anim_ticker = ticker;
     return ON;
@@ -17,7 +17,7 @@ void init_anim(ANIM *anim, FLAG loop, int speed)
     int i;
 
     if (anim_ticker < 0) {
-        fprintf(stderr, "ANIMATION: System not installed. See \"install_anim\".\n");
+        fprintf(stderr, "ANIMATION: System not initialized. See \"init_anim_system\".\n");
         anim = NULL;
         return;
     }
