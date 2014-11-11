@@ -86,7 +86,7 @@ void add_frame(ANIM *anim, IMAGE *frame)
 }
 
 
-void draw_anim(ANIM *anim, IMAGE *canvas, float x, float y)
+void draw_anim(ANIM *anim, float x, float y)
 {
     int xhalf = 0;
     int yhalf = 0;

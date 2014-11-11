@@ -8,12 +8,14 @@
 extern FLAG end_app;
 
 
-ANIM hero;
+static ANIM hero;
+static int hero_x = TILE_SIZE;
+static int hero_y = TILE_SIZE;
 
 
 FLAG init_gameplay()
 {
-    init_anim(&hero, ON, 20);
+    init_anim(&hero, ON, 10);
     add_frame(&hero, IMG("makayla-01.png"));
     add_frame(&hero, IMG("makayla-02.png"));
     return ON;
@@ -54,5 +56,5 @@ void draw_gameplay(void *data)
     }
 
     /* Draw the hero */
-    draw_anim(&hero, NULL, TILE_SIZE, TILE_SIZE);
+    draw_anim(&hero, hero_x, hero_y);
 }
