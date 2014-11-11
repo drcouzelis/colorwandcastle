@@ -6,12 +6,14 @@ bin_PROGRAMS = colorwandcastle
 # A list of all of the source code files.
 # The "SOURCES" suffix marks it as source code.
 colorwandcastle_SOURCES = \
-  animation.c \
-  animation.h \
-  colorwandcastle.c \
-  colorwandcastle.h \
+  anim.c \
+  anim.h \
   input.c \
   input.h \
+  gameplay.c \
+  gameplay.h \
+  main.c \
+  main.h \
   memory.c \
   memory.h \
   resources.c \

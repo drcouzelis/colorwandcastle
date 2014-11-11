@@ -1,5 +1,5 @@
-#ifndef ANIMATION_HEADER
-#define ANIMATION_HEADER
+#ifndef ANIM_HEADER
+#define ANIM_HEADER
 
 
 #include "resources.h"

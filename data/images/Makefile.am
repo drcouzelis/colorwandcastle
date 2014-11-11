@@ -14,6 +14,7 @@ dist_imagesdata_DATA = \
   block-red.png \
   block-yellow.png \
   bricks.png \
+  icon.png \
   makayla-01.png \
   makayla-02.png \
   star-blue.png \

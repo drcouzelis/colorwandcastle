@@ -3,40 +3,17 @@
 
 #include "config.h"
 
-#include "animation.h"
-#include "colorwandcastle.h"
+#include "anim.h"
+#include "gameplay.h"
+#include "main.h"
 #include "resources.h"
 
 
 FLAG end_app = OFF;
 
 
-void control_gameplay(void *data, ALLEGRO_EVENT *event)
-{
-    if (event->type == ALLEGRO_EVENT_KEY_UP) {
-        if (event->keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-            end_app = ON;
-        }
-    }
-}
-
-
-int update_gameplay(void *data)
-{
-    /* Update */
-    return !end_app;
-}
-
-
-void draw_gameplay(void *data)
-{
-    /* Draw */
-    al_draw_bitmap(IMG("makayla-01.png"), TILE_SIZE, TILE_SIZE, 0);
-}
-
-
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
-        int (*update)(void *data), void (*draw)(void *data), void *data)
+        FLAG (*update)(void *data), void (*draw)(void *data), void *data)
 {
   ALLEGRO_TIMER *timer = NULL;
   int keep_running = 1;
@@ -150,6 +127,7 @@ int main(int argc, char **argv)
     /* Initialize the one and only global display for the game */
     get_desktop_resolution(&monitor_w, &monitor_h);
     scale = get_biggest_scale(DISPLAY_WIDTH, DISPLAY_HEIGHT, monitor_w, monitor_h);
+    scale = 4; /* TEMP */
   
     display = al_create_display(DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale);
     if (!display) {
@@ -170,8 +148,10 @@ int main(int argc, char **argv)
   
     /* Set the window title and icon */
     al_set_window_title(display, "Colorwand Castle");
-    //al_set_display_icon(display, IMG("icon.bmp")); // NEW_ALLEGRO
+    al_set_display_icon(display, IMG("icon.png"));
   
+    init_gameplay();
+
     /* START THE GAME */
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
   

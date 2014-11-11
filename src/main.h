@@ -1,5 +1,5 @@
-#ifndef COLORWANDCASTLE_HEADER
-#define COLORWANDCASTLE_HEADER
+#ifndef MAIN_HEADER
+#define MAIN_HEADER
 
 
 #include <allegro5/allegro.h>

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "animation.h"
+#include "anim.h"
 
 
 static int anim_ticker = -1;
