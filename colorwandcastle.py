@@ -178,10 +178,7 @@ class Hero:
         self.new_star()
 
     def new_star(self):
-        if self.room:
-            color = random.choice(list(self.room.front_colors.keys()))
-        else:
-            color = random.choice(Block.colors)
+        color = random.choice(Block.colors)
         self.star = Star(color)
         self.star.control = FollowHeroStarControl(star=self.star, hero=self)
 
@@ -306,7 +303,6 @@ def hit_block(actor, room):
     return tuple()
 
 def hit_actor(actor, other):
-    print('Pretending to check for hit actor...')
     return False
 
 class FollowHeroStarControl:

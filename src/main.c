@@ -93,6 +93,16 @@ int get_biggest_scale(window_w, window_h, monitor_w, monitor_h)
     } else {
       scale = (int) scale_y;
     }
+
+    /**
+     * If scaling the window will make it exactly the same size as one
+     * of the dimensions of the monitor, then decrease the scale a bit.
+     * This will provide some room for things like window borders and
+     * task bars.
+     */
+    if (scale * window_w == monitor_w || scale * window_h == monitor_h) {
+        scale--;
+    }
   
     return scale;
 }
@@ -127,7 +137,6 @@ int main(int argc, char **argv)
     /* Initialize the one and only global display for the game */
     get_desktop_resolution(&monitor_w, &monitor_h);
     scale = get_biggest_scale(DISPLAY_WIDTH, DISPLAY_HEIGHT, monitor_w, monitor_h);
-    scale = 4; /* TEMP */
   
     display = al_create_display(DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale);
     if (!display) {
