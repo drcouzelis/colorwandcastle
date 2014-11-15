@@ -6,7 +6,6 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_image.h>
-#include "utilities.h"
 
 
 #define IMG(name) (get_image(name))

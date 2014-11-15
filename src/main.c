@@ -9,11 +9,11 @@
 #include "resources.h"
 
 
-FLAG end_app = OFF;
+int end_app = 0;
 
 
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
-        FLAG (*update)(void *data), void (*draw)(void *data), void *data)
+        int (*update)(void *data), void (*draw)(void *data), void *data)
 {
   ALLEGRO_TIMER *timer = NULL;
   int keep_running = 1;
@@ -128,8 +128,8 @@ int main(int argc, char **argv)
     int monitor_h = DISPLAY_HEIGHT;
     int scale = 1;
   
-    if (!al_init() || !al_init_image_addon() || !al_init_primitives_addon() ||
-            !al_install_keyboard() || !al_install_mouse()) {
+    if (!al_init() || !al_init_image_addon() || !al_install_keyboard() ||
+            !al_install_mouse()) {
         fprintf(stderr, "Failed to initialize allegro.\n");
         exit(1);
     }
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
     /* START THE GAME */
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
   
-    // DONE, clean up
+    /* DONE, clean up */
     stop_resources();
     al_destroy_display(display);
     

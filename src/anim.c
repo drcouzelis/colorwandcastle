@@ -5,14 +5,14 @@
 static int anim_ticker = -1;
 
 
-FLAG init_anim_system(int ticker)
+int init_anim_system(int ticker)
 {
     anim_ticker = ticker;
-    return ON;
+    return 1;
 }
 
 
-void init_anim(ANIM *anim, FLAG loop, int speed)
+void init_anim(ANIM *anim, int loop, int speed)
 {
     int i;
 
@@ -29,14 +29,14 @@ void init_anim(ANIM *anim, FLAG loop, int speed)
     anim->len = 0;
     anim->pos = 0;
     anim->loop = loop;
-    anim->done = OFF;
+    anim->done = 0;
     anim->speed = speed;
     anim->fudge = 0;
     anim->offset_x = 0;
     anim->offset_y = 0;
-    anim->h_flip = OFF;
-    anim->v_flip = OFF;
-    anim->rotate = OFF;
+    anim->h_flip = 0;
+    anim->v_flip = 0;
+    anim->rotate = 0;
 }
 
 
@@ -63,7 +63,7 @@ void copy_anim(ANIM *anim, ANIM *orig)
 void reset_anim(ANIM *anim)
 {
     anim->pos = 0;
-    anim->done = OFF;
+    anim->done = 0;
     anim->fudge = 0;
 }
 
@@ -99,13 +99,17 @@ void draw_anim(ANIM *anim, float x, float y)
     yhalf = al_get_bitmap_height(get_frame(anim)) / 2;
     
     if (anim->rotate && anim->h_flip && anim->v_flip) {
-        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, (ALLEGRO_PI / 2) * 3, 0); // 270 degrees
+        /* 270 degrees */
+        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, (ALLEGRO_PI / 2) * 3, 0);
     } else if (anim->rotate && anim->h_flip) {
-        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, (ALLEGRO_PI / 2) * 3, ALLEGRO_FLIP_VERTICAL); // 270 degrees
+        /* 270 degrees */
+        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, (ALLEGRO_PI / 2) * 3, ALLEGRO_FLIP_VERTICAL);
     } else if (anim->rotate && anim->v_flip) {
-        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, ALLEGRO_PI / 2, ALLEGRO_FLIP_VERTICAL); // 90 degrees
+        /* 90 degrees */
+        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, ALLEGRO_PI / 2, ALLEGRO_FLIP_VERTICAL);
     } else if (anim->rotate) {
-        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, ALLEGRO_PI / 2, 0); // 90 degrees
+        /* 90 degrees */
+        al_draw_rotated_bitmap(get_frame(anim), xhalf, yhalf, x, y, ALLEGRO_PI / 2, 0);
     } else if (anim->h_flip && anim->v_flip) {
         al_draw_bitmap(get_frame(anim), x + anim->offset_x, y + anim->offset_y, ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL);
     } else if (anim->h_flip) {
@@ -118,7 +122,7 @@ void draw_anim(ANIM *anim, float x, float y)
 }
 
 
-// Animate the animation.
+/* Animate the animation */
 void animate(ANIM *anim)
 {
     if (anim->len > 1 && anim->speed != 0) {
@@ -132,14 +136,14 @@ void animate(ANIM *anim)
                     anim->pos = 0;
                 } else {
                     anim->pos--;
-                    anim->done = ON;
+                    anim->done = 1;
                 }
             }
             anim->fudge -= anim_ticker;
         }
       
     } else {
-        anim->done = ON;
+        anim->done = 1;
     }
 }
 

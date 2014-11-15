@@ -3,7 +3,6 @@
 
 
 #include "resources.h"
-#include "utilities.h"
 
 
 #define MAX_FRAMES 16
@@ -17,23 +16,23 @@ typedef struct
     int speed;
     int fudge;
     
-    FLAG done;
+    int done;
   
-    // An animation is drawn with respect to its offset.
+    /* An animation is drawn with respect to its offset */
     int offset_x;
     int offset_y;
   
-    FLAG loop;
+    int loop;
   
-    FLAG h_flip;
-    FLAG v_flip;
-    FLAG rotate;
+    int h_flip;
+    int v_flip;
+    int rotate;
 } ANIM;
 
 
-FLAG init_anim_system(int ticker);
+int init_anim_system(int ticker);
 
-void init_anim(ANIM *anim, FLAG loop, int speed);
+void init_anim(ANIM *anim, int loop, int speed);
 void copy_anim(ANIM *anim, ANIM *orig);
 
 void animate(ANIM *anim);

@@ -8,8 +8,6 @@ bin_PROGRAMS = colorwandcastle
 colorwandcastle_SOURCES = \
   anim.c \
   anim.h \
-  input.c \
-  input.h \
   gameplay.c \
   gameplay.h \
   main.c \
@@ -24,4 +22,4 @@ colorwandcastle_SOURCES = \
 # This provides the compiler with a variable that points to the
 # location of the data files.
 # NOTE: "CPP" stands for "C Pre-Processor".
-colorwandcastle_CPPFLAGS = -DPKGDATADIR='"$(pkgdatadir)"'
+colorwandcastle_CPPFLAGS = -ansi -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'

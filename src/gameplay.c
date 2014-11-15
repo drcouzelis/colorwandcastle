@@ -5,7 +5,7 @@
 #include "resources.h"
 
 
-extern FLAG end_app;
+extern int end_app;
 
 
 static ANIM hero;
@@ -16,12 +16,12 @@ static float hero_dy = 0;
 static float hero_speed = 2;
 
 
-FLAG init_gameplay()
+int init_gameplay()
 {
-    init_anim(&hero, ON, 10);
+    init_anim(&hero, 1, 10);
     add_frame(&hero, IMG("makayla-01.png"));
     add_frame(&hero, IMG("makayla-02.png"));
-    return ON;
+    return 1;
 }
 
 
@@ -34,7 +34,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 
         /* To quit the game */
         if (key == ALLEGRO_KEY_ESCAPE) {
-            end_app = ON;
+            end_app = 1;
         }
 
         /* Hero key controls released */
@@ -68,7 +68,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 }
 
 
-FLAG update_gameplay(void *data)
+int update_gameplay(void *data)
 {
     /* Update */
     hero_x += hero_dx;

@@ -8,7 +8,7 @@
 #define GAME_TICKER 100
 
 
-// Colors
+/* Colors */
 #define WHITE (al_map_rgb(255, 255, 255))
 #define BLACK (al_map_rgb(0, 0, 0))
 #define GREEN (al_map_rgb(0, 255, 0))
