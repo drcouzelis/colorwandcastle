@@ -13,7 +13,11 @@ static float hero_x = TILE_SIZE;
 static float hero_y = TILE_SIZE;
 static float hero_dx = 0;
 static float hero_dy = 0;
-static float hero_speed = 2;
+
+/* In pixels per second */
+/* The hero can move four tiles in one second */
+#define HERO_SPEED ((TILE_SIZE) * 4)
+#define PPS_TO_TICKS(PPS) ((PPS) / (float)(GAME_TICKER))
 
 
 int init_gameplay()
@@ -52,16 +56,16 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
         /* Hero control */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero_dy = -hero_speed;
+                hero_dy = -PPS_TO_TICKS(HERO_SPEED);
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero_dy = hero_speed;
+                hero_dy = PPS_TO_TICKS(HERO_SPEED);
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero_dx = -hero_speed;
+                hero_dx = -PPS_TO_TICKS(HERO_SPEED);
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero_dx = hero_speed;
+                hero_dx = PPS_TO_TICKS(HERO_SPEED);
                 break;
         }
     }
