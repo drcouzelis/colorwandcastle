@@ -11,8 +11,10 @@ extern int end_app;
 static ANIM hero;
 static float hero_x = TILE_SIZE;
 static float hero_y = TILE_SIZE;
-static float hero_dx = 0;
-static float hero_dy = 0;
+static int hero_u = 0;
+static int hero_d = 0;
+static int hero_r = 0;
+static int hero_l = 0;
 
 /* In pixels per second */
 /* The hero can move four tiles in one second */
@@ -42,11 +44,19 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
         }
 
         /* Hero key controls released */
-        if (key == ALLEGRO_KEY_UP || key == ALLEGRO_KEY_DOWN) {
-            hero_dy = 0;
-        }
-        if (key == ALLEGRO_KEY_LEFT || key == ALLEGRO_KEY_RIGHT) {
-            hero_dx = 0;
+        switch (key) {
+            case ALLEGRO_KEY_UP:
+                hero_u = 0;
+                break;
+            case ALLEGRO_KEY_DOWN:
+                hero_d = 0;
+                break;
+            case ALLEGRO_KEY_LEFT:
+                hero_l = 0;
+                break;
+            case ALLEGRO_KEY_RIGHT:
+                hero_r = 0;
+                break;
         }
     }
 
@@ -56,29 +66,63 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
         /* Hero control */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero_dy = -PPS_TO_TICKS(HERO_SPEED);
+                hero_u = 1;
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero_dy = PPS_TO_TICKS(HERO_SPEED);
+                hero_d = 1;
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero_dx = -PPS_TO_TICKS(HERO_SPEED);
+                hero_l = 1;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero_dx = PPS_TO_TICKS(HERO_SPEED);
+                hero_r = 1;
                 break;
         }
     }
 }
 
 
+int move_hero(float dx, float dy)
+{
+    hero_x += dx;
+    hero_y += dy;
+
+    return 1;
+}
+
+
+void update_hero()
+{
+    float new_x = 0;
+    float new_y = 0;
+
+    /* Vertical movement */
+    if (!(hero_u && hero_d)) {
+        if (hero_u) {
+            move_hero(0, -PPS_TO_TICKS(HERO_SPEED));
+        } else if (hero_d) {
+            move_hero(0, PPS_TO_TICKS(HERO_SPEED));
+        }
+    }
+
+    /* Horizontal movement */
+    if (!(hero_l && hero_r)) {
+        if (hero_l) {
+            move_hero(-PPS_TO_TICKS(HERO_SPEED), 0);
+        } else if (hero_r) {
+            move_hero(PPS_TO_TICKS(HERO_SPEED), 0);
+        }
+    }
+
+    /* Graphics */
+    animate(&hero);
+}
+
+
 int update_gameplay(void *data)
 {
-    /* Update */
-    hero_x += hero_dx;
-    hero_y += hero_dy;
-
-    animate(&hero);
+    /* Hero */
+    update_hero();
 
     return !end_app;
 }
