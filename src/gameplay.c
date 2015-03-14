@@ -90,33 +90,58 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 }
 
 
-int move_hero(float dx, float dy)
+int is_hero_board_collision()
 {
-    hero.x += dx;
-    hero.y += dy;
+    int r1 = (int)((hero.y + 5) / TILE_SIZE);
+    int c1 = (int)((hero.x + 5) / TILE_SIZE);
+    int r2 = (int)((hero.y + 25) / TILE_SIZE);
+    int c2 = (int)((hero.x + 20) / TILE_SIZE);
 
-    return 1;
+    if (board[r1][c2] != BOARD_EMPTY) {
+        return 1;
+    } else if (board[r1][c2] != BOARD_EMPTY) {
+        return 1;
+    } else if (board[r2][c1] != BOARD_EMPTY) {
+        return 1;
+    } else if (board[r2][c2] != BOARD_EMPTY) {
+        return 1;
+    }
+
+    return 0;
 }
 
 
 void update_hero(HERO *hero)
 {
+    float old_x = hero->x;
+    float old_y = hero->y;
+
     /* Vertical movement */
     if (!(hero->u && hero->d)) {
         if (hero->u) {
-            move_hero(0, -PPS_TO_TICKS(HERO_SPEED));
+            hero->y -= PPS_TO_TICKS(HERO_SPEED);
         } else if (hero->d) {
-            move_hero(0, PPS_TO_TICKS(HERO_SPEED));
+            hero->y += PPS_TO_TICKS(HERO_SPEED);
         }
+    }
+
+    /* Check for vertical collisions */
+    if (is_hero_board_collision()) {
+        hero->y = old_y;
     }
 
     /* Horizontal movement */
     if (!(hero->l && hero->r)) {
         if (hero->l) {
-            move_hero(-PPS_TO_TICKS(HERO_SPEED), 0);
+            hero->x -= PPS_TO_TICKS(HERO_SPEED);
         } else if (hero->r) {
-            move_hero(PPS_TO_TICKS(HERO_SPEED), 0);
+            hero->x += PPS_TO_TICKS(HERO_SPEED);
         }
+    }
+
+    /* Check for horizontal collisions */
+    if (is_hero_board_collision()) {
+        hero->x = old_x;
     }
 
     /* Graphics */
