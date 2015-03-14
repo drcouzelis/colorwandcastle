@@ -26,7 +26,5 @@
 #define DISPLAY_WIDTH (COLS * TILE_SIZE)
 #define DISPLAY_HEIGHT (ROWS * TILE_SIZE)
 
-#define DEFAULT_SCREEN_RATIO 2
-
 
 #endif

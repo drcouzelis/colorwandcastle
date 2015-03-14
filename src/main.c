@@ -9,9 +9,6 @@
 #include "resources.h"
 
 
-int end_app = 0;
-
-
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
         int (*update)(void *data), void (*draw)(void *data), void *data)
 {

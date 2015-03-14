@@ -1,20 +1,12 @@
 #include <stdio.h>
 
 #include "anim.h"
+#include "hero.h"
 #include "main.h"
-#include "resources.h"
 
 
-extern int end_app;
+static int end_gameplay = 0;
 
-
-static ANIM hero;
-static float hero_x = TILE_SIZE;
-static float hero_y = TILE_SIZE;
-static int hero_u = 0;
-static int hero_d = 0;
-static int hero_r = 0;
-static int hero_l = 0;
 
 /* In pixels per second */
 /* The hero can move four tiles in one second */
@@ -22,11 +14,13 @@ static int hero_l = 0;
 #define PPS_TO_TICKS(PPS) ((PPS) / (float)(GAME_TICKER))
 
 
+static HERO hero;
+
+
 int init_gameplay()
 {
-    init_anim(&hero, 1, 10);
-    add_frame(&hero, IMG("makayla-01.png"));
-    add_frame(&hero, IMG("makayla-02.png"));
+    init_hero(&hero);
+
     return 1;
 }
 
@@ -35,96 +29,61 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
     int key = 0;
 
+    /* General application control */
     if (event->type == ALLEGRO_EVENT_KEY_UP) {
         key = event->keyboard.keycode;
 
         /* To quit the game */
         if (key == ALLEGRO_KEY_ESCAPE) {
-            end_app = 1;
-        }
-
-        /* Hero key controls released */
-        switch (key) {
-            case ALLEGRO_KEY_UP:
-                hero_u = 0;
-                break;
-            case ALLEGRO_KEY_DOWN:
-                hero_d = 0;
-                break;
-            case ALLEGRO_KEY_LEFT:
-                hero_l = 0;
-                break;
-            case ALLEGRO_KEY_RIGHT:
-                hero_r = 0;
-                break;
+            end_gameplay = 1;
         }
     }
 
-    if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
-        key = event->keyboard.keycode;
-
-        /* Hero control */
-        switch (key) {
-            case ALLEGRO_KEY_UP:
-                hero_u = 1;
-                break;
-            case ALLEGRO_KEY_DOWN:
-                hero_d = 1;
-                break;
-            case ALLEGRO_KEY_LEFT:
-                hero_l = 1;
-                break;
-            case ALLEGRO_KEY_RIGHT:
-                hero_r = 1;
-                break;
-        }
-    }
+    /* Hero control */
+    control_hero(&hero, event);
 }
 
 
 int move_hero(float dx, float dy)
 {
-    hero_x += dx;
-    hero_y += dy;
+    hero.x += dx;
+    hero.y += dy;
 
     return 1;
 }
 
 
-void update_hero()
+void update_hero(HERO *hero)
 {
-    float new_x = 0;
-    float new_y = 0;
-
     /* Vertical movement */
-    if (!(hero_u && hero_d)) {
-        if (hero_u) {
+    if (!(hero->u && hero->d)) {
+        if (hero->u) {
             move_hero(0, -PPS_TO_TICKS(HERO_SPEED));
-        } else if (hero_d) {
+        } else if (hero->d) {
             move_hero(0, PPS_TO_TICKS(HERO_SPEED));
         }
     }
 
     /* Horizontal movement */
-    if (!(hero_l && hero_r)) {
-        if (hero_l) {
+    if (!(hero->l && hero->r)) {
+        if (hero->l) {
             move_hero(-PPS_TO_TICKS(HERO_SPEED), 0);
-        } else if (hero_r) {
+        } else if (hero->r) {
             move_hero(PPS_TO_TICKS(HERO_SPEED), 0);
         }
     }
 
     /* Graphics */
-    animate(&hero);
+    animate(&hero->anim);
 }
 
 
 int update_gameplay(void *data)
 {
     /* Hero */
-    update_hero();
+    update_hero(&hero);
 
-    return !end_app;
+    return !end_gameplay;
 }
 
 
@@ -144,5 +103,5 @@ void draw_gameplay(void *data)
     }
 
     /* Draw the hero */
-    draw_anim(&hero, hero_x, hero_y);
+    draw_anim(&hero.anim, hero.x, hero.y);
 }
