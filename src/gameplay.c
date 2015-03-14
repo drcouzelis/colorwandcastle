@@ -3,6 +3,7 @@
 #include "anim.h"
 #include "hero.h"
 #include "main.h"
+#include "utilities.h"
 
 
 static int end_gameplay = 0;
@@ -16,10 +17,55 @@ static int end_gameplay = 0;
 
 static HERO hero;
 
+static int board[ROWS][COLS];
+
+
+typedef enum
+{
+    BOARD_EMPTY = 0,
+    BOARD_BORDER = 1,
+
+    BOARD_FIRST_COLOR = 10,
+    BOARD_RED = 10,
+    BOARD_ORANGE = 11,
+    BOARD_YELLOW = 12,
+    BOARD_GREEN = 13,
+    BOARD_BLUE = 14,
+    BOARD_PURPLE = 15,
+    BOARD_LAST_COLOR
+} BOARD_TYPES;
+
+
+void setup_board(int num_cols, int num_colors)
+{
+    int r, c;
+    int rand_color;
+
+    /* Border */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            if (c == 0 || r == 0 || c == COLS - 1 || r == ROWS - 1) {
+                board[r][c] = BOARD_BORDER;
+            }
+        }
+    }
+
+    /* Blocks */
+    for (r = 1; r < ROWS - 1; r++) {
+        for (c = 0; c < num_cols; c++) {
+            rand_color = BOARD_FIRST_COLOR + random_number(0, num_colors - 1);
+            board[r][COLS - 2 - c] = rand_color;
+        }
+    }
+}
+
 
 int init_gameplay()
 {
     init_hero(&hero);
+
+    /* Init the board */
+    setup_board(6, 6);
 
     return 1;
 }
@@ -89,16 +135,43 @@ int update_gameplay(void *data)
 
 void draw_gameplay(void *data)
 {
-    int x, y;
+    int r, c;
+    IMAGE *image;
 
     /* Draw the background and border */
-    for (y = 0; y < ROWS; y++) {
-        for (x = 0; x < COLS; x++) {
-            if (x == 0 || y == 0 || x == COLS - 1 || y == ROWS - 1) {
-                al_draw_bitmap(IMG("bricks.png"), x * TILE_SIZE, y * TILE_SIZE, 0);
-            } else {
-                al_draw_bitmap(IMG("background.png"), x * TILE_SIZE, y * TILE_SIZE, 0);
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+
+            /* Draw the background first behind everything else */
+            al_draw_bitmap(IMG("background.png"), c * TILE_SIZE, r * TILE_SIZE, 0);
+
+            switch (board[r][c]) {
+                case BOARD_BORDER:
+                    image = IMG("bricks.png");
+                    break;
+                case BOARD_RED:
+                    image = IMG("block-red.png");
+                    break;
+                case BOARD_ORANGE:
+                    image = IMG("block-orange.png");
+                    break;
+                case BOARD_YELLOW:
+                    image = IMG("block-yellow.png");
+                    break;
+                case BOARD_GREEN:
+                    image = IMG("block-green.png");
+                    break;
+                case BOARD_BLUE:
+                    image = IMG("block-blue.png");
+                    break;
+                case BOARD_PURPLE:
+                    image = IMG("block-purple.png");
+                    break;
+                default:
+                    image = IMG("background.png");
             }
+
+            al_draw_bitmap(image, c * TILE_SIZE, r * TILE_SIZE, 0);
         }
     }
 
