@@ -18,6 +18,8 @@ colorwandcastle_SOURCES = \
   memory.h \
   resources.c \
   resources.h \
+  star.c \
+  star.h \
   utilities.c \
   utilities.h
 

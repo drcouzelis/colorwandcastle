@@ -2,6 +2,10 @@
 #define HERO_HEADER
 
 
+#include "anim.h"
+#include "star.h"
+
+
 typedef struct
 {
     ANIM anim;
@@ -14,10 +18,13 @@ typedef struct
     int d;
     int l;
     int r;
+
+    STAR star;
 } HERO;
 
 
-int init_hero(HERO *hero);
+int init_hero(HERO *hero, float x, float y);
+
 void control_hero(HERO *hero, ALLEGRO_EVENT *event);
 
 

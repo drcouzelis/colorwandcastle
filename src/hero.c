@@ -1,36 +1,24 @@
 #include "anim.h"
-#include "main.h"
+#include "hero.h"
+#include "star.h"
 
 
-typedef struct
-{
-    ANIM anim;
-    float x;
-    float y;
-
-    /* Movement toggles */
-    /* True means the hero is moving in that direction */
-    int u;
-    int d;
-    int l;
-    int r;
-} HERO;
-
-
-int init_hero(HERO *hero)
+int init_hero(HERO *hero, float x, float y)
 {
     init_anim(&hero->anim, 1, 10);
     add_frame(&hero->anim, IMG("makayla-01.png"));
     add_frame(&hero->anim, IMG("makayla-02.png"));
 
     /* Set the starting position */
-    hero->x = TILE_SIZE;
-    hero->y = TILE_SIZE;
+    hero->x = x;
+    hero->y = y;
 
     hero->u = 0;
     hero->d = 0;
     hero->l = 0;
     hero->r = 0;
+
+    init_star(&hero->star, STAR_RED);
 
     return 1;
 }

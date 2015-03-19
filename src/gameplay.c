@@ -27,11 +27,11 @@ typedef enum
 
     BOARD_FIRST_COLOR = 10,
     BOARD_RED = 10,
-    BOARD_ORANGE = 11,
-    BOARD_YELLOW = 12,
-    BOARD_GREEN = 13,
-    BOARD_BLUE = 14,
-    BOARD_PURPLE = 15,
+    BOARD_ORANGE,
+    BOARD_YELLOW,
+    BOARD_GREEN,
+    BOARD_BLUE,
+    BOARD_PURPLE,
     BOARD_LAST_COLOR
 } BOARD_TYPES;
 
@@ -62,7 +62,7 @@ void setup_board(int num_cols, int num_colors)
 
 int init_gameplay()
 {
-    init_hero(&hero);
+    init_hero(&hero, TILE_SIZE, TILE_SIZE);
 
     /* Init the board */
     setup_board(6, 6);
