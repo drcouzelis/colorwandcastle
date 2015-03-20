@@ -10,16 +10,12 @@ colorwandcastle_SOURCES = \
   anim.h \
   gameplay.c \
   gameplay.h \
-  hero.c \
-  hero.h \
   main.c \
   main.h \
   memory.c \
   memory.h \
   resources.c \
   resources.h \
-  star.c \
-  star.h \
   utilities.c \
   utilities.h
 
