@@ -8,10 +8,6 @@
 #include <allegro5/allegro_image.h>
 
 
-#define IMG(name) (get_image(name))
-#define SND(name) (get_sound(name))
-
-
 typedef ALLEGRO_BITMAP IMAGE;
 typedef ALLEGRO_SAMPLE SOUND;
 
@@ -44,6 +40,11 @@ void add_resource_path(const char *path);
  */
 IMAGE *get_image(const char *name);
 SOUND *get_sound(const char *name);
+
+
+/* For convenience. */
+#define IMG(name) (get_image(name))
+#define SND(name) (get_sound(name))
 
 
 #endif
