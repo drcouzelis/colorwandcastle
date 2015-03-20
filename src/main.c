@@ -3,9 +3,9 @@
 
 #include "config.h"
 
-#include "anim.h"
 #include "gameplay.h"
 #include "main.h"
+#include "sprite.h"
 #include "resources.h"
 
 
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     /* Hide the mouse cursor */
     al_hide_mouse_cursor(display);
   
-    init_anim_system(GAME_TICKER);
+    set_animation_system_fps(GAME_TICKER);
     init_resources();
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");

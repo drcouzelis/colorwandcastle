@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "anim.h"
 #include "main.h"
+#include "sprite.h"
 #include "utilities.h"
 
 
@@ -48,7 +48,7 @@ typedef enum
 
 typedef struct
 {
-    ANIM anim;
+    SPRITE sprite;
     int color;
 
     float x;
@@ -88,9 +88,9 @@ int init_star(STAR *star, int color)
             image = NULL;
     }
 
-    init_anim(&star->anim, 1, 2);
-    add_frame(&star->anim, image);
-    add_frame(&star->anim, image);
+    init_sprite(&star->sprite, 1, 2);
+    add_frame(&star->sprite, image);
+    add_frame(&star->sprite, image);
 
     star->color = color;
 
@@ -108,9 +108,12 @@ int init_star(STAR *star, int color)
 
 typedef struct
 {
-    ANIM anim;
+    SPRITE sprite;
+
     float x;
     float y;
+    int w;
+    int h;
 
     /* Movement toggles */
     /* True means the hero is moving in that direction */
@@ -128,13 +131,18 @@ static HERO hero;
 
 int init_hero(HERO *hero, float x, float y)
 {
-    init_anim(&hero->anim, 1, 10);
-    add_frame(&hero->anim, IMG("makayla-01.png"));
-    add_frame(&hero->anim, IMG("makayla-02.png"));
+    init_sprite(&hero->sprite, 1, 10);
+    add_frame(&hero->sprite, IMG("makayla-01.png"));
+    add_frame(&hero->sprite, IMG("makayla-02.png"));
+    hero->sprite.x_offset = -5;
+    hero->sprite.y_offset = -5;
 
     /* Set the starting position */
     hero->x = x;
     hero->y = y;
+
+    hero->w = 15;
+    hero->h = 20;
 
     hero->u = 0;
     hero->d = 0;
@@ -247,12 +255,12 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 }
 
 
-int is_hero_board_collision()
+int is_collision()
 {
-    int r1 = (int)((hero.y + 5) / TILE_SIZE);
-    int c1 = (int)((hero.x + 5) / TILE_SIZE);
-    int r2 = (int)((hero.y + 25) / TILE_SIZE);
-    int c2 = (int)((hero.x + 20) / TILE_SIZE);
+    int r1 = (int)(hero.y / TILE_SIZE);
+    int c1 = (int)(hero.x / TILE_SIZE);
+    int r2 = (int)((hero.y + hero.h) / TILE_SIZE);
+    int c2 = (int)((hero.x + hero.w) / TILE_SIZE);
 
     if (board[r1][c2] != BOARD_EMPTY) {
         return 1;
@@ -283,7 +291,7 @@ void update_hero(HERO *hero)
     }
 
     /* Check for vertical collisions */
-    if (is_hero_board_collision()) {
+    if (is_collision()) {
         hero->y = old_y;
     }
 
@@ -297,12 +305,12 @@ void update_hero(HERO *hero)
     }
 
     /* Check for horizontal collisions */
-    if (is_hero_board_collision()) {
+    if (is_collision()) {
         hero->x = old_x;
     }
 
     /* Graphics */
-    animate(&hero->anim);
+    animate(&hero->sprite);
 }
 
 
@@ -358,5 +366,5 @@ void draw_gameplay(void *data)
     }
 
     /* Draw the hero */
-    draw_anim(&hero.anim, hero.x, hero.y);
+    draw_sprite(&hero.sprite, hero.x, hero.y);
 }
