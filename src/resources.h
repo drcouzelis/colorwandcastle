@@ -13,11 +13,6 @@ typedef ALLEGRO_SAMPLE SOUND;
 
 
 /**
- * Initialize the resource library.
- */
-void init_resources();
-
-/**
  * Free all the resource memory and
  * all of the resources.
  */
@@ -41,6 +36,7 @@ void add_resource_path(const char *path);
 IMAGE *get_image(const char *name);
 SOUND *get_sound(const char *name);
 
+int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip);
 
 /* For convenience. */
 #define IMG(name) (get_image(name))

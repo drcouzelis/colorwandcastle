@@ -5,7 +5,8 @@
 #include <allegro5/allegro.h>
 
 
-void init_gameplay();
+void new_game();
+
 void control_gameplay(void *data, ALLEGRO_EVENT *event);
 int update_gameplay(void *data);
 void draw_gameplay(void *data);

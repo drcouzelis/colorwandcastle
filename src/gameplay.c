@@ -225,7 +225,7 @@ void setup_board(int num_cols, int num_colors)
 }
 
 
-int init_gameplay()
+int new_game()
 {
     init_hero(&hero, TILE_SIZE, TILE_SIZE);
 

@@ -35,16 +35,6 @@ static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILENAME_LEN];
 static int num_resource_paths = 0;
 
 
-void init_resources()
-{
-    int i;
-  
-    for (i = 0; i < MAX_RESOURCES; i++) {
-        resources[i] = NULL;
-    }
-}
-
-
 void stop_resources()
 {
     int i;
@@ -177,4 +167,43 @@ IMAGE *get_image(const char *name)
 SOUND *get_sound(const char *name)
 {
     return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
+}
+
+
+int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
+{
+    int cx = 0;
+    int cy = 0;
+
+    if (img == NULL) {
+        return EXIT_FAILURE;
+    }
+  
+    /* Find the center of the image */
+    cx = al_get_bitmap_width(img) / 2;
+    cy = al_get_bitmap_height(img) / 2;
+
+    if (rotate && mirror && flip) {
+        /* 270 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, 0);
+    } else if (rotate && mirror) {
+        /* 270 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, ALLEGRO_FLIP_VERTICAL);
+    } else if (rotate && flip) {
+        /* 90 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, ALLEGRO_FLIP_VERTICAL);
+    } else if (rotate) {
+        /* 90 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, 0);
+    } else if (mirror && flip) {
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL);
+    } else if (mirror) {
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
+    } else if (flip) {
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_VERTICAL);
+    } else {
+        al_draw_bitmap(img, x, y, 0);
+    }
+
+    return EXIT_SUCCESS;
 }

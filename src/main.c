@@ -147,8 +147,7 @@ int main(int argc, char **argv)
     /* Hide the mouse cursor */
     al_hide_mouse_cursor(display);
   
-    set_animation_system_fps(GAME_TICKER);
-    init_resources();
+    set_animation_fps(GAME_TICKER);
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
   
@@ -156,7 +155,7 @@ int main(int argc, char **argv)
     al_set_window_title(display, "Colorwand Castle");
     al_set_display_icon(display, IMG("icon.png"));
   
-    init_gameplay();
+    new_game();
 
     /* START THE GAME */
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);

@@ -5,7 +5,7 @@
 static int sprite_fps = -1;
 
 
-int set_animation_system_fps(int fps)
+int set_animation_fps(int fps)
 {
     if (fps <= 0) {
         fprintf(stderr, "SPRITE: FPS must be greater than 0.\n");
@@ -45,9 +45,9 @@ int init_sprite(SPRITE *s, int loop, int speed)
     s->fudge = 0;
     s->x_offset = 0;
     s->y_offset = 0;
-    s->h_flip = 0;
-    s->v_flip = 0;
     s->rotate = 0;
+    s->mirror = 0;
+    s->flip = 0;
 
     return EXIT_SUCCESS;
 }
@@ -76,9 +76,9 @@ int copy_sprite(SPRITE *copy, SPRITE *orig)
     
     copy->x_offset = orig->x_offset;
     copy->y_offset = orig->y_offset;
-    copy->h_flip = orig->h_flip;
-    copy->v_flip = orig->v_flip;
     copy->rotate = orig->rotate;
+    copy->mirror = orig->mirror;
+    copy->flip = orig->flip;
   
     reset_sprite(copy);
 
@@ -128,46 +128,15 @@ int add_frame(SPRITE *s, IMAGE *frame)
 
 int draw_sprite(SPRITE *s, float x, float y)
 {
-    IMAGE *img = NULL;
-    int cx = 0;
-    int cy = 0;
-
     if (s == NULL || s->len == 0) {
         return EXIT_FAILURE;
     }
   
-    /* Find the center of the image */
-    cx = get_sprite_width(s) / 2;
-    cy = get_sprite_height(s) / 2;
-
+    /* Apply the offset */
     x += s->x_offset;
     y += s->y_offset;
     
-    img = get_frame(s);
-
-    if (s->rotate && s->h_flip && s->v_flip) {
-        /* 270 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, 0);
-    } else if (s->rotate && s->h_flip) {
-        /* 270 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, ALLEGRO_FLIP_VERTICAL);
-    } else if (s->rotate && s->v_flip) {
-        /* 90 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, ALLEGRO_FLIP_VERTICAL);
-    } else if (s->rotate) {
-        /* 90 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, 0);
-    } else if (s->h_flip && s->v_flip) {
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL);
-    } else if (s->h_flip) {
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
-    } else if (s->v_flip) {
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_VERTICAL);
-    } else {
-        al_draw_bitmap(img, x, y, 0);
-    }
-
-    return EXIT_SUCCESS;
+    return draw_image(get_frame(s), x, y, s->rotate, s->mirror, s->flip);
 }
 
 

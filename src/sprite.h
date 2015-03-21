@@ -24,9 +24,9 @@ typedef struct
   
     int loop;
   
-    int h_flip;
-    int v_flip;
     int rotate;
+    int mirror;
+    int flip;
 } SPRITE;
 
 
@@ -34,7 +34,7 @@ typedef struct
  * The FPS must be greater than 0.
  * Use this before any other sprite functions.
  */
-int set_animation_system_fps(int fps);
+int set_animation_fps(int fps);
 
 /**
  * Initialize a sprite.
