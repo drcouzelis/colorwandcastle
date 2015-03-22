@@ -9,7 +9,22 @@
 #include "resources.h"
 
 
-void run(void (*control)(void *data, ALLEGRO_EVENT *event),
+static int run_fps = 60;
+
+
+int set_fps(int fps)
+{
+    if (fps <= 0) {
+        return EXIT_FAILURE;
+    }
+    
+    run_fps = fps;
+    
+    return EXIT_SUCCESS;
+}
+
+
+int run(void (*control)(void *data, ALLEGRO_EVENT *event),
         int (*update)(void *data), void (*draw)(void *data), void *data)
 {
   ALLEGRO_TIMER *timer = NULL;
@@ -19,7 +34,7 @@ void run(void (*control)(void *data, ALLEGRO_EVENT *event),
   ALLEGRO_EVENT_QUEUE *events = al_create_event_queue();
   ALLEGRO_EVENT event;
 
-  timer = al_create_timer(1.0 / GAME_TICKER);
+  timer = al_create_timer(1.0 / run_fps);
   al_register_event_source(events, al_get_timer_event_source(timer));
   al_register_event_source(events, al_get_keyboard_event_source());
 
@@ -53,10 +68,12 @@ void run(void (*control)(void *data, ALLEGRO_EVENT *event),
 
   al_destroy_event_queue(events);
   al_destroy_timer(timer);
+  
+  return EXIT_SUCCESS;
 }
 
 
-void get_desktop_resolution(int *w, int *h)
+static void get_desktop_resolution(int *w, int *h)
 {
     ALLEGRO_DISPLAY_MODE mode;
     int i;
@@ -75,7 +92,7 @@ void get_desktop_resolution(int *w, int *h)
 }
 
 
-int get_biggest_scale(window_w, window_h, monitor_w, monitor_h)
+static int get_biggest_scale(window_w, window_h, monitor_w, monitor_h)
 {
     int scale = 1;
     int scale_x = 1;
@@ -105,7 +122,7 @@ int get_biggest_scale(window_w, window_h, monitor_w, monitor_h)
 }
 
 
-void set_display_scaling(int scale)
+static void set_display_scaling(int scale)
 {
     ALLEGRO_TRANSFORM trans;
 
@@ -158,6 +175,7 @@ int main(int argc, char **argv)
     new_game();
 
     /* START THE GAME */
+    set_fps(GAME_TICKER);
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
   
     /* DONE, clean up */

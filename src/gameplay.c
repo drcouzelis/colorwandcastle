@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "main.h"
+#include "memory.h"
 #include "sprite.h"
 #include "utilities.h"
 
@@ -12,9 +13,6 @@ static int end_gameplay = 0;
 /* The hero can move four tiles in one second */
 #define HERO_SPEED ((TILE_SIZE) * 4)
 #define PPS_TO_TICKS(PPS) ((PPS) / (float)(GAME_TICKER))
-
-
-static int board[ROWS][COLS];
 
 
 typedef enum
@@ -46,6 +44,40 @@ typedef enum
 } STAR_COLOR;
 
 
+typedef enum
+{
+    FIRST_COLOR = 0,
+    RED = 0,
+    ORA,
+    YEL,
+    GRE,
+    BLU,
+    PUR,
+    LAST_COLOR
+} COLORS;
+
+
+typedef struct
+{
+    SPRITE sprite;
+    int solid;
+} TILE;
+
+
+static TILE *board[ROWS][COLS];
+
+
+typedef struct
+{
+    SPRITE sprite;
+    int color;
+    int hits;
+} BLOCK;
+
+
+static BLOCK *blocks[ROWS][COLS];
+
+
 typedef struct
 {
     SPRITE sprite;
@@ -58,52 +90,6 @@ typedef struct
     int is_forward;
     int is_exploding;
 } STAR;
-
-
-int init_star(STAR *star, int color)
-{
-    IMAGE *image;
-
-    /* Init anim based on color */
-    switch (color) {
-        case STAR_RED:
-            image = IMG("star-red.png");
-            break;
-        case STAR_ORANGE:
-            image = IMG("star-orange.png");
-            break;
-        case STAR_YELLOW:
-            image = IMG("star-yellow.png");
-            break;
-        case STAR_GREEN:
-            image = IMG("star-green.png");
-            break;
-        case STAR_BLUE:
-            image = IMG("star-blue.png");
-            break;
-        case STAR_PURPLE:
-            image = IMG("star-purple.png");
-            break;
-        default:
-            image = NULL;
-    }
-
-    init_sprite(&star->sprite, 1, 2);
-    add_frame(&star->sprite, image);
-    add_frame(&star->sprite, image);
-
-    star->color = color;
-
-    /* Init position based on hero */
-    star->x = 0;
-    star->y = 0;
-
-    star->is_moving = 0;
-    star->is_forward = 1;
-    star->is_exploding = 0;
-
-    return 1;
-}
 
 
 typedef struct
@@ -122,11 +108,64 @@ typedef struct
     int l;
     int r;
 
-    STAR star;
+    int attack;
+
+    STAR *star;
 } HERO;
 
 
 static HERO hero;
+
+#define MAX_STARS 8
+static STAR *stars[MAX_STARS];
+static int num_stars = 0;
+
+
+IMAGE *color_to_star_image(int color, int frame)
+{
+    if (color == RED) {
+        return IMG("star-red.png");
+    } else if (color == ORA) {
+        return IMG("star-orange.png");
+    } else if (color == YEL) {
+        return IMG("star-yellow.png");
+    } else if (color == GRE) {
+        return IMG("star-green.png");
+    } else if (color == BLU) {
+        return IMG("star-blue.png");
+    } else if (color == PUR) {
+        return IMG("star-purple.png");
+    } else {
+        return NULL;
+    }
+}
+
+
+int add_star(int color)
+{
+    STAR *star = NULL;
+
+    if (num_stars == MAX_STARS) {
+        return EXIT_FAILURE;
+    }
+    
+    star = alloc_memory("STAR", sizeof(STAR));
+
+    init_sprite(&star->sprite, 1, 2);
+    add_frame(&star->sprite, color_to_star_image(color, 1));
+
+    star->color = color;
+    star->is_moving = 0;
+    star->is_forward = 0;
+    star->is_exploding = 0;
+    star->x = 0;
+    star->y = 0;
+
+    stars[num_stars] = star;
+    num_stars++;
+    
+    return EXIT_SUCCESS;
+}
 
 
 int init_hero(HERO *hero, float x, float y)
@@ -134,24 +173,36 @@ int init_hero(HERO *hero, float x, float y)
     init_sprite(&hero->sprite, 1, 10);
     add_frame(&hero->sprite, IMG("makayla-01.png"));
     add_frame(&hero->sprite, IMG("makayla-02.png"));
-    hero->sprite.x_offset = -5;
-    hero->sprite.y_offset = -5;
+    hero->sprite.x_offset = -10;
+    hero->sprite.y_offset = -10;
 
     /* Set the starting position */
     hero->x = x;
     hero->y = y;
 
-    hero->w = 15;
-    hero->h = 20;
+    hero->w = 10;
+    hero->h = 10;
 
     hero->u = 0;
     hero->d = 0;
     hero->l = 0;
     hero->r = 0;
 
-    init_star(&hero->star, STAR_RED);
+    hero->attack = 0;
 
     return 1;
+}
+
+
+int init_stars()
+{
+    int i;
+
+    for (i = 0; i < MAX_STARS; i++) {
+        stars[i] = NULL;
+    }
+
+    return EXIT_SUCCESS;
 }
 
 
@@ -176,6 +227,9 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 1;
                 break;
+            case ALLEGRO_KEY_SPACE:
+                hero->attack = 1;
+                break;
         }
     }
 
@@ -196,30 +250,70 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 0;
                 break;
+            case ALLEGRO_KEY_SPACE:
+                hero->attack = 0;
+                break;
         }
+    }
+}
+
+
+IMAGE *color_to_block_image(int color)
+{
+    if (color == RED) {
+        return IMG("block-red.png");
+    } else if (color == ORA) {
+        return IMG("block-orange.png");
+    } else if (color == YEL) {
+        return IMG("block-yellow.png");
+    } else if (color == GRE) {
+        return IMG("block-green.png");
+    } else if (color == BLU) {
+        return IMG("block-blue.png");
+    } else if (color == PUR) {
+        return IMG("block-purple.png");
+    } else {
+        return NULL;
     }
 }
 
 
 void setup_board(int num_cols, int num_colors)
 {
+    TILE *tile;
+    BLOCK *block;
     int r, c;
-    int rand_color;
 
-    /* Border */
+    /* Board */
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
             if (c == 0 || r == 0 || c == COLS - 1 || r == ROWS - 1) {
-                board[r][c] = BOARD_BORDER;
+                tile = alloc_memory("TILE", sizeof(TILE));
+                init_sprite(&tile->sprite, 0, 0);
+                add_frame(&tile->sprite, IMG("bricks.png"));
+                tile->solid = 1;
+                board[r][c] = tile;
+            } else {
+                board[r][c] = NULL;
             }
         }
     }
 
     /* Blocks */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            blocks[r][c] = NULL; /* Clear all blocks */
+        }
+    }
+
     for (r = 1; r < ROWS - 1; r++) {
         for (c = 0; c < num_cols; c++) {
-            rand_color = BOARD_FIRST_COLOR + random_number(0, num_colors - 1);
-            board[r][COLS - 2 - c] = rand_color;
+            block = alloc_memory("BLOCK", sizeof(BLOCK));
+            block->color = random_number(FIRST_COLOR, num_colors - 1);
+            init_sprite(&block->sprite, 0, 0);
+            add_frame(&block->sprite, color_to_block_image(block->color));
+            block->hits = 0;
+            blocks[r][COLS - 2 - c] = block;
         }
     }
 }
@@ -228,6 +322,8 @@ void setup_board(int num_cols, int num_colors)
 int new_game()
 {
     init_hero(&hero, TILE_SIZE, TILE_SIZE);
+    init_stars();
+    add_star(RED);
 
     /* Init the board */
     setup_board(6, 6);
@@ -255,23 +351,39 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 }
 
 
-int is_collision()
+int is_crappy_collision()
 {
+    TILE *tile = NULL;
+    BLOCK *block = NULL;
     int r1 = (int)(hero.y / TILE_SIZE);
     int c1 = (int)(hero.x / TILE_SIZE);
     int r2 = (int)((hero.y + hero.h) / TILE_SIZE);
     int c2 = (int)((hero.x + hero.w) / TILE_SIZE);
-
-    if (board[r1][c2] != BOARD_EMPTY) {
-        return 1;
-    } else if (board[r1][c2] != BOARD_EMPTY) {
-        return 1;
-    } else if (board[r2][c1] != BOARD_EMPTY) {
-        return 1;
-    } else if (board[r2][c2] != BOARD_EMPTY) {
+    
+    tile = board[r1][c1];
+    block = blocks[r1][c1];
+    if ((tile && tile->solid) || block) {
         return 1;
     }
-
+    
+    tile = board[r1][c2];
+    block = blocks[r1][c2];
+    if ((tile && tile->solid) || block) {
+        return 1;
+    }
+    
+    tile = board[r2][c1];
+    block = blocks[r2][c1];
+    if ((tile && tile->solid) || block) {
+        return 1;
+    }
+    
+    tile = board[r2][c2];
+    block = blocks[r2][c2];
+    if ((tile && tile->solid) || block) {
+        return 1;
+    }
+    
     return 0;
 }
 
@@ -291,7 +403,7 @@ void update_hero(HERO *hero)
     }
 
     /* Check for vertical collisions */
-    if (is_collision()) {
+    if (is_crappy_collision()) {
         hero->y = old_y;
     }
 
@@ -305,12 +417,28 @@ void update_hero(HERO *hero)
     }
 
     /* Check for horizontal collisions */
-    if (is_collision()) {
+    if (is_crappy_collision()) {
         hero->x = old_x;
     }
 
     /* Graphics */
     animate(&hero->sprite);
+    animate(&hero->star->sprite);
+}
+
+
+int update_stars()
+{
+    STAR *star;
+    int i;
+
+    for (i = 0; i < num_stars; i++) {
+        star = stars[i];
+        star->x = hero.x + 20;
+        star->y = (((int)hero.y  + 5) / TILE_SIZE) * TILE_SIZE;
+    }
+
+    return EXIT_SUCCESS;
 }
 
 
@@ -319,6 +447,9 @@ int update_gameplay(void *data)
     /* Hero */
     update_hero(&hero);
 
+    /* Stars */
+    update_stars();
+
     return !end_gameplay;
 }
 
@@ -326,43 +457,32 @@ int update_gameplay(void *data)
 void draw_gameplay(void *data)
 {
     int r, c;
-    IMAGE *image;
+    int i;
 
-    /* Draw the background and border */
+    /* Draw the background behind everything else */
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
-
-            /* Draw the background first behind everything else */
             al_draw_bitmap(IMG("background.png"), c * TILE_SIZE, r * TILE_SIZE, 0);
-
-            switch (board[r][c]) {
-                case BOARD_BORDER:
-                    image = IMG("bricks.png");
-                    break;
-                case BOARD_RED:
-                    image = IMG("block-red.png");
-                    break;
-                case BOARD_ORANGE:
-                    image = IMG("block-orange.png");
-                    break;
-                case BOARD_YELLOW:
-                    image = IMG("block-yellow.png");
-                    break;
-                case BOARD_GREEN:
-                    image = IMG("block-green.png");
-                    break;
-                case BOARD_BLUE:
-                    image = IMG("block-blue.png");
-                    break;
-                case BOARD_PURPLE:
-                    image = IMG("block-purple.png");
-                    break;
-                default:
-                    image = IMG("background.png");
-            }
-
-            al_draw_bitmap(image, c * TILE_SIZE, r * TILE_SIZE, 0);
         }
+    }
+    
+    /* Draw the game board */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            draw_sprite(&board[r][c]->sprite, c * TILE_SIZE, r * TILE_SIZE);
+        }
+    }
+    
+    /* Draw the blocks */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            draw_sprite(&blocks[r][c]->sprite, c * TILE_SIZE, r * TILE_SIZE);
+        }
+    }
+
+    /* Draw stars */
+    for (i = 0; i < num_stars; i++) {
+        draw_sprite(&stars[i]->sprite, stars[i]->x, stars[i]->y);
     }
 
     /* Draw the hero */
