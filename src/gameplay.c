@@ -124,20 +124,44 @@ static int num_stars = 0;
 IMAGE *color_to_star_image(int color, int frame)
 {
     if (color == RED) {
-        return IMG("star-red.png");
+        if (frame == 1) {
+            return IMG("star-red-1.png");
+        } else if (frame == 2) {
+            return IMG("star-red-2.png");
+        }
     } else if (color == ORA) {
-        return IMG("star-orange.png");
+        if (frame == 1) {
+            return IMG("star-orange-1.png");
+        } else if (frame == 2) {
+            return IMG("star-orange-2.png");
+        }
     } else if (color == YEL) {
-        return IMG("star-yellow.png");
+        if (frame == 1) {
+            return IMG("star-yellow-1.png");
+        } else if (frame == 2) {
+            return IMG("star-yellow-2.png");
+        }
     } else if (color == GRE) {
-        return IMG("star-green.png");
+        if (frame == 1) {
+            return IMG("star-green-1.png");
+        } else if (frame == 2) {
+            return IMG("star-green-2.png");
+        }
     } else if (color == BLU) {
-        return IMG("star-blue.png");
+        if (frame == 1) {
+            return IMG("star-blue-1.png");
+        } else if (frame == 2) {
+            return IMG("star-blue-2.png");
+        }
     } else if (color == PUR) {
-        return IMG("star-purple.png");
-    } else {
-        return NULL;
+        if (frame == 1) {
+            return IMG("star-purple-1.png");
+        } else if (frame == 2) {
+            return IMG("star-purple-2.png");
+        }
     }
+
+    return NULL;
 }
 
 
@@ -151,8 +175,9 @@ int add_star(int color)
     
     star = alloc_memory("STAR", sizeof(STAR));
 
-    init_sprite(&star->sprite, 1, 2);
+    init_sprite(&star->sprite, 1, 4);
     add_frame(&star->sprite, color_to_star_image(color, 1));
+    add_frame(&star->sprite, color_to_star_image(color, 2));
 
     star->color = color;
     star->is_moving = 0;
@@ -436,6 +461,7 @@ int update_stars()
         star = stars[i];
         star->x = hero.x + 20;
         star->y = (((int)hero.y  + 5) / TILE_SIZE) * TILE_SIZE;
+        animate(&star->sprite);
     }
 
     return EXIT_SUCCESS;

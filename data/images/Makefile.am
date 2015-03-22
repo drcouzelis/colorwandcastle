@@ -17,9 +17,15 @@ dist_imagesdata_DATA = \
   icon.png \
   makayla-01.png \
   makayla-02.png \
-  star-blue.png \
-  star-green.png \
-  star-orange.png \
-  star-purple.png \
-  star-red.png \
-  star-yellow.png
+  star-blue-1.png \
+  star-blue-2.png \
+  star-green-1.png \
+  star-green-2.png \
+  star-orange-1.png \
+  star-orange-2.png \
+  star-purple-1.png \
+  star-purple-2.png \
+  star-red-1.png \
+  star-red-2.png \
+  star-yellow-1.png \
+  star-yellow-2.png
