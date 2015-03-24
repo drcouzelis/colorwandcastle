@@ -118,7 +118,6 @@ static HERO hero;
 
 #define MAX_STARS 8
 static STAR *stars[MAX_STARS];
-static int num_stars = 0;
 
 
 IMAGE *color_to_star_image(int color, int frame)
@@ -165,15 +164,9 @@ IMAGE *color_to_star_image(int color, int frame)
 }
 
 
-int add_star(int color)
+STAR *create_star(int color)
 {
-    STAR *star = NULL;
-
-    if (num_stars == MAX_STARS) {
-        return EXIT_FAILURE;
-    }
-    
-    star = alloc_memory("STAR", sizeof(STAR));
+    STAR *star = alloc_memory("STAR", sizeof(STAR));
 
     init_sprite(&star->sprite, 1, 4);
     add_frame(&star->sprite, color_to_star_image(color, 1));
@@ -186,10 +179,22 @@ int add_star(int color)
     star->x = 0;
     star->y = 0;
 
-    stars[num_stars] = star;
-    num_stars++;
-    
-    return EXIT_SUCCESS;
+    return star;
+}
+
+
+int add_star(int color)
+{
+    int i;
+
+    for (i = 0; i < MAX_STARS; i++) {
+        if (stars[i] == NULL) {
+            stars[i] = create_star(color);
+            return EXIT_SUCCESS;
+        }
+    }
+
+    return EXIT_FAILURE;
 }
 
 
@@ -215,7 +220,9 @@ int init_hero(HERO *hero, float x, float y)
 
     hero->attack = 0;
 
-    return 1;
+    hero->star = create_star(RED);
+
+    return EXIT_SUCCESS;
 }
 
 
@@ -348,7 +355,6 @@ int new_game()
 {
     init_hero(&hero, TILE_SIZE, TILE_SIZE);
     init_stars();
-    add_star(RED);
 
     /* Init the board */
     setup_board(6, 6);
@@ -446,6 +452,10 @@ void update_hero(HERO *hero)
         hero->x = old_x;
     }
 
+    /* Hero's star */
+    hero->star->x = hero->x + 20;
+    hero->star->y = (((int)hero->y  + 5) / TILE_SIZE) * TILE_SIZE;
+
     /* Graphics */
     animate(&hero->sprite);
     animate(&hero->star->sprite);
@@ -457,11 +467,12 @@ int update_stars()
     STAR *star;
     int i;
 
-    for (i = 0; i < num_stars; i++) {
+    for (i = 0; i < MAX_STARS; i++) {
         star = stars[i];
-        star->x = hero.x + 20;
-        star->y = (((int)hero.y  + 5) / TILE_SIZE) * TILE_SIZE;
-        animate(&star->sprite);
+        if (star != NULL) {
+            /* ADD STAR PHYSICS HERE */
+            animate(&star->sprite);
+        }
     }
 
     return EXIT_SUCCESS;
@@ -507,10 +518,15 @@ void draw_gameplay(void *data)
     }
 
     /* Draw stars */
-    for (i = 0; i < num_stars; i++) {
-        draw_sprite(&stars[i]->sprite, stars[i]->x, stars[i]->y);
+    for (i = 0; i < MAX_STARS; i++) {
+        if (stars[i] != NULL) {
+            draw_sprite(&stars[i]->sprite, stars[i]->x, stars[i]->y);
+        }
     }
 
     /* Draw the hero */
     draw_sprite(&hero.sprite, hero.x, hero.y);
+    if (hero.star != NULL) {
+        draw_sprite(&hero.star->sprite, hero.star->x, hero.star->y);
+    }
 }
