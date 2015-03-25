@@ -183,6 +183,14 @@ STAR *create_star(int color)
 }
 
 
+STAR *destroy_star(STAR *star)
+{
+    free_memory("STAR", star);
+    
+    return NULL;
+}
+
+
 int add_star(int color)
 {
     int i;
@@ -220,7 +228,7 @@ int init_hero(HERO *hero, float x, float y)
 
     hero->attack = 0;
 
-    hero->star = create_star(RED);
+    hero->star = NULL;
 
     return EXIT_SUCCESS;
 }
@@ -233,6 +241,64 @@ int init_stars()
     for (i = 0; i < MAX_STARS; i++) {
         stars[i] = NULL;
     }
+
+    return EXIT_SUCCESS;
+}
+
+
+int random_front_color()
+{
+    int r, c;
+    int colors[STAR_LAST_COLOR];
+    int num_colors = 0;
+    int i;
+    int exists;
+
+    r = 0;
+    while (r < ROWS) {
+        c = 0;
+        while (c < COLS) {
+            if (blocks[r][c] != NULL) {
+                exists = 0;
+                for (i = 0; i < num_colors && !exists; i++) {
+                    if (colors[i] == blocks[r][c]->color) {
+                        exists = 1;
+                    }
+                }
+                if (!exists) {
+                    colors[num_colors] = blocks[r][c]->color;
+                    num_colors++;
+                }
+                c = COLS;
+            } else {
+                c++;
+            }
+        }
+        r++;
+    }
+
+    return colors[random_number(0, num_colors - 1)];
+}
+
+
+int set_hero_star_position(HERO *hero)
+{
+    hero->star->x = hero->x + 20;
+    hero->star->y = (((int)hero->y  + 5) / TILE_SIZE) * TILE_SIZE;
+
+    return EXIT_SUCCESS;
+}
+
+
+int set_hero_star(HERO *hero)
+{
+    if (hero->star != NULL) {
+        destroy_star(hero->star);
+    }
+
+    hero->star = create_star(random_front_color());
+
+    set_hero_star_position(hero);
 
     return EXIT_SUCCESS;
 }
@@ -259,9 +325,6 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 1;
                 break;
-            case ALLEGRO_KEY_SPACE:
-                hero->attack = 1;
-                break;
         }
     }
 
@@ -283,7 +346,7 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
                 hero->r = 0;
                 break;
             case ALLEGRO_KEY_SPACE:
-                hero->attack = 0;
+                set_hero_star(hero);
                 break;
         }
     }
@@ -357,9 +420,11 @@ int new_game()
     init_stars();
 
     /* Init the board */
-    setup_board(6, 6);
+    setup_board(6, 3);
 
-    return 1;
+    set_hero_star(&hero);
+
+    return EXIT_SUCCESS;
 }
 
 
@@ -453,8 +518,7 @@ void update_hero(HERO *hero)
     }
 
     /* Hero's star */
-    hero->star->x = hero->x + 20;
-    hero->star->y = (((int)hero->y  + 5) / TILE_SIZE) * TILE_SIZE;
+    set_hero_star_position(hero);
 
     /* Graphics */
     animate(&hero->sprite);
