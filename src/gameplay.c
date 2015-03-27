@@ -17,35 +17,6 @@ static int end_gameplay = 0;
 
 typedef enum
 {
-    BOARD_EMPTY = 0,
-    BOARD_BORDER = 1,
-
-    BOARD_FIRST_COLOR = 10,
-    BOARD_RED = 10,
-    BOARD_ORANGE,
-    BOARD_YELLOW,
-    BOARD_GREEN,
-    BOARD_BLUE,
-    BOARD_PURPLE,
-    BOARD_LAST_COLOR
-} BOARD_TYPES;
-
-
-typedef enum
-{
-    STAR_FIRST_COLOR = 0,
-    STAR_RED = 0,
-    STAR_ORANGE,
-    STAR_YELLOW,
-    STAR_GREEN,
-    STAR_BLUE,
-    STAR_PURPLE,
-    STAR_LAST_COLOR,
-} STAR_COLOR;
-
-
-typedef enum
-{
     FIRST_COLOR = 0,
     RED = 0,
     ORA,
@@ -53,7 +24,7 @@ typedef enum
     GRE,
     BLU,
     PUR,
-    LAST_COLOR
+    MAX_COLORS
 } COLORS;
 
 
@@ -249,7 +220,7 @@ int init_stars()
 int random_front_color()
 {
     int r, c;
-    int colors[STAR_LAST_COLOR];
+    int colors[MAX_COLORS];
     int num_colors = 0;
     int i;
     int exists;
