@@ -12,6 +12,7 @@ static int end_gameplay = 0;
 /* In pixels per second */
 /* The hero can move four tiles in one second */
 #define HERO_SPEED ((TILE_SIZE) * 4)
+#define STAR_SPEED ((TILE_SIZE) * 10)
 #define PPS_TO_TICKS(PPS) ((PPS) / (float)(GAME_TICKER))
 
 
@@ -56,6 +57,8 @@ typedef struct
 
     float x;
     float y;
+    int w;
+    int h;
 
     int is_moving;
     int is_forward;
@@ -149,6 +152,8 @@ STAR *create_star(int color)
     star->is_exploding = 0;
     star->x = 0;
     star->y = 0;
+    star->w = TILE_SIZE - 1;
+    star->h = TILE_SIZE - 1;
 
     return star;
 }
@@ -159,21 +164,6 @@ STAR *destroy_star(STAR *star)
     free_memory("STAR", star);
     
     return NULL;
-}
-
-
-int add_star(int color)
-{
-    int i;
-
-    for (i = 0; i < MAX_STARS; i++) {
-        if (stars[i] == NULL) {
-            stars[i] = create_star(color);
-            return EXIT_SUCCESS;
-        }
-    }
-
-    return EXIT_FAILURE;
 }
 
 
@@ -275,6 +265,25 @@ int set_hero_star(HERO *hero)
 }
 
 
+int shoot_star(int color, float x, float y)
+{
+    int i;
+
+    for (i = 0; i < MAX_STARS; i++) {
+        if (stars[i] == NULL) {
+            stars[i] = create_star(color);
+            stars[i]->x = x;
+            stars[i]->y = y;
+            stars[i]->is_moving = 1;
+            stars[i]->is_forward = 1;
+            return EXIT_SUCCESS;
+        }
+    }
+
+    return EXIT_FAILURE;
+}
+
+
 void control_hero(HERO *hero, ALLEGRO_EVENT *event)
 {
     int key = 0;
@@ -296,6 +305,10 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 1;
                 break;
+            case ALLEGRO_KEY_SPACE:
+                shoot_star(hero->star->color, hero->star->x, hero->star->y);
+                set_hero_star(hero);
+                break;
         }
     }
 
@@ -315,9 +328,6 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 0;
-                break;
-            case ALLEGRO_KEY_SPACE:
-                set_hero_star(hero);
                 break;
         }
     }
@@ -497,6 +507,117 @@ void update_hero(HERO *hero)
 }
 
 
+BLOCK *destroy_block(BLOCK *block)
+{
+    free_memory("BLOCK", block);
+    return NULL;
+}
+
+
+int is_star_and_block_collision(STAR *star)
+{
+    int r1 = (int)(star->y / TILE_SIZE);
+    int c1 = (int)(star->x / TILE_SIZE);
+    int r2 = (int)((star->y + star->h) / TILE_SIZE);
+    int c2 = (int)((star->x + star->w) / TILE_SIZE);
+    
+    if (blocks[r1][c1]) {
+        if (star->color == blocks[r1][c1]->color) {
+            blocks[r1][c1] = destroy_block(blocks[r1][c1]);
+            star->is_exploding = 1;
+        }
+        return 1;
+    }
+    
+    if (blocks[r1][c2]) {
+        if (star->color == blocks[r1][c2]->color) {
+            blocks[r1][c2] = destroy_block(blocks[r1][c2]);
+            star->is_exploding = 1;
+        }
+        return 1;
+    }
+    
+    if (blocks[r2][c1]) {
+        if (star->color == blocks[r2][c1]->color) {
+            blocks[r2][c1] = destroy_block(blocks[r2][c1]);
+            star->is_exploding = 1;
+        }
+        return 1;
+    }
+    
+    if (blocks[r2][c2]) {
+        if (star->color == blocks[r2][c2]->color) {
+            blocks[r2][c2] = destroy_block(blocks[r2][c2]);
+            star->is_exploding = 1;
+        }
+        return 1;
+    }
+    
+    return 0;
+}
+
+
+int is_star_and_tile_collision(STAR *star)
+{
+    TILE *tile = NULL;
+    int r1 = (int)(star->y / TILE_SIZE);
+    int c1 = (int)(star->x / TILE_SIZE);
+    int r2 = (int)((star->y + star->h) / TILE_SIZE);
+    int c2 = (int)((star->x + star->w) / TILE_SIZE);
+    
+    tile = board[r1][c1];
+    if (tile && tile->solid) {
+        return 1;
+    }
+    
+    tile = board[r1][c2];
+    if (tile && tile->solid) {
+        return 1;
+    }
+    
+    tile = board[r2][c1];
+    if (tile && tile->solid) {
+        return 1;
+    }
+    
+    tile = board[r2][c2];
+    if (tile && tile->solid) {
+        return 1;
+    }
+    
+    return 0;
+}
+
+
+int update_star(STAR *star)
+{
+    float old_x = star->x;
+    float old_y = star->y;
+
+    if (star->is_moving) {
+        if (star->is_forward) {
+            star->x += PPS_TO_TICKS(STAR_SPEED);
+        } else {
+            star->x -= PPS_TO_TICKS(STAR_SPEED);
+        }
+    }
+
+    if (is_star_and_block_collision(star)) {
+        star->x = old_x;
+        star->y = old_y;
+        star->is_forward = 0;
+    } else if (is_star_and_tile_collision(star)) {
+        star->x = old_x;
+        star->y = old_y;
+        star->is_exploding = 1;
+    }
+
+    animate(&star->sprite);
+
+    return EXIT_SUCCESS;
+}
+
+
 int update_stars()
 {
     STAR *star;
@@ -505,8 +626,10 @@ int update_stars()
     for (i = 0; i < MAX_STARS; i++) {
         star = stars[i];
         if (star != NULL) {
-            /* ADD STAR PHYSICS HERE */
-            animate(&star->sprite);
+            update_star(star);
+            if (star->is_exploding) {
+                stars[i] = destroy_star(star);
+            }
         }
     }
 
