@@ -9,18 +9,15 @@
 static int end_gameplay = 0;
 
 
-
-
 typedef enum
 {
-    FIRST_COLOR = 0,
-    RED = 0,
-    ORA,
-    YEL,
-    GRE,
-    BLU,
-    PUR,
-    MAX_COLORS
+    COLOR_RED = 0,
+    COLOR_ORA,
+    COLOR_YEL,
+    COLOR_GRE,
+    COLOR_BLU,
+    COLOR_PUR,
+    TOTAL_COLORS
 } COLORS;
 
 
@@ -47,9 +44,19 @@ static BLOCK *blocks[ROWS][COLS];
 
 typedef struct
 {
+    float x;
+    float y;
+    int w;
+    int h;
+} BODY;
+
+
+typedef struct
+{
     SPRITE sprite;
     int color;
 
+    BODY body;
     float x;
     float y;
     int w;
@@ -65,6 +72,7 @@ typedef struct
 {
     SPRITE sprite;
 
+    BODY body;
     float x;
     float y;
     int w;
@@ -77,7 +85,7 @@ typedef struct
     int l;
     int r;
 
-    int attack;
+    int is_shooting;
 
     STAR *star;
 } HERO;
@@ -85,8 +93,23 @@ typedef struct
 
 static HERO hero;
 
-#define MAX_STARS 8
+#define MAX_STARS 32
 static STAR *stars[MAX_STARS];
+
+
+typedef struct
+{
+    HERO hero;
+    STAR *stars[MAX_STARS];
+    TILE *board[ROWS][COLS];
+    BLOCK *blocks[ROWS][COLS];
+} SCENE;
+
+
+int init_scene(SCENE *scene)
+{
+    return EXIT_FAILURE;
+}
 
 
 static int get_hero_speed()
@@ -108,47 +131,18 @@ static float convert_pps_to_fps(int pps)
 }
 
 
-IMAGE *color_to_star_image(int color, int frame)
+IMAGE *get_star_image(int color, int frame)
 {
-    if (color == RED) {
-        if (frame == 1) {
-            return IMG("star-red-1.png");
-        } else if (frame == 2) {
-            return IMG("star-red-2.png");
-        }
-    } else if (color == ORA) {
-        if (frame == 1) {
-            return IMG("star-orange-1.png");
-        } else if (frame == 2) {
-            return IMG("star-orange-2.png");
-        }
-    } else if (color == YEL) {
-        if (frame == 1) {
-            return IMG("star-yellow-1.png");
-        } else if (frame == 2) {
-            return IMG("star-yellow-2.png");
-        }
-    } else if (color == GRE) {
-        if (frame == 1) {
-            return IMG("star-green-1.png");
-        } else if (frame == 2) {
-            return IMG("star-green-2.png");
-        }
-    } else if (color == BLU) {
-        if (frame == 1) {
-            return IMG("star-blue-1.png");
-        } else if (frame == 2) {
-            return IMG("star-blue-2.png");
-        }
-    } else if (color == PUR) {
-        if (frame == 1) {
-            return IMG("star-purple-1.png");
-        } else if (frame == 2) {
-            return IMG("star-purple-2.png");
-        }
-    }
+    static char *star_image_names[6][2] = {
+        {"star-red-1.png", "star-red-2.png"},
+        {"star-orange-1.png", "star-orange-2.png"},
+        {"star-yellow-1.png", "star-yellow-2.png"},
+        {"star-green-1.png", "star-green-2.png"},
+        {"star-blue-1.png", "star-blue-2.png"},
+        {"star-purple-1.png", "star-purple-2.png"}
+    };
 
-    return NULL;
+    return IMG(star_image_names[color][frame]);
 }
 
 
@@ -157,8 +151,8 @@ STAR *create_star(int color)
     STAR *star = alloc_memory("STAR", sizeof(STAR));
 
     init_sprite(&star->sprite, 1, 4);
-    add_frame(&star->sprite, color_to_star_image(color, 1));
-    add_frame(&star->sprite, color_to_star_image(color, 2));
+    add_frame(&star->sprite, get_star_image(color, 0));
+    add_frame(&star->sprite, get_star_image(color, 1));
 
     star->color = color;
     star->is_moving = 0;
@@ -175,9 +169,7 @@ STAR *create_star(int color)
 
 STAR *destroy_star(STAR *star)
 {
-    free_memory("STAR", star);
-    
-    return NULL;
+    return free_memory("STAR", star);
 }
 
 
@@ -201,7 +193,7 @@ int init_hero(HERO *hero, float x, float y)
     hero->l = 0;
     hero->r = 0;
 
-    hero->attack = 0;
+    hero->is_shooting = 0;
 
     hero->star = NULL;
 
@@ -224,11 +216,21 @@ int init_stars()
 int random_front_color()
 {
     int r, c;
-    int colors[MAX_COLORS];
+    int colors[TOTAL_COLORS];
     int num_colors = 0;
     int i;
     int exists;
 
+    /**
+     * TODO:
+     * Take in to account that the hero might be about to destroy
+     * the last block of this color!
+     *
+     * if (only one block of this block color is available to hit)
+     *   and
+     * if (it's the same color as the previous star color)
+     *     remove the color from the list of available colors
+     */ 
     r = 0;
     while (r < ROWS) {
         c = 0;
@@ -256,24 +258,13 @@ int random_front_color()
 }
 
 
-int set_hero_star_position(HERO *hero)
-{
-    hero->star->x = hero->x + 20;
-    hero->star->y = (((int)hero->y  + 5) / TILE_SIZE) * TILE_SIZE;
-
-    return EXIT_SUCCESS;
-}
-
-
-int set_hero_star(HERO *hero)
+int set_hero_star(HERO *hero, STAR *star)
 {
     if (hero->star != NULL) {
-        destroy_star(hero->star);
+        hero->star = destroy_star(hero->star);
     }
 
-    hero->star = create_star(random_front_color());
-
-    set_hero_star_position(hero);
+    hero->star = star;
 
     return EXIT_SUCCESS;
 }
@@ -320,8 +311,7 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
                 hero->r = 1;
                 break;
             case ALLEGRO_KEY_SPACE:
-                shoot_star(hero->star->color, hero->star->x, hero->star->y);
-                set_hero_star(hero);
+                hero->is_shooting = 1;
                 break;
         }
     }
@@ -348,27 +338,22 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
 }
 
 
-IMAGE *color_to_block_image(int color)
+IMAGE *get_block_image(int color)
 {
-    if (color == RED) {
-        return IMG("block-red.png");
-    } else if (color == ORA) {
-        return IMG("block-orange.png");
-    } else if (color == YEL) {
-        return IMG("block-yellow.png");
-    } else if (color == GRE) {
-        return IMG("block-green.png");
-    } else if (color == BLU) {
-        return IMG("block-blue.png");
-    } else if (color == PUR) {
-        return IMG("block-purple.png");
-    } else {
-        return NULL;
-    }
+    static char *block_image_names[6] = {
+        "block-red.png",
+        "block-orange.png",
+        "block-yellow.png",
+        "block-green.png",
+        "block-blue.png",
+        "block-purple.png"
+    };
+
+    return IMG(block_image_names[color]);
 }
 
 
-void setup_board(int num_cols, int num_colors)
+void setup_room(int num_cols, int num_colors)
 {
     TILE *tile;
     BLOCK *block;
@@ -399,9 +384,9 @@ void setup_board(int num_cols, int num_colors)
     for (r = 1; r < ROWS - 1; r++) {
         for (c = 0; c < num_cols; c++) {
             block = alloc_memory("BLOCK", sizeof(BLOCK));
-            block->color = random_number(FIRST_COLOR, num_colors - 1);
+            block->color = random_number(0, num_colors - 1);
             init_sprite(&block->sprite, 0, 0);
-            add_frame(&block->sprite, color_to_block_image(block->color));
+            add_frame(&block->sprite, get_block_image(block->color));
             block->hits = 0;
             blocks[r][COLS - 2 - c] = block;
         }
@@ -415,9 +400,9 @@ int new_game()
     init_stars();
 
     /* Init the board */
-    setup_board(6, 3);
+    setup_room(6, 3);
 
-    set_hero_star(&hero);
+    set_hero_star(&hero, create_star(random_front_color()));
 
     return EXIT_SUCCESS;
 }
@@ -484,6 +469,11 @@ void update_hero(HERO *hero)
     float old_x = hero->x;
     float old_y = hero->y;
 
+    /*
+     * TODO:
+     * Allow for key-holds and temp movement taps.
+     */
+
     /* Vertical movement */
     if (!(hero->u && hero->d)) {
         if (hero->u) {
@@ -512,8 +502,17 @@ void update_hero(HERO *hero)
         hero->x = old_x;
     }
 
-    /* Hero's star */
-    set_hero_star_position(hero);
+    if (hero->is_shooting) {
+        shoot_star(hero->star->color, hero->star->x, hero->star->y);
+        set_hero_star(hero, create_star(random_front_color()));
+        hero->is_shooting = 0;
+    }
+
+    /* Tell the hero's star to follow the hero */
+    if (hero->star != NULL) {
+        hero->star->x = hero->x + 20;
+        hero->star->y = (((int)hero->y  + 5) / TILE_SIZE) * TILE_SIZE;
+    }
 
     /* Graphics */
     animate(&hero->sprite);
@@ -523,8 +522,7 @@ void update_hero(HERO *hero)
 
 BLOCK *destroy_block(BLOCK *block)
 {
-    free_memory("BLOCK", block);
-    return NULL;
+    return free_memory("BLOCK", block);
 }
 
 

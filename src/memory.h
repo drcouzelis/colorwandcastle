@@ -19,6 +19,7 @@ void *calloc_memory(const char *label, size_t nmemb, size_t size);
 
 /**
  * Call "free" and increase the memory deallocation counter.
+ * Returns NULL.
  */
 void *free_memory(const char *label, void *ptr);
 
