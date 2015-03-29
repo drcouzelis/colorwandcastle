@@ -9,11 +9,6 @@
 static int end_gameplay = 0;
 
 
-/* In pixels per second */
-/* The hero can move four tiles in one second */
-#define HERO_SPEED ((TILE_SIZE) * 4)
-#define STAR_SPEED ((TILE_SIZE) * 10)
-#define PPS_TO_TICKS(PPS) ((PPS) / (float)(GAME_TICKER))
 
 
 typedef enum
@@ -92,6 +87,25 @@ static HERO hero;
 
 #define MAX_STARS 8
 static STAR *stars[MAX_STARS];
+
+
+static int get_hero_speed()
+{
+    /* The hero can move four tiles in one second */
+    return TILE_SIZE * 4;
+}
+
+
+static int get_star_speed()
+{
+    return TILE_SIZE * 10;
+}
+
+
+static float convert_pps_to_fps(int pps)
+{
+    return pps / (float)(GAME_TICKER);
+}
 
 
 IMAGE *color_to_star_image(int color, int frame)
@@ -473,9 +487,9 @@ void update_hero(HERO *hero)
     /* Vertical movement */
     if (!(hero->u && hero->d)) {
         if (hero->u) {
-            hero->y -= PPS_TO_TICKS(HERO_SPEED);
+            hero->y -= convert_pps_to_fps(get_hero_speed());
         } else if (hero->d) {
-            hero->y += PPS_TO_TICKS(HERO_SPEED);
+            hero->y += convert_pps_to_fps(get_hero_speed());
         }
     }
 
@@ -487,9 +501,9 @@ void update_hero(HERO *hero)
     /* Horizontal movement */
     if (!(hero->l && hero->r)) {
         if (hero->l) {
-            hero->x -= PPS_TO_TICKS(HERO_SPEED);
+            hero->x -= convert_pps_to_fps(get_hero_speed());
         } else if (hero->r) {
-            hero->x += PPS_TO_TICKS(HERO_SPEED);
+            hero->x += convert_pps_to_fps(get_hero_speed());
         }
     }
 
@@ -596,9 +610,9 @@ int update_star(STAR *star)
 
     if (star->is_moving) {
         if (star->is_forward) {
-            star->x += PPS_TO_TICKS(STAR_SPEED);
+            star->x += convert_pps_to_fps(get_star_speed());
         } else {
-            star->x -= PPS_TO_TICKS(STAR_SPEED);
+            star->x -= convert_pps_to_fps(get_star_speed());
         }
     }
 
