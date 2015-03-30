@@ -1,0 +1,29 @@
+**** FOR DEVELOPERS ****
+
+Standard function prefixes:
+
+    * create
+
+        . Allocate memory
+        . Initialize defaults
+        . Return the new data structure, NULL on failure
+
+    * destroy
+
+        . Free all memory
+        . Return NULL
+
+    * init
+
+        . Initialize defaults in pre-existing data
+        . Return EXIT_SUCCESS or EXIT_FAILURE
+
+    * get
+
+        . Return a value
+        . Does not modify data
+
+    * set
+
+        * The first parameter is the data that is being modified
+        * Alternatively, set a global

@@ -400,7 +400,7 @@ int new_game()
     init_stars();
 
     /* Init the board */
-    setup_room(6, 3);
+    setup_room(4, 5);
 
     set_hero_star(&hero, create_star(random_front_color()));
 
