@@ -24,22 +24,20 @@ typedef enum
 typedef struct
 {
     SPRITE sprite;
+
+    /* A character cannot pass through a solid tile */
     int solid;
+
+    /* The tile will be removed if hits is 0 */
+    /* Indestructable if < 0 */
+    int hits;
+
+    /* Color is used to compare to stars */
+    int color;
 } TILE;
 
 
 static TILE *board[ROWS][COLS];
-
-
-typedef struct
-{
-    SPRITE sprite;
-    int color;
-    int hits;
-} BLOCK;
-
-
-static BLOCK *blocks[ROWS][COLS];
 
 
 typedef struct
@@ -102,7 +100,6 @@ typedef struct
     HERO hero;
     STAR *stars[MAX_STARS];
     TILE *board[ROWS][COLS];
-    BLOCK *blocks[ROWS][COLS];
 } SCENE;
 
 
@@ -235,23 +232,31 @@ int random_front_color()
     while (r < ROWS) {
         c = 0;
         while (c < COLS) {
-            if (blocks[r][c] != NULL) {
+            if (board[r][c] != NULL && board[r][c]->color >= 0) {
+
                 exists = 0;
+
                 for (i = 0; i < num_colors && !exists; i++) {
-                    if (colors[i] == blocks[r][c]->color) {
+                    if (colors[i] == board[r][c]->color) {
                         exists = 1;
                     }
                 }
+
                 if (!exists) {
-                    colors[num_colors] = blocks[r][c]->color;
+                    colors[num_colors] = board[r][c]->color;
                     num_colors++;
                 }
+
                 c = COLS;
             } else {
+
                 c++;
+
             }
         }
+
         r++;
+
     }
 
     return colors[random_number(0, num_colors - 1)];
@@ -356,7 +361,6 @@ IMAGE *get_block_image(int color)
 void setup_room(int num_cols, int num_colors)
 {
     TILE *tile;
-    BLOCK *block;
     int r, c;
 
     /* Board */
@@ -367,6 +371,8 @@ void setup_room(int num_cols, int num_colors)
                 init_sprite(&tile->sprite, 0, 0);
                 add_frame(&tile->sprite, IMG("bricks.png"));
                 tile->solid = 1;
+                tile->color = -1;
+                tile->hits = -1;
                 board[r][c] = tile;
             } else {
                 board[r][c] = NULL;
@@ -374,21 +380,19 @@ void setup_room(int num_cols, int num_colors)
         }
     }
 
-    /* Blocks */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
-            blocks[r][c] = NULL; /* Clear all blocks */
-        }
-    }
-
+    /* Add blocks */
     for (r = 1; r < ROWS - 1; r++) {
         for (c = 0; c < num_cols; c++) {
-            block = alloc_memory("BLOCK", sizeof(BLOCK));
-            block->color = random_number(0, num_colors - 1);
-            init_sprite(&block->sprite, 0, 0);
-            add_frame(&block->sprite, get_block_image(block->color));
-            block->hits = 0;
-            blocks[r][COLS - 2 - c] = block;
+            tile = alloc_memory("TILE", sizeof(TILE));
+
+            tile->solid = 1;
+            tile->hits = 1;
+            tile->color = random_number(0, num_colors - 1);
+
+            init_sprite(&tile->sprite, 0, 0);
+            add_frame(&tile->sprite, get_block_image(tile->color));
+
+            board[r][COLS - 2 - c] = tile;
         }
     }
 }
@@ -430,33 +434,28 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 int is_crappy_collision()
 {
     TILE *tile = NULL;
-    BLOCK *block = NULL;
     int r1 = (int)(hero.y / TILE_SIZE);
     int c1 = (int)(hero.x / TILE_SIZE);
     int r2 = (int)((hero.y + hero.h) / TILE_SIZE);
     int c2 = (int)((hero.x + hero.w) / TILE_SIZE);
     
     tile = board[r1][c1];
-    block = blocks[r1][c1];
-    if ((tile && tile->solid) || block) {
+    if (tile && tile->solid) {
         return 1;
     }
     
     tile = board[r1][c2];
-    block = blocks[r1][c2];
-    if ((tile && tile->solid) || block) {
+    if (tile && tile->solid) {
         return 1;
     }
     
     tile = board[r2][c1];
-    block = blocks[r2][c1];
-    if ((tile && tile->solid) || block) {
+    if (tile && tile->solid) {
         return 1;
     }
     
     tile = board[r2][c2];
-    block = blocks[r2][c2];
-    if ((tile && tile->solid) || block) {
+    if (tile && tile->solid) {
         return 1;
     }
     
@@ -520,12 +519,6 @@ void update_hero(HERO *hero)
 }
 
 
-BLOCK *destroy_block(BLOCK *block)
-{
-    return free_memory("BLOCK", block);
-}
-
-
 int is_star_and_block_collision(STAR *star)
 {
     int r1 = (int)(star->y / TILE_SIZE);
@@ -533,33 +526,33 @@ int is_star_and_block_collision(STAR *star)
     int r2 = (int)((star->y + star->h) / TILE_SIZE);
     int c2 = (int)((star->x + star->w) / TILE_SIZE);
     
-    if (blocks[r1][c1]) {
-        if (star->color == blocks[r1][c1]->color) {
-            blocks[r1][c1] = destroy_block(blocks[r1][c1]);
+    if (board[r1][c1]) {
+        if (star->color == board[r1][c1]->color) {
+            board[r1][c1]->hits--;
             star->is_exploding = 1;
         }
         return 1;
     }
     
-    if (blocks[r1][c2]) {
-        if (star->color == blocks[r1][c2]->color) {
-            blocks[r1][c2] = destroy_block(blocks[r1][c2]);
+    if (board[r1][c2]) {
+        if (star->color == board[r1][c2]->color) {
+            board[r1][c2]->hits--;
             star->is_exploding = 1;
         }
         return 1;
     }
     
-    if (blocks[r2][c1]) {
-        if (star->color == blocks[r2][c1]->color) {
-            blocks[r2][c1] = destroy_block(blocks[r2][c1]);
+    if (board[r2][c1]) {
+        if (star->color == board[r2][c1]->color) {
+            board[r2][c1]->hits--;
             star->is_exploding = 1;
         }
         return 1;
     }
     
-    if (blocks[r2][c2]) {
-        if (star->color == blocks[r2][c2]->color) {
-            blocks[r2][c2] = destroy_block(blocks[r2][c2]);
+    if (board[r2][c2]) {
+        if (star->color == board[r2][c2]->color) {
+            board[r2][c2]->hits--;
             star->is_exploding = 1;
         }
         return 1;
@@ -617,11 +610,11 @@ int update_star(STAR *star)
     if (is_star_and_block_collision(star)) {
         star->x = old_x;
         star->y = old_y;
-        star->is_forward = 0;
-    } else if (is_star_and_tile_collision(star)) {
-        star->x = old_x;
-        star->y = old_y;
-        star->is_exploding = 1;
+        if (star->is_forward) {
+            star->is_forward = 0;
+        } else {
+            star->is_exploding = 1;
+        }
     }
 
     animate(&star->sprite);
@@ -649,6 +642,28 @@ int update_stars()
 }
 
 
+int update_board()
+{
+    int r, c;
+    TILE *tile;
+
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+
+            tile = board[r][c];
+
+            if (tile && tile->hits == 0) {
+                /* Remove the tile */
+                board[r][c] = free_memory("TILE", tile);
+            }
+
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
+
+
 int update_gameplay(void *data)
 {
     /* Hero */
@@ -656,6 +671,9 @@ int update_gameplay(void *data)
 
     /* Stars */
     update_stars();
+
+    /* Board */
+    update_board();
 
     return !end_gameplay;
 }
@@ -680,13 +698,6 @@ void draw_gameplay(void *data)
         }
     }
     
-    /* Draw the blocks */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
-            draw_sprite(&blocks[r][c]->sprite, c * TILE_SIZE, r * TILE_SIZE);
-        }
-    }
-
     /* Draw stars */
     for (i = 0; i < MAX_STARS; i++) {
         if (stars[i] != NULL) {
