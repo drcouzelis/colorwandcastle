@@ -144,7 +144,8 @@ int main(int argc, char **argv)
     int scale = 1;
   
     if (!al_init() || !al_init_image_addon() || !al_install_keyboard() ||
-            !al_install_mouse()) {
+            !al_install_mouse() || !al_install_audio() ||
+            !al_init_acodec_addon() || !al_reserve_samples(4)) {
         fprintf(stderr, "Failed to initialize allegro.\n");
         exit(1);
     }

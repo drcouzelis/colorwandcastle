@@ -207,3 +207,11 @@ int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
 
     return EXIT_SUCCESS;
 }
+
+
+int play_sound(SOUND *snd)
+{
+    al_play_sample(snd, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+
+    return EXIT_SUCCESS;
+}

@@ -2,12 +2,6 @@
 # for details about this file.
 soundsdatadir = $(pkgdatadir)/sounds
 
-#dist_soundsdata_DATA = \
-#  arrow_fly.wav \
-#  arrow_hit.wav \
-#  chomp.wav \
-#  gasp.wav \
-#  hammer.wav \
-#  heart.wav \
-#  money.wav \
-#  sword.wav
+dist_soundsdata_DATA = \
+  star_disolve.wav \
+  star_hit.wav
