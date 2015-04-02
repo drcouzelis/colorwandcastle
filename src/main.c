@@ -5,6 +5,7 @@
 
 #include "gameplay.h"
 #include "main.h"
+#include "memory.h"
 #include "sprite.h"
 #include "resources.h"
 
@@ -177,11 +178,14 @@ int main(int argc, char **argv)
     /* START THE GAME */
     set_fps(GAME_TICKER);
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
+    cleanup_gameplay(NULL);
   
     /* DONE, clean up */
     stop_resources();
     al_destroy_display(display);
+
+    check_memory();
     
-    return 0;
+    return EXIT_SUCCESS;
 }
 

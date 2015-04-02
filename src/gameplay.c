@@ -11,6 +11,7 @@ static int end_gameplay = 0;
 
 typedef enum
 {
+    NO_COLOR = -1,
     COLOR_RED = 0,
     COLOR_ORA,
     COLOR_YEL,
@@ -54,15 +55,12 @@ typedef struct
     SPRITE sprite;
     int color;
 
+    int hits;
+
     BODY body;
-    float x;
-    float y;
-    int w;
-    int h;
 
     int is_moving;
     int is_forward;
-    int is_exploding;
 } STAR;
 
 
@@ -71,10 +69,6 @@ typedef struct
     SPRITE sprite;
 
     BODY body;
-    float x;
-    float y;
-    int w;
-    int h;
 
     /* Movement toggles */
     /* True means the hero is moving in that direction */
@@ -154,11 +148,11 @@ STAR *create_star(int color)
     star->color = color;
     star->is_moving = 0;
     star->is_forward = 0;
-    star->is_exploding = 0;
-    star->x = 0;
-    star->y = 0;
-    star->w = TILE_SIZE - 1;
-    star->h = TILE_SIZE - 1;
+    star->hits = 2;
+    star->body.x = 0;
+    star->body.y = 0;
+    star->body.w = TILE_SIZE - 1;
+    star->body.h = TILE_SIZE - 1;
 
     return star;
 }
@@ -179,11 +173,11 @@ int init_hero(HERO *hero, float x, float y)
     hero->sprite.y_offset = -10;
 
     /* Set the starting position */
-    hero->x = x;
-    hero->y = y;
+    hero->body.x = x;
+    hero->body.y = y;
 
-    hero->w = 10;
-    hero->h = 10;
+    hero->body.w = 10;
+    hero->body.h = 10;
 
     hero->u = 0;
     hero->d = 0;
@@ -282,8 +276,8 @@ int shoot_star(int color, float x, float y)
     for (i = 0; i < MAX_STARS; i++) {
         if (stars[i] == NULL) {
             stars[i] = create_star(color);
-            stars[i]->x = x;
-            stars[i]->y = y;
+            stars[i]->body.x = x;
+            stars[i]->body.y = y;
             stars[i]->is_moving = 1;
             stars[i]->is_forward = 1;
             return EXIT_SUCCESS;
@@ -370,9 +364,11 @@ void setup_room(int num_cols, int num_colors)
                 tile = alloc_memory("TILE", sizeof(TILE));
                 init_sprite(&tile->sprite, 0, 0);
                 add_frame(&tile->sprite, IMG("bricks.png"));
+
                 tile->solid = 1;
-                tile->color = -1;
+                tile->color = NO_COLOR;
                 tile->hits = -1;
+
                 board[r][c] = tile;
             } else {
                 board[r][c] = NULL;
@@ -431,42 +427,42 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 }
 
 
-int is_crappy_collision()
+TILE *is_board_collision(BODY *body)
 {
     TILE *tile = NULL;
-    int r1 = (int)(hero.y / TILE_SIZE);
-    int c1 = (int)(hero.x / TILE_SIZE);
-    int r2 = (int)((hero.y + hero.h) / TILE_SIZE);
-    int c2 = (int)((hero.x + hero.w) / TILE_SIZE);
+    int r1 = (int)(body->y / TILE_SIZE);
+    int c1 = (int)(body->x / TILE_SIZE);
+    int r2 = (int)((body->y + body->h) / TILE_SIZE);
+    int c2 = (int)((body->x + body->w) / TILE_SIZE);
     
     tile = board[r1][c1];
     if (tile && tile->solid) {
-        return 1;
+        return tile;
     }
     
     tile = board[r1][c2];
     if (tile && tile->solid) {
-        return 1;
+        return tile;
     }
     
     tile = board[r2][c1];
     if (tile && tile->solid) {
-        return 1;
+        return tile;
     }
     
     tile = board[r2][c2];
     if (tile && tile->solid) {
-        return 1;
+        return tile;
     }
     
-    return 0;
+    return NULL;
 }
 
 
 void update_hero(HERO *hero)
 {
-    float old_x = hero->x;
-    float old_y = hero->y;
+    float old_x = hero->body.x;
+    float old_y = hero->body.y;
 
     /*
      * TODO:
@@ -476,41 +472,41 @@ void update_hero(HERO *hero)
     /* Vertical movement */
     if (!(hero->u && hero->d)) {
         if (hero->u) {
-            hero->y -= convert_pps_to_fps(get_hero_speed());
+            hero->body.y -= convert_pps_to_fps(get_hero_speed());
         } else if (hero->d) {
-            hero->y += convert_pps_to_fps(get_hero_speed());
+            hero->body.y += convert_pps_to_fps(get_hero_speed());
         }
     }
 
     /* Check for vertical collisions */
-    if (is_crappy_collision()) {
-        hero->y = old_y;
+    if (is_board_collision(&hero->body) != NULL) {
+        hero->body.y = old_y;
     }
 
     /* Horizontal movement */
     if (!(hero->l && hero->r)) {
         if (hero->l) {
-            hero->x -= convert_pps_to_fps(get_hero_speed());
+            hero->body.x -= convert_pps_to_fps(get_hero_speed());
         } else if (hero->r) {
-            hero->x += convert_pps_to_fps(get_hero_speed());
+            hero->body.x += convert_pps_to_fps(get_hero_speed());
         }
     }
 
     /* Check for horizontal collisions */
-    if (is_crappy_collision()) {
-        hero->x = old_x;
+    if (is_board_collision(&hero->body) != NULL) {
+        hero->body.x = old_x;
     }
 
     if (hero->is_shooting) {
-        shoot_star(hero->star->color, hero->star->x, hero->star->y);
+        shoot_star(hero->star->color, hero->star->body.x, hero->star->body.y);
         set_hero_star(hero, create_star(random_front_color()));
         hero->is_shooting = 0;
     }
 
     /* Tell the hero's star to follow the hero */
     if (hero->star != NULL) {
-        hero->star->x = hero->x + 20;
-        hero->star->y = (((int)hero->y  + 5) / TILE_SIZE) * TILE_SIZE;
+        hero->star->body.x = hero->body.x + 20;
+        hero->star->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
     }
 
     /* Graphics */
@@ -519,101 +515,38 @@ void update_hero(HERO *hero)
 }
 
 
-int is_star_and_block_collision(STAR *star)
-{
-    int r1 = (int)(star->y / TILE_SIZE);
-    int c1 = (int)(star->x / TILE_SIZE);
-    int r2 = (int)((star->y + star->h) / TILE_SIZE);
-    int c2 = (int)((star->x + star->w) / TILE_SIZE);
-    
-    if (board[r1][c1]) {
-        if (star->color == board[r1][c1]->color) {
-            board[r1][c1]->hits--;
-            star->is_exploding = 1;
-        }
-        return 1;
-    }
-    
-    if (board[r1][c2]) {
-        if (star->color == board[r1][c2]->color) {
-            board[r1][c2]->hits--;
-            star->is_exploding = 1;
-        }
-        return 1;
-    }
-    
-    if (board[r2][c1]) {
-        if (star->color == board[r2][c1]->color) {
-            board[r2][c1]->hits--;
-            star->is_exploding = 1;
-        }
-        return 1;
-    }
-    
-    if (board[r2][c2]) {
-        if (star->color == board[r2][c2]->color) {
-            board[r2][c2]->hits--;
-            star->is_exploding = 1;
-        }
-        return 1;
-    }
-    
-    return 0;
-}
-
-
-int is_star_and_tile_collision(STAR *star)
-{
-    TILE *tile = NULL;
-    int r1 = (int)(star->y / TILE_SIZE);
-    int c1 = (int)(star->x / TILE_SIZE);
-    int r2 = (int)((star->y + star->h) / TILE_SIZE);
-    int c2 = (int)((star->x + star->w) / TILE_SIZE);
-    
-    tile = board[r1][c1];
-    if (tile && tile->solid) {
-        return 1;
-    }
-    
-    tile = board[r1][c2];
-    if (tile && tile->solid) {
-        return 1;
-    }
-    
-    tile = board[r2][c1];
-    if (tile && tile->solid) {
-        return 1;
-    }
-    
-    tile = board[r2][c2];
-    if (tile && tile->solid) {
-        return 1;
-    }
-    
-    return 0;
-}
-
-
 int update_star(STAR *star)
 {
-    float old_x = star->x;
-    float old_y = star->y;
+    TILE *tile = NULL;
+    float old_x = star->body.x;
+    float old_y = star->body.y;
 
     if (star->is_moving) {
         if (star->is_forward) {
-            star->x += convert_pps_to_fps(get_star_speed());
+            star->body.x += convert_pps_to_fps(get_star_speed());
         } else {
-            star->x -= convert_pps_to_fps(get_star_speed());
+            star->body.x -= convert_pps_to_fps(get_star_speed());
         }
     }
 
-    if (is_star_and_block_collision(star)) {
-        star->x = old_x;
-        star->y = old_y;
-        if (star->is_forward) {
-            star->is_forward = 0;
+    tile = is_board_collision(&star->body);
+
+    if (tile != NULL) {
+
+        /* A tile has been hit! */
+
+        star->body.x = old_x;
+        star->body.y = old_y;
+
+        if (star->color == tile->color) {
+            /* Matching colors! */
+            /* Remove the star and tile */
+            tile->hits--;
+            star->hits = 0;
         } else {
-            star->is_exploding = 1;
+            /* Just bounce */
+            star->hits--;
+            star->is_forward = star->is_forward ? 0 : 1;
         }
     }
 
@@ -626,15 +559,31 @@ int update_star(STAR *star)
 int update_stars()
 {
     STAR *star;
-    int i;
+    int i, j;
 
     for (i = 0; i < MAX_STARS; i++) {
+
         star = stars[i];
+
         if (star != NULL) {
+
             update_star(star);
-            if (star->is_exploding) {
+
+            /* Remove stars that have no hits left */
+            if (star->hits <= 0) {
                 stars[i] = destroy_star(star);
             }
+        }
+    }
+
+    /* Remove any empty spaces in the array of stars */
+    /* Keep things on screen looking nice and in order */
+    for (i = 0; i < MAX_STARS; i++) {
+        if (stars[i] == NULL) {
+            for (j = i; j < MAX_STARS - 1; j++) {
+                stars[j] = stars[j + 1];
+            }
+            stars[j] = NULL;
         }
     }
 
@@ -701,13 +650,43 @@ void draw_gameplay(void *data)
     /* Draw stars */
     for (i = 0; i < MAX_STARS; i++) {
         if (stars[i] != NULL) {
-            draw_sprite(&stars[i]->sprite, stars[i]->x, stars[i]->y);
+            draw_sprite(&stars[i]->sprite, stars[i]->body.x, stars[i]->body.y);
         }
     }
 
     /* Draw the hero */
-    draw_sprite(&hero.sprite, hero.x, hero.y);
+    draw_sprite(&hero.sprite, hero.body.x, hero.body.y);
     if (hero.star != NULL) {
-        draw_sprite(&hero.star->sprite, hero.star->x, hero.star->y);
+        draw_sprite(&hero.star->sprite, hero.star->body.x, hero.star->body.y);
     }
+}
+
+
+void cleanup_hero(HERO *hero)
+{
+    if (hero != NULL && hero->star != NULL) {
+        hero->star = destroy_star(hero->star);
+    }
+}
+
+
+void cleanup_gameplay(void *data)
+{
+    int r, c;
+    int i;
+
+    /* Destroy tiles */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            board[r][c] = free_memory("TILE", board[r][c]);
+        }
+    }
+    
+    /* Destroy stars */
+    for (i = 0; i < MAX_STARS; i++) {
+        stars[i] = destroy_star(stars[i]);
+    }
+
+    /* Destroy the hero */
+    cleanup_hero(&hero);
 }
