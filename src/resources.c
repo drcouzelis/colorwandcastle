@@ -34,6 +34,8 @@ static int num_resources = 0;
 static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILENAME_LEN];
 static int num_resource_paths = 0;
 
+static int is_audio_on = 1;
+
 
 void stop_resources()
 {
@@ -211,7 +213,15 @@ int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
 
 int play_sound(SOUND *snd)
 {
-    al_play_sample(snd, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    if (is_audio_on) {
+        al_play_sample(snd, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    }
 
     return EXIT_SUCCESS;
+}
+
+
+void toggle_audio()
+{
+    is_audio_on = is_audio_on ? 0 : 1;
 }

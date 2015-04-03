@@ -39,6 +39,7 @@ SOUND *get_sound(const char *name);
 int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip);
 
 int play_sound(SOUND *snd);
+void toggle_audio();
 
 /* For convenience. */
 #define IMG(name) (get_image(name))

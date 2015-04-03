@@ -413,12 +413,15 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     int key = 0;
 
     /* General application control */
-    if (event->type == ALLEGRO_EVENT_KEY_UP) {
+    if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         key = event->keyboard.keycode;
 
-        /* To quit the game */
         if (key == ALLEGRO_KEY_ESCAPE) {
+            /* ESC : Quit the game */
             end_gameplay = 1;
+        } else if (key == ALLEGRO_KEY_S) {
+            /* S : Toggle audio */
+            toggle_audio();
         }
     }
 

@@ -173,6 +173,9 @@ int main(int argc, char **argv)
     /* Set the window title and icon */
     al_set_window_title(display, "Colorwand Castle");
     al_set_display_icon(display, IMG("icon.png"));
+
+    /* Turn audio off */
+    toggle_audio();
   
     new_game();
 
