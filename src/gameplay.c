@@ -92,15 +92,9 @@ static STAR *stars[MAX_STARS];
 typedef struct
 {
     HERO hero;
-    STAR *stars[MAX_STARS];
-    TILE *board[ROWS][COLS];
+    STAR **stars;
+    TILE **board;
 } SCENE;
-
-
-int init_scene(SCENE *scene)
-{
-    return EXIT_FAILURE;
-}
 
 
 static int get_hero_speed()
@@ -139,6 +133,10 @@ IMAGE *get_star_image(int color, int frame)
 
 STAR *create_star(int color)
 {
+    if (color == NO_COLOR) {
+        return NULL;
+    }
+
     STAR *star = alloc_memory("STAR", sizeof(STAR));
 
     init_sprite(&star->sprite, 1, 4);
@@ -204,6 +202,39 @@ int init_stars()
 }
 
 
+SCENE *create_scene()
+{
+    SCENE *scene = NULL;
+    int i = 0;
+
+    scene = alloc_memory("SCENE", sizeof(SCENE));
+
+    init_hero(&scene->hero, TILE_SIZE, TILE_SIZE);
+
+    scene->stars = calloc_memory("STARS", MAX_STARS, sizeof(STAR));
+    for (i = 0; i < MAX_STARS; i++) {
+        scene->stars[i] = NULL;
+    }
+
+    scene->board = calloc_memory("BOARD", ROWS * COLS, sizeof(TILE));
+    for (i = 0; i < ROWS * COLS; i++) {
+        scene->board[i] = NULL;
+    }
+
+    return scene;
+}
+
+
+SCENE *destroy_scene(SCENE *scene)
+{
+    free_memory("STARS", scene->stars);
+    free_memory("BOARD", scene->board);
+    free_memory("SCENE", scene);
+
+    return NULL;
+}
+
+
 int random_front_color()
 {
     int r, c;
@@ -245,15 +276,17 @@ int random_front_color()
             } else {
 
                 c++;
-
             }
         }
 
         r++;
-
     }
 
-    return colors[random_number(0, num_colors - 1)];
+    if (num_colors < 1) {
+        return NO_COLOR;
+    } else {
+        return colors[random_number(0, num_colors - 1)];
+    }
 }
 
 
@@ -396,8 +429,14 @@ void setup_room(int num_cols, int num_colors)
 
 int new_game()
 {
+    SCENE *scene = NULL;
+
     init_hero(&hero, TILE_SIZE, TILE_SIZE);
     init_stars();
+
+    /* Testing SCENE creation */
+    scene = create_scene();
+    destroy_scene(scene);
 
     /* Init the board */
     setup_room(4, 5);
