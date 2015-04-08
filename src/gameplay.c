@@ -38,9 +38,6 @@ typedef struct
 } TILE;
 
 
-static TILE *board[ROWS][COLS];
-
-
 typedef struct
 {
     float x;
@@ -83,17 +80,14 @@ typedef struct
 } HERO;
 
 
-static HERO hero;
-
 #define MAX_STARS 32
-static STAR *stars[MAX_STARS];
 
 
 typedef struct
 {
     HERO hero;
     STAR **stars;
-    TILE **board;
+    TILE ***board;
 } SCENE;
 
 
@@ -190,21 +184,10 @@ int init_hero(HERO *hero, float x, float y)
 }
 
 
-int init_stars()
-{
-    int i;
-
-    for (i = 0; i < MAX_STARS; i++) {
-        stars[i] = NULL;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-
 SCENE *create_scene()
 {
     SCENE *scene = NULL;
+    int r, c;
     int i = 0;
 
     scene = alloc_memory("SCENE", sizeof(SCENE));
@@ -216,17 +199,110 @@ SCENE *create_scene()
         scene->stars[i] = NULL;
     }
 
-    scene->board = calloc_memory("BOARD", ROWS * COLS, sizeof(TILE));
-    for (i = 0; i < ROWS * COLS; i++) {
-        scene->board[i] = NULL;
+    scene->board = calloc_memory("BOARD", ROWS, sizeof(TILE *));
+    for (r = 0; r < ROWS; r++) {
+        scene->board[r] = calloc_memory("BOARD", COLS, sizeof(TILE));
+    }
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            scene->board[r][c] = NULL;
+        }
     }
 
     return scene;
 }
 
 
+void add_border(SCENE *scene)
+{
+    TILE *tile;
+    int r, c;
+
+    /* Board */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            if (c == 0 || r == 0 || c == COLS - 1 || r == ROWS - 1) {
+                tile = alloc_memory("TILE", sizeof(TILE));
+                init_sprite(&tile->sprite, 0, 0);
+                add_frame(&tile->sprite, IMG("bricks.png"));
+
+                tile->solid = 1;
+                tile->color = NO_COLOR;
+                tile->hits = -1;
+
+                scene->board[r][c] = tile;
+            } else {
+                scene->board[r][c] = NULL;
+            }
+        }
+    }
+}
+
+
+IMAGE *get_block_image(int color)
+{
+    static char *block_image_names[6] = {
+        "block-red.png",
+        "block-orange.png",
+        "block-yellow.png",
+        "block-green.png",
+        "block-blue.png",
+        "block-purple.png"
+    };
+
+    return IMG(block_image_names[color]);
+}
+
+
+TILE *create_block(int color)
+{
+    TILE *tile = alloc_memory("TILE", sizeof(TILE));
+
+    tile->solid = 1;
+    tile->hits = 1;
+    tile->color = color;
+
+    init_sprite(&tile->sprite, 0, 0);
+    add_frame(&tile->sprite, get_block_image(tile->color));
+
+    return tile;
+}
+
+
+void add_blocks(SCENE *scene, int num_cols, int num_colors)
+{
+    int r, c;
+
+    for (r = 1; r < ROWS - 1; r++) {
+        for (c = 0; c < num_cols; c++) {
+            scene->board[r][COLS - 2 - c] = create_block(random_number(0, num_colors - 1));
+        }
+    }
+}
+
+
+SCENE *create_scene_01()
+{
+    SCENE *scene = create_scene();
+
+    add_border(scene);
+    add_blocks(scene, 4, 5);
+
+    return scene;
+}
+
+
+void cleanup_hero(HERO *hero)
+{
+    if (hero != NULL && hero->star != NULL) {
+        hero->star = destroy_star(hero->star);
+    }
+}
+
+
 SCENE *destroy_scene(SCENE *scene)
 {
+    cleanup_hero(&scene->hero);
     free_memory("STARS", scene->stars);
     free_memory("BOARD", scene->board);
     free_memory("SCENE", scene);
@@ -235,7 +311,7 @@ SCENE *destroy_scene(SCENE *scene)
 }
 
 
-int random_front_color()
+int random_front_color(SCENE *scene)
 {
     int r, c;
     int colors[TOTAL_COLORS];
@@ -257,18 +333,18 @@ int random_front_color()
     while (r < ROWS) {
         c = 0;
         while (c < COLS) {
-            if (board[r][c] != NULL && board[r][c]->color >= 0) {
+            if (scene->board[r][c] != NULL && scene->board[r][c]->color >= 0) {
 
                 exists = 0;
 
                 for (i = 0; i < num_colors && !exists; i++) {
-                    if (colors[i] == board[r][c]->color) {
+                    if (colors[i] == scene->board[r][c]->color) {
                         exists = 1;
                     }
                 }
 
                 if (!exists) {
-                    colors[num_colors] = board[r][c]->color;
+                    colors[num_colors] = scene->board[r][c]->color;
                     num_colors++;
                 }
 
@@ -302,17 +378,17 @@ int set_hero_star(HERO *hero, STAR *star)
 }
 
 
-int shoot_star(int color, float x, float y)
+int shoot_star(SCENE *scene, int color, float x, float y)
 {
     int i;
 
     for (i = 0; i < MAX_STARS; i++) {
-        if (stars[i] == NULL) {
-            stars[i] = create_star(color);
-            stars[i]->body.x = x;
-            stars[i]->body.y = y;
-            stars[i]->is_moving = 1;
-            stars[i]->is_forward = 1;
+        if (scene->stars[i] == NULL) {
+            scene->stars[i] = create_star(color);
+            scene->stars[i]->body.x = x;
+            scene->stars[i]->body.y = y;
+            scene->stars[i]->is_moving = 1;
+            scene->stars[i]->is_forward = 1;
             return EXIT_SUCCESS;
         }
     }
@@ -370,85 +446,9 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
 }
 
 
-IMAGE *get_block_image(int color)
-{
-    static char *block_image_names[6] = {
-        "block-red.png",
-        "block-orange.png",
-        "block-yellow.png",
-        "block-green.png",
-        "block-blue.png",
-        "block-purple.png"
-    };
-
-    return IMG(block_image_names[color]);
-}
-
-
-void setup_room(int num_cols, int num_colors)
-{
-    TILE *tile;
-    int r, c;
-
-    /* Board */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
-            if (c == 0 || r == 0 || c == COLS - 1 || r == ROWS - 1) {
-                tile = alloc_memory("TILE", sizeof(TILE));
-                init_sprite(&tile->sprite, 0, 0);
-                add_frame(&tile->sprite, IMG("bricks.png"));
-
-                tile->solid = 1;
-                tile->color = NO_COLOR;
-                tile->hits = -1;
-
-                board[r][c] = tile;
-            } else {
-                board[r][c] = NULL;
-            }
-        }
-    }
-
-    /* Add blocks */
-    for (r = 1; r < ROWS - 1; r++) {
-        for (c = 0; c < num_cols; c++) {
-            tile = alloc_memory("TILE", sizeof(TILE));
-
-            tile->solid = 1;
-            tile->hits = 1;
-            tile->color = random_number(0, num_colors - 1);
-
-            init_sprite(&tile->sprite, 0, 0);
-            add_frame(&tile->sprite, get_block_image(tile->color));
-
-            board[r][COLS - 2 - c] = tile;
-        }
-    }
-}
-
-
-int new_game()
-{
-    SCENE *scene = NULL;
-
-    init_hero(&hero, TILE_SIZE, TILE_SIZE);
-    init_stars();
-
-    /* Testing SCENE creation */
-    scene = create_scene();
-    destroy_scene(scene);
-
-    /* Init the board */
-    setup_room(4, 5);
-
-    set_hero_star(&hero, create_star(random_front_color()));
-
-    return EXIT_SUCCESS;
-}
-
-
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
+    SCENE *scene = (SCENE *)data;
     int key = 0;
 
     /* General application control */
@@ -465,11 +465,11 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 
     /* Hero control */
-    control_hero(&hero, event);
+    control_hero(&scene->hero, event);
 }
 
 
-TILE *is_board_collision(BODY *body)
+TILE *is_board_collision(SCENE *scene, BODY *body)
 {
     TILE *tile = NULL;
     int r1 = (int)(body->y / TILE_SIZE);
@@ -477,22 +477,22 @@ TILE *is_board_collision(BODY *body)
     int r2 = (int)((body->y + body->h) / TILE_SIZE);
     int c2 = (int)((body->x + body->w) / TILE_SIZE);
     
-    tile = board[r1][c1];
+    tile = scene->board[r1][c1];
     if (tile && tile->solid) {
         return tile;
     }
     
-    tile = board[r1][c2];
+    tile = scene->board[r1][c2];
     if (tile && tile->solid) {
         return tile;
     }
     
-    tile = board[r2][c1];
+    tile = scene->board[r2][c1];
     if (tile && tile->solid) {
         return tile;
     }
     
-    tile = board[r2][c2];
+    tile = scene->board[r2][c2];
     if (tile && tile->solid) {
         return tile;
     }
@@ -501,8 +501,9 @@ TILE *is_board_collision(BODY *body)
 }
 
 
-void update_hero(HERO *hero)
+void update_hero(SCENE *scene)
 {
+    HERO *hero = &scene->hero;
     float old_x = hero->body.x;
     float old_y = hero->body.y;
 
@@ -521,7 +522,7 @@ void update_hero(HERO *hero)
     }
 
     /* Check for vertical collisions */
-    if (is_board_collision(&hero->body) != NULL) {
+    if (is_board_collision(scene, &hero->body) != NULL) {
         hero->body.y = old_y;
     }
 
@@ -535,13 +536,13 @@ void update_hero(HERO *hero)
     }
 
     /* Check for horizontal collisions */
-    if (is_board_collision(&hero->body) != NULL) {
+    if (is_board_collision(scene, &hero->body) != NULL) {
         hero->body.x = old_x;
     }
 
     if (hero->is_shooting) {
-        shoot_star(hero->star->color, hero->star->body.x, hero->star->body.y);
-        set_hero_star(hero, create_star(random_front_color()));
+        shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
+        set_hero_star(hero, create_star(random_front_color(scene)));
         hero->is_shooting = 0;
     }
 
@@ -549,6 +550,8 @@ void update_hero(HERO *hero)
     if (hero->star != NULL) {
         hero->star->body.x = hero->body.x + 20;
         hero->star->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
+    } else {
+        set_hero_star(&scene->hero, create_star(random_front_color(scene)));
     }
 
     /* Graphics */
@@ -557,7 +560,7 @@ void update_hero(HERO *hero)
 }
 
 
-int update_star(STAR *star)
+int update_star(SCENE *scene, STAR *star)
 {
     TILE *tile = NULL;
     float old_x = star->body.x;
@@ -571,7 +574,7 @@ int update_star(STAR *star)
         }
     }
 
-    tile = is_board_collision(&star->body);
+    tile = is_board_collision(scene, &star->body);
 
     if (tile != NULL) {
 
@@ -599,22 +602,22 @@ int update_star(STAR *star)
 }
 
 
-int update_stars()
+int update_stars(SCENE *scene)
 {
     STAR *star;
     int i, j;
 
     for (i = 0; i < MAX_STARS; i++) {
 
-        star = stars[i];
+        star = scene->stars[i];
 
         if (star != NULL) {
 
-            update_star(star);
+            update_star(scene, star);
 
             /* Remove stars that have no hits left */
             if (star->hits <= 0) {
-                stars[i] = destroy_star(star);
+                scene->stars[i] = destroy_star(star);
                 play_sound(SND("star_disolve.wav"));
             }
         }
@@ -623,11 +626,11 @@ int update_stars()
     /* Remove any empty spaces in the array of stars */
     /* Keep things on screen looking nice and in order */
     for (i = 0; i < MAX_STARS; i++) {
-        if (stars[i] == NULL) {
+        if (scene->stars[i] == NULL) {
             for (j = i; j < MAX_STARS - 1; j++) {
-                stars[j] = stars[j + 1];
+                scene->stars[j] = scene->stars[j + 1];
             }
-            stars[j] = NULL;
+            scene->stars[j] = NULL;
         }
     }
 
@@ -635,7 +638,7 @@ int update_stars()
 }
 
 
-int update_board()
+int update_board(SCENE *scene)
 {
     int r, c;
     TILE *tile;
@@ -643,11 +646,11 @@ int update_board()
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
 
-            tile = board[r][c];
+            tile = scene->board[r][c];
 
             if (tile && tile->hits == 0) {
                 /* Remove the tile */
-                board[r][c] = free_memory("TILE", tile);
+                scene->board[r][c] = free_memory("TILE", tile);
             }
 
         }
@@ -659,14 +662,16 @@ int update_board()
 
 int update_gameplay(void *data)
 {
+    SCENE *scene = (SCENE *)data;
+
     /* Hero */
-    update_hero(&hero);
+    update_hero(scene);
 
     /* Stars */
-    update_stars();
+    update_stars(scene);
 
     /* Board */
-    update_board();
+    update_board(scene);
 
     return !end_gameplay;
 }
@@ -674,6 +679,10 @@ int update_gameplay(void *data)
 
 void draw_gameplay(void *data)
 {
+    SCENE *scene = (SCENE *)data;
+    TILE *tile = NULL;
+    STAR *star = NULL;
+    HERO *hero = NULL;
     int r, c;
     int i;
 
@@ -687,50 +696,24 @@ void draw_gameplay(void *data)
     /* Draw the game board */
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
-            draw_sprite(&board[r][c]->sprite, c * TILE_SIZE, r * TILE_SIZE);
+            tile = scene->board[r][c];
+            draw_sprite(&tile->sprite, c * TILE_SIZE, r * TILE_SIZE);
         }
     }
     
     /* Draw stars */
     for (i = 0; i < MAX_STARS; i++) {
-        if (stars[i] != NULL) {
-            draw_sprite(&stars[i]->sprite, stars[i]->body.x, stars[i]->body.y);
+        if (scene->stars[i] != NULL) {
+            star = scene->stars[i];
+            draw_sprite(&star->sprite, star->body.x, star->body.y);
         }
     }
 
     /* Draw the hero */
-    draw_sprite(&hero.sprite, hero.body.x, hero.body.y);
-    if (hero.star != NULL) {
-        draw_sprite(&hero.star->sprite, hero.star->body.x, hero.star->body.y);
+    hero = &scene->hero;
+    draw_sprite(&hero->sprite, hero->body.x, hero->body.y);
+    star = hero->star;
+    if (star != NULL) {
+        draw_sprite(&star->sprite, star->body.x, star->body.y);
     }
-}
-
-
-void cleanup_hero(HERO *hero)
-{
-    if (hero != NULL && hero->star != NULL) {
-        hero->star = destroy_star(hero->star);
-    }
-}
-
-
-void cleanup_gameplay(void *data)
-{
-    int r, c;
-    int i;
-
-    /* Destroy tiles */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
-            board[r][c] = free_memory("TILE", board[r][c]);
-        }
-    }
-    
-    /* Destroy stars */
-    for (i = 0; i < MAX_STARS; i++) {
-        stars[i] = destroy_star(stars[i]);
-    }
-
-    /* Destroy the hero */
-    cleanup_hero(&hero);
 }

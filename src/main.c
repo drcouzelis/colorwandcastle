@@ -142,6 +142,8 @@ int main(int argc, char **argv)
     int monitor_w = DISPLAY_WIDTH;
     int monitor_h = DISPLAY_HEIGHT;
     int scale = 1;
+
+    SCENE *scene = NULL;
   
     if (!al_init() || !al_init_image_addon() || !al_install_keyboard() ||
             !al_install_mouse() || !al_install_audio() ||
@@ -177,12 +179,12 @@ int main(int argc, char **argv)
     /* Turn audio off */
     toggle_audio();
   
-    new_game();
+    set_fps(GAME_TICKER);
 
     /* START THE GAME */
-    set_fps(GAME_TICKER);
-    run(control_gameplay, update_gameplay, draw_gameplay, NULL);
-    cleanup_gameplay(NULL);
+    scene = create_scene_01();
+    run(control_gameplay, update_gameplay, draw_gameplay, scene);
+    destroy_scene(scene);
   
     /* DONE, clean up */
     stop_resources();
