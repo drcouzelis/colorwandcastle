@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 
     /* START THE GAME */
     scene = create_scene_01();
-    run(control_gameplay, update_gameplay, draw_gameplay, scene);
+    run(control_scene, update_scene, draw_scene, scene);
     destroy_scene(scene);
   
     /* DONE, clean up */

@@ -8,9 +8,9 @@
 typedef struct SCENE SCENE;
 
 
-void control_gameplay(void *data, ALLEGRO_EVENT *event);
-int update_gameplay(void *data);
-void draw_gameplay(void *data);
+void control_scene(void *data, ALLEGRO_EVENT *event);
+int update_scene(void *data);
+void draw_scene(void *data);
 
 SCENE *create_scene_01();
 SCENE *destroy_scene(SCENE *scene);

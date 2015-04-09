@@ -6,7 +6,7 @@
 #include "utilities.h"
 
 
-static int end_gameplay = 0;
+static int end_scene = 0;
 
 
 typedef enum
@@ -199,10 +199,13 @@ SCENE *create_scene()
         scene->stars[i] = NULL;
     }
 
+    /* Create the board */
     scene->board = calloc_memory("BOARD", ROWS, sizeof(TILE *));
     for (r = 0; r < ROWS; r++) {
         scene->board[r] = calloc_memory("BOARD", COLS, sizeof(TILE));
     }
+
+    /* Init the board */
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
             scene->board[r][c] = NULL;
@@ -302,9 +305,28 @@ void cleanup_hero(HERO *hero)
 
 SCENE *destroy_scene(SCENE *scene)
 {
+    int r, c;
+    int i;
+
+    /* Hero */
     cleanup_hero(&scene->hero);
+
+    /* Stars */
+    for (i = 0; i < MAX_STARS; i++) {
+        destroy_star(scene->stars[i]);
+    }
     free_memory("STARS", scene->stars);
+
+    /* Board */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            free_memory("TILE", scene->board[r][c]);
+        }
+        free_memory("BOARD", scene->board[r]);
+    }
     free_memory("BOARD", scene->board);
+
+    /* And the scene itself */
     free_memory("SCENE", scene);
 
     return NULL;
@@ -446,7 +468,7 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
 }
 
 
-void control_gameplay(void *data, ALLEGRO_EVENT *event)
+void control_scene(void *data, ALLEGRO_EVENT *event)
 {
     SCENE *scene = (SCENE *)data;
     int key = 0;
@@ -457,7 +479,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 
         if (key == ALLEGRO_KEY_ESCAPE) {
             /* ESC : Quit the game */
-            end_gameplay = 1;
+            end_scene = 1;
         } else if (key == ALLEGRO_KEY_S) {
             /* S : Toggle audio */
             toggle_audio();
@@ -660,7 +682,7 @@ int update_board(SCENE *scene)
 }
 
 
-int update_gameplay(void *data)
+int update_scene(void *data)
 {
     SCENE *scene = (SCENE *)data;
 
@@ -673,11 +695,11 @@ int update_gameplay(void *data)
     /* Board */
     update_board(scene);
 
-    return !end_gameplay;
+    return !end_scene;
 }
 
 
-void draw_gameplay(void *data)
+void draw_scene(void *data)
 {
     SCENE *scene = (SCENE *)data;
     TILE *tile = NULL;
