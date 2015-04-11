@@ -1,16 +1,4 @@
-#ifndef RUN_HEADER
-#define RUN_HEADER
-
-#include <allegro5/allegro.h>
-#include <stdio.h>
-
-#include "config.h"
-
-#include "gameplay.h"
-#include "main.h"
-#include "memory.h"
-#include "sprite.h"
-#include "resources.h"
+#include "run.h"
 
 
 static int run_fps = 60;
@@ -75,6 +63,3 @@ int RUN_run(void (*control)(void *data, ALLEGRO_EVENT *event),
   
   return EXIT_SUCCESS;
 }
-
-
-#endif
