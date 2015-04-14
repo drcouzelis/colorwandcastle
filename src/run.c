@@ -4,7 +4,7 @@
 static int run_fps = 60;
 
 
-int RUN_set_fps(int fps)
+int set_fps(int fps)
 {
     if (fps <= 0) {
         return EXIT_FAILURE;
@@ -16,7 +16,7 @@ int RUN_set_fps(int fps)
 }
 
 
-int RUN_run(void (*control)(void *data, ALLEGRO_EVENT *event),
+int run(void (*control)(void *data, ALLEGRO_EVENT *event),
         int (*update)(void *data), void (*draw)(void *data), void *data)
 {
   ALLEGRO_TIMER *timer = NULL;
