@@ -85,7 +85,7 @@ typedef struct
 
 typedef struct
 {
-    HERO hero;
+    HERO *hero;
     STAR **stars;
     TILE ***board;
 } SCENE;
@@ -152,12 +152,20 @@ STAR *create_star(int color)
 
 STAR *destroy_star(STAR *star)
 {
+    if (star == NULL) {
+        return NULL;
+    }
+
     return free_memory("STAR", star);
 }
 
 
-int init_hero(HERO *hero, float x, float y)
+HERO *create_hero(float x, float y)
 {
+    HERO *hero = NULL;
+
+    hero = alloc_memory("HERO", sizeof(HERO));
+
     init_sprite(&hero->sprite, 1, 10);
     add_frame(&hero->sprite, IMG("makayla-01.png"));
     add_frame(&hero->sprite, IMG("makayla-02.png"));
@@ -180,7 +188,7 @@ int init_hero(HERO *hero, float x, float y)
 
     hero->star = NULL;
 
-    return EXIT_SUCCESS;
+    return hero;
 }
 
 
@@ -192,7 +200,7 @@ SCENE *create_scene()
 
     scene = alloc_memory("SCENE", sizeof(SCENE));
 
-    init_hero(&scene->hero, TILE_SIZE, TILE_SIZE);
+    scene->hero = create_hero(TILE_SIZE, TILE_SIZE);
 
     scene->stars = calloc_memory("STARS", MAX_STARS, sizeof(STAR));
     for (i = 0; i < MAX_STARS; i++) {
@@ -295,11 +303,15 @@ SCENE *create_scene_01()
 }
 
 
-void cleanup_hero(HERO *hero)
+HERO *destroy_hero(HERO *hero)
 {
-    if (hero != NULL && hero->star != NULL) {
-        hero->star = destroy_star(hero->star);
+    if (hero == NULL) {
+        return NULL;
     }
+
+    hero->star = destroy_star(hero->star);
+
+    return free_memory("HERO", hero);
 }
 
 
@@ -308,28 +320,30 @@ SCENE *destroy_scene(SCENE *scene)
     int r, c;
     int i;
 
+    if (scene == NULL) {
+        return NULL;
+    }
+
     /* Hero */
-    cleanup_hero(&scene->hero);
+    scene->hero = destroy_hero(scene->hero);
 
     /* Stars */
     for (i = 0; i < MAX_STARS; i++) {
-        destroy_star(scene->stars[i]);
+        scene->stars[i] = destroy_star(scene->stars[i]);
     }
-    free_memory("STARS", scene->stars);
+    scene->stars = free_memory("STARS", scene->stars);
 
     /* Board */
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
-            free_memory("TILE", scene->board[r][c]);
+            scene->board[r][c] = free_memory("TILE", scene->board[r][c]);
         }
-        free_memory("BOARD", scene->board[r]);
+        scene->board[r] = free_memory("BOARD", scene->board[r]);
     }
-    free_memory("BOARD", scene->board);
+    scene->board = free_memory("BOARD", scene->board);
 
     /* And the scene itself */
-    free_memory("SCENE", scene);
-
-    return NULL;
+    return free_memory("SCENE", scene);
 }
 
 
@@ -487,7 +501,7 @@ void control_scene(void *data, ALLEGRO_EVENT *event)
     }
 
     /* Hero control */
-    control_hero(&scene->hero, event);
+    control_hero(scene->hero, event);
 }
 
 
@@ -525,7 +539,7 @@ TILE *is_board_collision(SCENE *scene, BODY *body)
 
 void update_hero(SCENE *scene)
 {
-    HERO *hero = &scene->hero;
+    HERO *hero = scene->hero;
     float old_x = hero->body.x;
     float old_y = hero->body.y;
 
@@ -573,7 +587,7 @@ void update_hero(SCENE *scene)
         hero->star->body.x = hero->body.x + 20;
         hero->star->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
     } else {
-        set_hero_star(&scene->hero, create_star(random_front_color(scene)));
+        set_hero_star(scene->hero, create_star(random_front_color(scene)));
     }
 
     /* Graphics */
@@ -732,7 +746,7 @@ void draw_scene(void *data)
     }
 
     /* Draw the hero */
-    hero = &scene->hero;
+    hero = scene->hero;
     draw_sprite(&hero->sprite, hero->body.x, hero->body.y);
     star = hero->star;
     if (star != NULL) {
