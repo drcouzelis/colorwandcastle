@@ -74,6 +74,9 @@ typedef struct
     int l;
     int r;
 
+    int dx;
+    int dy;
+
     int is_shooting;
 
     STAR *star;
@@ -183,6 +186,9 @@ HERO *create_hero(float x, float y)
     hero->d = 0;
     hero->l = 0;
     hero->r = 0;
+
+    hero->dx = 0;
+    hero->dy = 0;
 
     hero->is_shooting = 0;
 
@@ -444,15 +450,19 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = 1;
+                hero->dy = -get_hero_speed();
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = 1;
+                hero->dy = get_hero_speed();
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = 1;
+                hero->dx = -get_hero_speed();
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 1;
+                hero->dx = get_hero_speed();
                 break;
             case ALLEGRO_KEY_SPACE:
                 hero->is_shooting = 1;
@@ -464,18 +474,25 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
         key = event->keyboard.keycode;
 
         /* Hero key released */
+        /* These crazy conditionals allow the hero to continue moving */
+        /* if another key was still being held after a release. */
+        /* (It feels more natural this way.) */
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = 0;
+                hero->dy = hero->d ? get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = 0;
+                hero->dy = hero->u ? -get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = 0;
+                hero->dx = hero->r ? get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 0;
+                hero->dx = hero->l ? -get_hero_speed() : 0;
                 break;
         }
     }
@@ -549,13 +566,7 @@ void update_hero(SCENE *scene)
      */
 
     /* Vertical movement */
-    if (!(hero->u && hero->d)) {
-        if (hero->u) {
-            hero->body.y -= convert_pps_to_fps(get_hero_speed());
-        } else if (hero->d) {
-            hero->body.y += convert_pps_to_fps(get_hero_speed());
-        }
-    }
+    hero->body.y += convert_pps_to_fps(hero->dy);
 
     /* Check for vertical collisions */
     if (is_board_collision(scene, &hero->body) != NULL) {
@@ -563,13 +574,7 @@ void update_hero(SCENE *scene)
     }
 
     /* Horizontal movement */
-    if (!(hero->l && hero->r)) {
-        if (hero->l) {
-            hero->body.x -= convert_pps_to_fps(get_hero_speed());
-        } else if (hero->r) {
-            hero->body.x += convert_pps_to_fps(get_hero_speed());
-        }
-    }
+    hero->body.x += convert_pps_to_fps(hero->dx);
 
     /* Check for horizontal collisions */
     if (is_board_collision(scene, &hero->body) != NULL) {
