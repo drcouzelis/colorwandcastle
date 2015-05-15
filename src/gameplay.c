@@ -582,8 +582,10 @@ void update_hero(SCENE *scene)
     }
 
     if (hero->is_shooting) {
-        shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
-        set_hero_star(hero, create_star(random_front_color(scene)));
+        if (hero->star != NULL) {
+            shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
+            set_hero_star(hero, create_star(random_front_color(scene)));
+        }
         hero->is_shooting = 0;
     }
 
