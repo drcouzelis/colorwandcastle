@@ -1,16 +1,13 @@
 #ifndef RESOURCES_HEADER
 #define RESOURCES_HEADER
 
-
 #include <allegro5/allegro.h>
-#include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_audio.h>
+/*#include <allegro5/allegro_acodec.h>*/
+/*#include <allegro5/allegro_audio.h>*/
 #include <allegro5/allegro_image.h>
 
-
 typedef ALLEGRO_BITMAP IMAGE;
-typedef ALLEGRO_SAMPLE SOUND;
-
+/*typedef ALLEGRO_SAMPLE SOUND;*/
 
 /**
  * Free all the resource memory and
@@ -34,16 +31,15 @@ void add_resource_path(const char *path);
  * resource isn't found it will return NULL.
  */
 IMAGE *get_image(const char *name);
-SOUND *get_sound(const char *name);
+/*SOUND *get_sound(const char *name);*/
 
 int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip);
 
-int play_sound(SOUND *snd);
+/*int play_sound(SOUND *snd);*/
 void toggle_audio();
 
 /* For convenience. */
 #define IMG(name) (get_image(name))
-#define SND(name) (get_sound(name))
-
+/*#define SND(name) (get_sound(name))*/
 
 #endif

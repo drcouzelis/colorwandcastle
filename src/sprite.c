@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include "sprite.h"
 
-
 static int sprite_fps = -1;
-
 
 int set_animation_fps(int fps)
 {
@@ -16,7 +14,6 @@ int set_animation_fps(int fps)
 
     return EXIT_SUCCESS;
 }
-
 
 int init_sprite(SPRITE *s, int loop, int speed)
 {
@@ -52,7 +49,6 @@ int init_sprite(SPRITE *s, int loop, int speed)
     return EXIT_SUCCESS;
 }
 
-
 int copy_sprite(SPRITE *copy, SPRITE *orig)
 {
     int i;
@@ -85,7 +81,6 @@ int copy_sprite(SPRITE *copy, SPRITE *orig)
     return EXIT_SUCCESS;
 }
 
-
 int reset_sprite(SPRITE *s)
 {
     if (s == NULL) {
@@ -99,7 +94,6 @@ int reset_sprite(SPRITE *s)
     return EXIT_SUCCESS;
 }
 
-
 IMAGE *get_frame(SPRITE *s)
 {
     if (s == NULL || s->len == 0) {
@@ -108,7 +102,6 @@ IMAGE *get_frame(SPRITE *s)
 
     return s->frames[s->pos];
 }
-
 
 int add_frame(SPRITE *s, IMAGE *frame)
 {
@@ -125,7 +118,6 @@ int add_frame(SPRITE *s, IMAGE *frame)
     return EXIT_SUCCESS;
 }
 
-
 int draw_sprite(SPRITE *s, float x, float y)
 {
     if (s == NULL || s->len == 0) {
@@ -138,7 +130,6 @@ int draw_sprite(SPRITE *s, float x, float y)
     
     return draw_image(get_frame(s), x, y, s->rotate, s->mirror, s->flip);
 }
-
 
 /* Animate the sprite */
 int animate(SPRITE *s)
@@ -176,7 +167,6 @@ int animate(SPRITE *s)
     return EXIT_SUCCESS;
 }
 
-
 int get_sprite_width(SPRITE *s)
 {
     if (s == NULL || s->len == 0) {
@@ -185,7 +175,6 @@ int get_sprite_width(SPRITE *s)
 
     return al_get_bitmap_width(get_frame(s));
 }
-
 
 int get_sprite_height(SPRITE *s)
 {

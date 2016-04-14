@@ -1,9 +1,7 @@
-#ifndef MEMORY_H
-#define MEMORY_H
-
+#ifndef MEMORY_HEADER
+#define MEMORY_HEADER
 
 #include <malloc.h>
-
 
 void show_memory_label();
 
@@ -28,6 +26,5 @@ void *free_memory(const char *label, void *ptr);
  * matches the number of frees.
  */
 void check_memory();
-
 
 #endif

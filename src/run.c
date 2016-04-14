@@ -1,12 +1,12 @@
+#include <stdio.h>
 #include "run.h"
 
-
 static int run_fps = 60;
-
 
 int set_fps(int fps)
 {
     if (fps <= 0) {
+        fprintf(stderr, "FPS must be greater than 0.\n");
         return EXIT_FAILURE;
     }
     
@@ -15,9 +15,7 @@ int set_fps(int fps)
     return EXIT_SUCCESS;
 }
 
-
-int run(void (*control)(void *data, ALLEGRO_EVENT *event),
-        int (*update)(void *data), void (*draw)(void *data), void *data)
+int run(void (*control)(void *data, ALLEGRO_EVENT *event), int (*update)(void *data), void (*draw)(void *data), void *data)
 {
   ALLEGRO_TIMER *timer = NULL;
   int keep_running = 1;

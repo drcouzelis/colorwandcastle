@@ -1,3 +1,11 @@
+TODO
+----
+* Remove Allegro from:
+  * main
+  * run
+  * resources
+  * gameplay
+
 Colorwand Castle
 ----------------
 By David Couzelis

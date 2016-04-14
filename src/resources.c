@@ -1,16 +1,13 @@
 #include <stdio.h>
 #include <string.h>
-
 #include "memory.h"
 #include "resources.h"
-
 
 #define MAX_RESOURCES 256
 #define MAX_RESOURCE_PATHS 4
 #define MAX_FILENAME_LEN 256
 
 #define GAME_VOLUME 192
-
 
 typedef enum
 {
@@ -27,7 +24,6 @@ typedef struct
     void *data;
 } RESOURCE;
 
-
 static RESOURCE *resources[MAX_RESOURCES];
 static int num_resources = 0;
 
@@ -35,7 +31,6 @@ static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILENAME_LEN];
 static int num_resource_paths = 0;
 
 static int is_audio_on = 1;
-
 
 void stop_resources()
 {
@@ -46,7 +41,7 @@ void stop_resources()
             if (resources[i]->type == RESOURCE_TYPE_IMAGE) {
                 al_destroy_bitmap((IMAGE *)resources[i]->data);
             } else if (resources[i]->type == RESOURCE_TYPE_SOUND) {
-                al_destroy_sample((SOUND *)resources[i]->data);
+                /*al_destroy_sample((SOUND *)resources[i]->data);*/
             }
             free_memory("RESOURCE", resources[i]);
             resources[i] = NULL;
@@ -55,7 +50,6 @@ void stop_resources()
   
     num_resources = 0;
 }
-
 
 void add_resource_path(const char *path)
 {
@@ -73,7 +67,6 @@ void add_resource_path(const char *path)
     num_resource_paths++;
 }
 
-
 /**
  * Load a bitmap and set magic pink to transparent.
  */
@@ -89,7 +82,6 @@ IMAGE *load_bitmap_with_magic_pink(const char *filename)
 
     return bitmap;
 }
-
 
 /**
  * Create a RESOURCE structure.
@@ -107,7 +99,6 @@ RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
 
     return resource;
 }
-
 
 void *get_resource(const char *name, RESOURCE_TYPE type)
 {
@@ -145,7 +136,7 @@ void *get_resource(const char *name, RESOURCE_TYPE type)
         if (type == RESOURCE_TYPE_IMAGE) {
             data = load_bitmap_with_magic_pink(fullpath);
         } else if (type == RESOURCE_TYPE_SOUND) {
-            data = al_load_sample(fullpath);
+            /*data = al_load_sample(fullpath);*/
         }
 
         if (data) {
@@ -159,18 +150,17 @@ void *get_resource(const char *name, RESOURCE_TYPE type)
     return NULL;
 }
 
-
 IMAGE *get_image(const char *name)
 {
     return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
 }
 
-
+/*
 SOUND *get_sound(const char *name)
 {
     return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
 }
-
+*/
 
 int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
 {
@@ -210,7 +200,7 @@ int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
     return EXIT_SUCCESS;
 }
 
-
+/*
 int play_sound(SOUND *snd)
 {
     if (is_audio_on) {
@@ -219,7 +209,7 @@ int play_sound(SOUND *snd)
 
     return EXIT_SUCCESS;
 }
-
+*/
 
 void toggle_audio()
 {

@@ -1,12 +1,9 @@
 #ifndef SPRITE_HEADER
 #define SPRITE_HEADER
 
-
 #include "resources.h"
 
-
 #define MAX_FRAMES 16
-
 
 typedef struct
 {
@@ -28,7 +25,6 @@ typedef struct
     int mirror;
     int flip;
 } SPRITE;
-
 
 /**
  * The FPS must be greater than 0.
@@ -80,6 +76,5 @@ int draw_sprite(SPRITE *s, float x, float y);
  */
 int get_sprite_width(SPRITE *s);
 int get_sprite_height(SPRITE *s);
-
 
 #endif

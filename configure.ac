@@ -21,12 +21,6 @@ AM_PROG_CC_C_O
 AC_CHECK_LIB([allegro], [al_install_system], [],
              [AC_MSG_ERROR([liballegro not found.])])
 
-AC_CHECK_LIB([allegro_acodec], [al_init_acodec_addon], [],
-             [AC_MSG_ERROR([liballegro_acodec not found.])])
-
-AC_CHECK_LIB([allegro_audio], [al_install_audio], [],
-             [AC_MSG_ERROR([liballegro_audio not found.])])
-
 AC_CHECK_LIB([allegro_image], [al_init_image_addon], [],
              [AC_MSG_ERROR([liballegro_image not found.])])
 

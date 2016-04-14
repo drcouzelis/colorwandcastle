@@ -631,7 +631,7 @@ int update_star(SCENE *scene, STAR *star)
             /* Remove the star and tile */
             tile->hits--;
             star->hits = 0;
-            play_sound(SND("star_hit.wav"));
+            /*play_sound(SND("star_hit.wav"));*/
         } else {
             /* Just bounce */
             star->hits--;
@@ -661,7 +661,7 @@ int update_stars(SCENE *scene)
             /* Remove stars that have no hits left */
             if (star->hits <= 0) {
                 scene->stars[i] = destroy_star(star);
-                play_sound(SND("star_disolve.wav"));
+                /*play_sound(SND("star_disolve.wav"));*/
             }
         }
     }
