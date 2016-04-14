@@ -27,17 +27,20 @@ AC_CHECK_LIB([allegro_acodec], [al_init_acodec_addon], [],
 AC_CHECK_LIB([allegro_audio], [al_install_audio], [],
              [AC_MSG_ERROR([liballegro_audio not found.])])
 
-#AC_CHECK_LIB([allegro_font], [al_init_font_addon], [],
-#             [AC_MSG_ERROR([liballegro_font not found.])])
-
 AC_CHECK_LIB([allegro_image], [al_init_image_addon], [],
              [AC_MSG_ERROR([liballegro_image not found.])])
 
-#AC_CHECK_LIB([allegro_primitives], [al_init_primitives_addon], [],
-#             [AC_MSG_ERROR([liballegro_primitives not found.])])
+# Check for SDL
+AC_CHECK_LIB([SDL2], [SDL_Init], [],
+             [AC_MSG_ERROR([libSDL2 not found.])])
 
-#AC_CHECK_LIB([allegro_ttf], [al_init_ttf_addon], [],
-#             [AC_MSG_ERROR([liballegro_ttf not found.])])
+#SDL_VERSION=2.0.4
+#AM_PATH_SDL2($SDL_VERSION,
+#          :,
+#          AC_MSG_ERROR([SDL version $SDL_VERSION not found!])
+#)
+#CFLAGS="$CFLAGS $SDL_CFLAGS"
+#LIBS="$LIBS $SDL_LIBS"
 
 # A list of the Makefiles that need to be created.
 AC_CONFIG_FILES([Makefile
