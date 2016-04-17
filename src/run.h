@@ -1,14 +1,12 @@
 #ifndef RUN_HEADER
 #define RUN_HEADER
 
-
-#include <allegro5/allegro.h>
-
+#include <SDL2/SDL.h>
 
 int set_fps(int fps);
 
-int run(void (*control)(void *data, ALLEGRO_EVENT *event),
-        int (*update)(void *data), void (*draw)(void *data), void *data);
+int set_window(SDL_Window *window);
 
+int run(void (*control)(void *data, SDL_Event *event), int (*update)(void *data), void (*draw)(void *data), void *data);
 
 #endif

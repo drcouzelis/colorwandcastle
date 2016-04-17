@@ -15,49 +15,58 @@ int set_fps(int fps)
     return EXIT_SUCCESS;
 }
 
-int run(void (*control)(void *data, ALLEGRO_EVENT *event), int (*update)(void *data), void (*draw)(void *data), void *data)
+SDL_Window *run_window = NULL;
+
+int set_window(SDL_Window *window)
 {
-  ALLEGRO_TIMER *timer = NULL;
-  int keep_running = 1;
-  int redraw = 1;
-
-  ALLEGRO_EVENT_QUEUE *events = al_create_event_queue();
-  ALLEGRO_EVENT event;
-
-  timer = al_create_timer(1.0 / run_fps);
-  al_register_event_source(events, al_get_timer_event_source(timer));
-  al_register_event_source(events, al_get_keyboard_event_source());
-
-  al_start_timer(timer);
-
-  while (keep_running) {
-
-    al_wait_for_event(events, &event);
-
-    control(data, &event);
-
-    if (event.type == ALLEGRO_EVENT_TIMER) {
-
-      /* Update */
-      keep_running = update(data);
-
-      redraw = 1;
+    if (window == NULL) {
+        fprintf(stderr, "Window is NULL.\n");
+        return EXIT_FAILURE;
     }
+    
+    run_window = window;
+    
+    return EXIT_SUCCESS;
+}
 
-    if (redraw && al_is_event_queue_empty(events)) {
-
-      redraw = 0;
-
-      /* Draw */
-      draw(data);
-
-      /* Update the screen */
-      al_flip_display();
-    }
-  }
-
-  al_destroy_event_queue(events);
-  al_destroy_timer(timer);
+int run(void (*control)(void *data, SDL_Event *event), int (*update)(void *data), void (*draw)(void *data), void *data)
+{
+    int keep_running = 1;
+    SDL_Event event;
+    float old_time = 0;
+    float milliseconds_per_frame = 1000.0 / run_fps;
+    float current_time = SDL_GetTicks();
   
-  return EXIT_SUCCESS;
+    /* Main loop */
+    while (keep_running) {
+  
+        old_time = current_time;
+        current_time = SDL_GetTicks();
+
+        /* STEP 1 */
+        /* Handle all events (controls) in the queue */
+        while (SDL_PollEvent(&event)) {
+            control(data, &event);
+        }
+    
+        /* STEP 2 */
+        /* Update */
+        keep_running = update(data);
+
+        /* If updating didn't take too much time... */
+        if (current_time < (old_time + milliseconds_per_frame)) {
+    
+            /* STEP 3 */
+            /* Draw */
+            draw(data);
+    
+            /* Update the screen */
+            SDL_UpdateWindowSurface(run_window);
+        }
+
+        /* Wait for the rest of the frame to finish */
+        SDL_Delay((old_time + milliseconds_per_frame) - current_time);
+    }
+  
+    return EXIT_SUCCESS;
 }
