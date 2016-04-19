@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <string.h>
-
 #include "memory.h"
 #include "resources.h"
-
 
 #define MAX_RESOURCES 256
 #define MAX_RESOURCE_PATHS 4
 #define MAX_FILENAME_LEN 256
-
 #define GAME_VOLUME 192
-
 
 typedef enum
 {
@@ -19,14 +15,12 @@ typedef enum
     RESOURCE_TYPE_MUSIC
 } RESOURCE_TYPE;
 
-
 typedef struct
 {
     char name[MAX_FILENAME_LEN];
     RESOURCE_TYPE type;
     void *data;
 } RESOURCE;
-
 
 static RESOURCE *resources[MAX_RESOURCES];
 static int num_resources = 0;
@@ -36,8 +30,7 @@ static int num_resource_paths = 0;
 
 static int is_audio_on = 1;
 
-
-void stop_resources()
+void free_resources()
 {
     int i;
   
@@ -56,7 +49,6 @@ void stop_resources()
     num_resources = 0;
 }
 
-
 void add_resource_path(const char *path)
 {
     if (num_resource_paths >= MAX_RESOURCE_PATHS) {
@@ -72,7 +64,6 @@ void add_resource_path(const char *path)
 
     num_resource_paths++;
 }
-
 
 /**
  * Load a bitmap and set magic pink to transparent.
@@ -107,7 +98,6 @@ RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
 
     return resource;
 }
-
 
 void *get_resource(const char *name, RESOURCE_TYPE type)
 {
@@ -159,18 +149,15 @@ void *get_resource(const char *name, RESOURCE_TYPE type)
     return NULL;
 }
 
-
 IMAGE *get_image(const char *name)
 {
     return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
 }
 
-
 SOUND *get_sound(const char *name)
 {
     return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
 }
-
 
 int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
 {
@@ -210,7 +197,6 @@ int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
     return EXIT_SUCCESS;
 }
 
-
 int play_sound(SOUND *snd)
 {
     if (is_audio_on) {
@@ -219,7 +205,6 @@ int play_sound(SOUND *snd)
 
     return EXIT_SUCCESS;
 }
-
 
 void toggle_audio()
 {

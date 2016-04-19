@@ -1,13 +1,10 @@
 #include <stdio.h>
-
 #include "main.h"
 #include "memory.h"
 #include "sprite.h"
 #include "utilities.h"
 
-
 static int end_scene = 0;
-
 
 typedef enum
 {
@@ -20,7 +17,6 @@ typedef enum
     COLOR_PUR,
     TOTAL_COLORS
 } COLORS;
-
 
 typedef struct
 {
@@ -37,7 +33,6 @@ typedef struct
     int color;
 } TILE;
 
-
 typedef struct
 {
     float x;
@@ -45,7 +40,6 @@ typedef struct
     int w;
     int h;
 } BODY;
-
 
 typedef struct
 {
@@ -59,7 +53,6 @@ typedef struct
     int is_moving;
     int is_forward;
 } STAR;
-
 
 typedef struct
 {
@@ -82,9 +75,7 @@ typedef struct
     STAR *star;
 } HERO;
 
-
 #define MAX_STARS 32
-
 
 typedef struct
 {
@@ -93,25 +84,21 @@ typedef struct
     TILE ***board;
 } SCENE;
 
-
 static int get_hero_speed()
 {
     /* The hero can move four tiles in one second */
     return TILE_SIZE * 4;
 }
 
-
 static int get_star_speed()
 {
     return TILE_SIZE * 10;
 }
 
-
 static float convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
 }
-
 
 IMAGE *get_star_image(int color, int frame)
 {
@@ -126,7 +113,6 @@ IMAGE *get_star_image(int color, int frame)
 
     return IMG(star_image_names[color][frame]);
 }
-
 
 STAR *create_star(int color)
 {
@@ -152,7 +138,6 @@ STAR *create_star(int color)
     return star;
 }
 
-
 STAR *destroy_star(STAR *star)
 {
     if (star == NULL) {
@@ -161,7 +146,6 @@ STAR *destroy_star(STAR *star)
 
     return free_memory("STAR", star);
 }
-
 
 HERO *create_hero(float x, float y)
 {
@@ -197,7 +181,6 @@ HERO *create_hero(float x, float y)
     return hero;
 }
 
-
 SCENE *create_scene()
 {
     SCENE *scene = NULL;
@@ -229,7 +212,6 @@ SCENE *create_scene()
     return scene;
 }
 
-
 void add_border(SCENE *scene)
 {
     TILE *tile;
@@ -255,7 +237,6 @@ void add_border(SCENE *scene)
     }
 }
 
-
 IMAGE *get_block_image(int color)
 {
     static char *block_image_names[6] = {
@@ -269,7 +250,6 @@ IMAGE *get_block_image(int color)
 
     return IMG(block_image_names[color]);
 }
-
 
 TILE *create_block(int color)
 {
@@ -285,7 +265,6 @@ TILE *create_block(int color)
     return tile;
 }
 
-
 void add_blocks(SCENE *scene, int num_cols, int num_colors)
 {
     int r, c;
@@ -297,7 +276,6 @@ void add_blocks(SCENE *scene, int num_cols, int num_colors)
     }
 }
 
-
 SCENE *create_scene_01()
 {
     SCENE *scene = create_scene();
@@ -307,7 +285,6 @@ SCENE *create_scene_01()
 
     return scene;
 }
-
 
 HERO *destroy_hero(HERO *hero)
 {
@@ -319,7 +296,6 @@ HERO *destroy_hero(HERO *hero)
 
     return free_memory("HERO", hero);
 }
-
 
 SCENE *destroy_scene(SCENE *scene)
 {
@@ -351,7 +327,6 @@ SCENE *destroy_scene(SCENE *scene)
     /* And the scene itself */
     return free_memory("SCENE", scene);
 }
-
 
 int random_front_color(SCENE *scene)
 {
@@ -407,7 +382,6 @@ int random_front_color(SCENE *scene)
     }
 }
 
-
 int set_hero_star(HERO *hero, STAR *star)
 {
     if (hero->star != NULL) {
@@ -418,7 +392,6 @@ int set_hero_star(HERO *hero, STAR *star)
 
     return EXIT_SUCCESS;
 }
-
 
 int shoot_star(SCENE *scene, int color, float x, float y)
 {
@@ -437,7 +410,6 @@ int shoot_star(SCENE *scene, int color, float x, float y)
 
     return EXIT_FAILURE;
 }
-
 
 void control_hero(HERO *hero, ALLEGRO_EVENT *event)
 {
@@ -498,7 +470,6 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
     }
 }
 
-
 void control_scene(void *data, ALLEGRO_EVENT *event)
 {
     SCENE *scene = (SCENE *)data;
@@ -509,7 +480,7 @@ void control_scene(void *data, ALLEGRO_EVENT *event)
         key = event->keyboard.keycode;
 
         if (key == ALLEGRO_KEY_ESCAPE) {
-            /* ESC : Quit the game */
+            /* ESC : Stop gameplay */
             end_scene = 1;
         } else if (key == ALLEGRO_KEY_S) {
             /* S : Toggle audio */
@@ -520,7 +491,6 @@ void control_scene(void *data, ALLEGRO_EVENT *event)
     /* Hero control */
     control_hero(scene->hero, event);
 }
-
 
 TILE *is_board_collision(SCENE *scene, BODY *body)
 {
@@ -553,17 +523,11 @@ TILE *is_board_collision(SCENE *scene, BODY *body)
     return NULL;
 }
 
-
 void update_hero(SCENE *scene)
 {
     HERO *hero = scene->hero;
     float old_x = hero->body.x;
     float old_y = hero->body.y;
-
-    /*
-     * TODO:
-     * Allow for key-holds and temp movement taps.
-     */
 
     /* Vertical movement */
     hero->body.y += convert_pps_to_fps(hero->dy);
@@ -601,7 +565,6 @@ void update_hero(SCENE *scene)
     animate(&hero->sprite);
     animate(&hero->star->sprite);
 }
-
 
 int update_star(SCENE *scene, STAR *star)
 {
@@ -644,7 +607,6 @@ int update_star(SCENE *scene, STAR *star)
     return EXIT_SUCCESS;
 }
 
-
 int update_stars(SCENE *scene)
 {
     STAR *star;
@@ -661,7 +623,8 @@ int update_stars(SCENE *scene)
             /* Remove stars that have no hits left */
             if (star->hits <= 0) {
                 scene->stars[i] = destroy_star(star);
-                play_sound(SND("star_disolve.wav"));
+                /* TODO: This plays when a block is destroyed too! */
+                /*play_sound(SND("star_disolve.wav"));*/
             }
         }
     }
@@ -679,7 +642,6 @@ int update_stars(SCENE *scene)
 
     return EXIT_SUCCESS;
 }
-
 
 int update_board(SCENE *scene)
 {
@@ -702,10 +664,17 @@ int update_board(SCENE *scene)
     return EXIT_SUCCESS;
 }
 
-
 int update_scene(void *data)
 {
     SCENE *scene = (SCENE *)data;
+
+    /**
+     * TODO:
+     * Separate updates into sections:
+     *  . Handle collisions
+     *  . Set status
+     *  . Move
+     */
 
     /* Hero */
     update_hero(scene);
@@ -718,7 +687,6 @@ int update_scene(void *data)
 
     return !end_scene;
 }
-
 
 void draw_scene(void *data)
 {
