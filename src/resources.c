@@ -6,7 +6,6 @@
 #define MAX_RESOURCES 256
 #define MAX_RESOURCE_PATHS 4
 #define MAX_FILENAME_LEN 256
-
 #define GAME_VOLUME 192
 
 typedef enum
@@ -15,7 +14,6 @@ typedef enum
     RESOURCE_TYPE_SOUND,
     RESOURCE_TYPE_MUSIC
 } RESOURCE_TYPE;
-
 
 typedef struct
 {
@@ -32,7 +30,7 @@ static int num_resource_paths = 0;
 
 static int is_audio_on = 1;
 
-void stop_resources()
+void free_resources()
 {
     int i;
   
@@ -155,12 +153,10 @@ IMAGE *get_image(const char *name)
     return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
 }
 
-/*
 SOUND *get_sound(const char *name)
 {
     return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
 }
-*/
 
 int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
 {
@@ -200,7 +196,6 @@ int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
     return EXIT_SUCCESS;
 }
 
-/*
 int play_sound(SOUND *snd)
 {
     if (is_audio_on) {
@@ -209,7 +204,6 @@ int play_sound(SOUND *snd)
 
     return EXIT_SUCCESS;
 }
-*/
 
 void toggle_audio()
 {

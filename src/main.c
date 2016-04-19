@@ -1,47 +1,13 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "config.h"
+#include "display.h"
 #include "gameplay.h"
 #include "main.h"
 #include "memory.h"
 #include "resources.h"
 #include "run.h"
 #include "sprite.h"
-
-#define TILE_SIZE 20 
- 
-#define COLS 16 
-#define ROWS 12 
- 
-#define DISPLAY_WIDTH (COLS * TILE_SIZE) 
-#define DISPLAY_HEIGHT (ROWS * TILE_SIZE) 
-
-SDL_Window* window = NULL;
-
-SDL_Surface *test_image = NULL;
-int quit_test = 0;
-
-void test_control(void *data, SDL_Event *event)
-{
-    if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
-        key = event->keyboard.keycode;
-
-        if (key == ALLEGRO_KEY_ESCAPE) {
-            quit_test = 1;
-        }
-    }
-}
-
-int test_update(void *data)
-{
-
-    return !quit_test;
-}
-
-void draw_scene(void *data)
-{
-    SDL_BlitSurface(gHelloWorld, NULL, SDL_GetWindowSurface(window), NULL);
-}
 
 int main(int argc, char **argv)
 {
@@ -53,11 +19,38 @@ int main(int argc, char **argv)
 
     /*SCENE *scene = NULL;*/
   
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+    /* Initialize Allegro */
+    if (!al_init()) {
+        fprintf(stderr, "Failed to init allegro.\n");
         exit(1);
     }
-  
+
+    /* Allow the use of PNG images */
+    if (!al_init_image_addon()) {
+        fprintf(stderr, "Failed to init image addon.\n");
+        exit(1);
+    }
+   
+    /* Add keyboard and mouse support */
+    if (!al_install_keyboard() || !al_install_mouse()) {
+        fprintf(stderr, "Failed to init keyboard and mouse.\n");
+        exit(1);
+    }
+
+    /*al_set_config_value(al_get_system_config(), "audio", "driver", "pulseaudio");*/
+    /*al_set_config_value(al_get_system_config(), "pulseaudio", "buffer_size", "512");*/
+   
+    /* Allow the use of audio controls and many codecs */
+    if (!al_install_audio() || !al_init_acodec_addon()) {
+        fprintf(stderr, "Failed to init audio addon.\n");
+        exit(1);
+    }
+
+    /* We shouldn't ever need to play more than this many sound effects at a time */
+    if (!al_reserve_samples(4)) {
+        fprintf(stderr, "Failed to reserve samples.\n");
+    }
+
     /* Initialize the one and only global display for the game */
     /*
     get_desktop_resolution(&monitor_w, &monitor_h);
@@ -86,7 +79,7 @@ int main(int argc, char **argv)
     /*al_set_display_icon(window, IMG("icon.png"));*/
 
     /* Turn audio off */
-    toggle_audio();
+    /*toggle_audio();*/
   
     set_fps(GAME_TICKER);
     set_window(window);
@@ -102,8 +95,8 @@ int main(int argc, char **argv)
     SDL_FreeSurface(test_image);
 
     /* DONE, clean up */
-    stop_resources();
-    SDL_DestroyWindow(window);
+    free_resources();
+    al_destroy_display(display);
 
     check_memory();
     
