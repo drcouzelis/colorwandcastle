@@ -37,9 +37,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    /*al_set_config_value(al_get_system_config(), "audio", "driver", "pulseaudio");*/
-    /*al_set_config_value(al_get_system_config(), "pulseaudio", "buffer_size", "512");*/
-   
     /* Allow the use of audio controls and many codecs */
     if (!al_install_audio() || !al_init_acodec_addon()) {
         fprintf(stderr, "Failed to init audio addon.\n");
