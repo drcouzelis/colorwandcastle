@@ -1,11 +1,12 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-
 #include <malloc.h>
 
-
-void show_memory_label();
+/**
+ * Print info about allocations to stdout.
+ */
+void show_memory_debug(void);
 
 /**
  * Call "malloc" and increase the memory allocation counter.
@@ -27,7 +28,6 @@ void *free_memory(const char *label, void *ptr);
  * Check to see if the number of allocations
  * matches the number of frees.
  */
-void check_memory();
-
+void check_memory(void);
 
 #endif

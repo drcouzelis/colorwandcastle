@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 static int init_random_numbers = 0;
-
 
 int random_number(int low, int high)
 {
@@ -14,7 +12,6 @@ int random_number(int low, int high)
     
     return (rand() % (high - low + 1)) + low;
 }
-
 
 int is_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
