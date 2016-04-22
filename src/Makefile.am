@@ -26,4 +26,4 @@ colorwandcastle_SOURCES = \
 # This provides the compiler with a variable that points to the
 # location of the data files.
 # NOTE: "CPP" stands for "C Pre-Processor".
-colorwandcastle_CPPFLAGS = -ansi -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'
+colorwandcastle_CPPFLAGS = -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'

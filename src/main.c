@@ -12,35 +12,34 @@
 int main(int argc, char **argv)
 {
     ALLEGRO_DISPLAY *display = NULL;
-  
-    int monitor_w = DISPLAY_WIDTH;
-    int monitor_h = DISPLAY_HEIGHT;
+    SCENE *scene = NULL;
     int scale = 1;
 
-    SCENE *scene = NULL;
-  
+    al_set_app_name("colorwandcastle");
+    al_set_org_name("drcouzelis");
+
     /* Initialize Allegro */
     if (!al_init()) {
         fprintf(stderr, "Failed to init allegro.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* Allow the use of PNG images */
     if (!al_init_image_addon()) {
         fprintf(stderr, "Failed to init image addon.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
    
     /* Add keyboard and mouse support */
     if (!al_install_keyboard() || !al_install_mouse()) {
         fprintf(stderr, "Failed to init keyboard and mouse.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* Allow the use of audio controls and many codecs */
     if (!al_install_audio() || !al_init_acodec_addon()) {
         fprintf(stderr, "Failed to init audio addon.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* We shouldn't ever need to play more than this many sound effects at a time */
@@ -48,18 +47,17 @@ int main(int argc, char **argv)
         fprintf(stderr, "Failed to reserve samples.\n");
     }
 
-    /* Initialize the one and only global display for the game */
-    get_desktop_resolution(&monitor_w, &monitor_h);
-    scale = get_biggest_scale(DISPLAY_WIDTH, DISPLAY_HEIGHT, monitor_w, monitor_h);
+    scale = get_max_display_scale(DISPLAY_WIDTH, DISPLAY_HEIGHT);
   
-    display = al_create_display(DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale);
-    if (!display) {
+    /* Initialize the one and only global display for the game */
+    al_create_display(DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale);
+    if (display == NULL) {
         fprintf(stderr, "Failed to create display.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
   
-    al_set_target_bitmap(al_get_backbuffer(display));
-    set_display_scaling(scale);
+    /* Scale the display as big as possible on this screen */
+    set_display_scale(scale);
   
     /* Hide the mouse cursor */
     al_hide_mouse_cursor(display);
@@ -68,7 +66,7 @@ int main(int argc, char **argv)
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
   
-    /* Set the window title and icon */
+    /* Set application properties */
     al_set_window_title(display, "Colorwand Castle");
     al_set_display_icon(display, IMG("icon.png"));
 
