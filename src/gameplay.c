@@ -470,7 +470,7 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
     }
 }
 
-void control_scene(void *data, ALLEGRO_EVENT *event)
+void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
     SCENE *scene = (SCENE *)data;
     int key = 0;
@@ -664,7 +664,7 @@ int update_board(SCENE *scene)
     return EXIT_SUCCESS;
 }
 
-int update_scene(void *data)
+int update_gameplay(void *data)
 {
     SCENE *scene = (SCENE *)data;
 
@@ -688,7 +688,7 @@ int update_scene(void *data)
     return !end_scene;
 }
 
-void draw_scene(void *data)
+void draw_gameplay(void *data)
 {
     SCENE *scene = (SCENE *)data;
     TILE *tile = NULL;
