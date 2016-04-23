@@ -18,6 +18,8 @@ colorwandcastle_SOURCES = \
   resources.h \
   run.c \
   run.h \
+  sound.c \
+  sound.h \
   sprite.c \
   sprite.h \
   utilities.c \

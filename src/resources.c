@@ -12,7 +12,6 @@ typedef enum
 {
     RESOURCE_TYPE_IMAGE = 0,
     RESOURCE_TYPE_SOUND,
-    RESOURCE_TYPE_MUSIC
 } RESOURCE_TYPE;
 
 typedef struct
@@ -27,8 +26,6 @@ static int num_resources = 0;
 
 static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILENAME_LEN];
 static int num_resource_paths = 0;
-
-static int is_audio_on = 1;
 
 void free_resources()
 {
@@ -68,11 +65,9 @@ void add_resource_path(const char *path)
 /**
  * Load a bitmap and set magic pink to transparent.
  */
-IMAGE *load_bitmap_with_magic_pink(const char *filename)
+IMAGE *_load_bitmap_with_magic_pink(const char *filename)
 {
-    IMAGE *bitmap;
-
-    bitmap = al_load_bitmap(filename);
+    IMAGE *bitmap = al_load_bitmap(filename);
 
     if (bitmap) {
         al_convert_mask_to_alpha(bitmap, al_map_rgb(255, 0, 255));
@@ -81,15 +76,13 @@ IMAGE *load_bitmap_with_magic_pink(const char *filename)
     return bitmap;
 }
 
-
 /**
  * Create a RESOURCE structure.
  */
-RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
+RESOURCE *_create_resource(const char *name, RESOURCE_TYPE type, void *data)
 {
-    RESOURCE *resource;
+    RESOURCE *resource = alloc_memory("RESOURCE", sizeof(RESOURCE));
 
-    resource = alloc_memory("RESOURCE", sizeof(RESOURCE));
     if (resource) {
         strncpy(resource->name, name, MAX_FILENAME_LEN - 1);
         resource->type = type;
@@ -99,7 +92,7 @@ RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
     return resource;
 }
 
-void *get_resource(const char *name, RESOURCE_TYPE type)
+void *_get_resource(const char *name, RESOURCE_TYPE type)
 {
     void *data = NULL;
     char fullpath[MAX_FILENAME_LEN];
@@ -118,8 +111,7 @@ void *get_resource(const char *name, RESOURCE_TYPE type)
     }
 
     if (num_resources == MAX_RESOURCES) {
-        fprintf(stderr, "RESOURCES: Failed to load resource.\n");
-        fprintf(stderr, "RESOURCES: Try increasing MAX_RESOURCES.\n");
+        fprintf(stderr, "RESOURCES: Failed to load resource, try increasing MAX_RESOURCES.\n");
         return NULL;
     }
 
@@ -133,13 +125,13 @@ void *get_resource(const char *name, RESOURCE_TYPE type)
         strncat(fullpath, name, MAX_FILENAME_LEN);
 
         if (type == RESOURCE_TYPE_IMAGE) {
-            data = load_bitmap_with_magic_pink(fullpath);
+            data = _load_bitmap_with_magic_pink(fullpath);
         } else if (type == RESOURCE_TYPE_SOUND) {
             data = al_load_sample(fullpath);
         }
 
         if (data) {
-            resources[num_resources] = create_resource(name, type, data);
+            resources[num_resources] = _create_resource(name, type, data);
             num_resources++;
             return data;
         }
@@ -151,62 +143,10 @@ void *get_resource(const char *name, RESOURCE_TYPE type)
 
 IMAGE *get_image(const char *name)
 {
-    return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
+    return (IMAGE *)_get_resource(name, RESOURCE_TYPE_IMAGE);
 }
 
 SOUND *get_sound(const char *name)
 {
-    return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
-}
-
-int draw_image(IMAGE *img, float x, float y, int rotate, int mirror, int flip)
-{
-    int cx = 0;
-    int cy = 0;
-
-    if (img == NULL) {
-        return EXIT_FAILURE;
-    }
-  
-    /* Find the center of the image */
-    cx = al_get_bitmap_width(img) / 2;
-    cy = al_get_bitmap_height(img) / 2;
-
-    if (rotate && mirror && flip) {
-        /* 270 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, 0);
-    } else if (rotate && mirror) {
-        /* 270 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, ALLEGRO_FLIP_VERTICAL);
-    } else if (rotate && flip) {
-        /* 90 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, ALLEGRO_FLIP_VERTICAL);
-    } else if (rotate) {
-        /* 90 degrees */
-        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, 0);
-    } else if (mirror && flip) {
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL);
-    } else if (mirror) {
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
-    } else if (flip) {
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_VERTICAL);
-    } else {
-        al_draw_bitmap(img, x, y, 0);
-    }
-
-    return EXIT_SUCCESS;
-}
-
-int play_sound(SOUND *snd)
-{
-    if (al_is_audio_installed() && is_audio_on) {
-        al_play_sample(snd, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-    }
-
-    return EXIT_SUCCESS;
-}
-
-void toggle_audio()
-{
-    is_audio_on = is_audio_on ? 0 : 1;
+    return (SOUND *)_get_resource(name, RESOURCE_TYPE_SOUND);
 }

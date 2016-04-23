@@ -73,7 +73,7 @@ int reset_sprite(SPRITE *s);
  * Draw the sprite at location x and y,
  * taking into account the offsets.
  */
-int draw_sprite(SPRITE *s, float x, float y);
+void draw_sprite(SPRITE *s, float x, float y);
 
 /**
  * Width and height.

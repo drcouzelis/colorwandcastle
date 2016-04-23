@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "main.h"
 #include "memory.h"
+#include "sound.h"
 #include "sprite.h"
 #include "utilities.h"
 

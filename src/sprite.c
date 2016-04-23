@@ -125,18 +125,53 @@ int add_frame(SPRITE *s, IMAGE *frame)
     return EXIT_SUCCESS;
 }
 
+void _draw_image(ALLEGRO_BITMAP *img, float x, float y, int rotate, int mirror, int flip)
+{
+    int cx = 0;
+    int cy = 0;
 
-int draw_sprite(SPRITE *s, float x, float y)
+    if (img == NULL) {
+        return;
+    }
+  
+    /* Find the center of the image */
+    cx = al_get_bitmap_width(img) / 2;
+    cy = al_get_bitmap_height(img) / 2;
+
+    if (rotate && mirror && flip) {
+        /* 270 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, 0);
+    } else if (rotate && mirror) {
+        /* 270 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, (ALLEGRO_PI / 2) * 3, ALLEGRO_FLIP_VERTICAL);
+    } else if (rotate && flip) {
+        /* 90 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, ALLEGRO_FLIP_VERTICAL);
+    } else if (rotate) {
+        /* 90 degrees */
+        al_draw_rotated_bitmap(img, cx, cy, x, y, ALLEGRO_PI / 2, 0);
+    } else if (mirror && flip) {
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL);
+    } else if (mirror) {
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
+    } else if (flip) {
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_VERTICAL);
+    } else {
+        al_draw_bitmap(img, x, y, 0);
+    }
+}
+
+void draw_sprite(SPRITE *s, float x, float y)
 {
     if (s == NULL || s->len == 0) {
-        return EXIT_FAILURE;
+        return;
     }
   
     /* Apply the offset */
     x += s->x_offset;
     y += s->y_offset;
     
-    return draw_image(get_frame(s), x, y, s->rotate, s->mirror, s->flip);
+    _draw_image(get_frame(s), x, y, s->rotate, s->mirror, s->flip);
 }
 
 
