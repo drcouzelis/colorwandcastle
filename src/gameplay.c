@@ -5,7 +5,17 @@
 #include "sprite.h"
 #include "utilities.h"
 
-static int end_scene = 0;
+/**
+ * TODO:
+ * Gameboard - 2D array of int
+ * Background - 2D array of SPRITE
+ * Block map - 2D array of BLOCK
+ * ENEMY list
+ * STAR list
+ * HERO
+ */
+
+static int end_gameplay = 0;
 
 typedef enum
 {
@@ -85,23 +95,23 @@ typedef struct
     TILE ***board;
 } SCENE;
 
-static int get_hero_speed()
+static int _get_hero_speed()
 {
     /* The hero can move four tiles in one second */
     return TILE_SIZE * 4;
 }
 
-static int get_star_speed()
+static int _get_star_speed()
 {
     return TILE_SIZE * 10;
 }
 
-static float convert_pps_to_fps(int pps)
+static float _convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
 }
 
-IMAGE *get_star_image(int color, int frame)
+IMAGE *_get_star_image(int color, int frame)
 {
     static char *star_image_names[6][2] = {
         {"star-red-1.png", "star-red-2.png"},
@@ -115,7 +125,7 @@ IMAGE *get_star_image(int color, int frame)
     return IMG(star_image_names[color][frame]);
 }
 
-STAR *create_star(int color)
+STAR *_create_star(int color)
 {
     if (color == NO_COLOR) {
         return NULL;
@@ -124,8 +134,8 @@ STAR *create_star(int color)
     STAR *star = alloc_memory("STAR", sizeof(STAR));
 
     init_sprite(&star->sprite, 1, 4);
-    add_frame(&star->sprite, get_star_image(color, 0));
-    add_frame(&star->sprite, get_star_image(color, 1));
+    add_frame(&star->sprite, _get_star_image(color, 0));
+    add_frame(&star->sprite, _get_star_image(color, 1));
 
     star->color = color;
     star->is_moving = 0;
@@ -139,7 +149,7 @@ STAR *create_star(int color)
     return star;
 }
 
-STAR *destroy_star(STAR *star)
+STAR *_destroy_star(STAR *star)
 {
     if (star == NULL) {
         return NULL;
@@ -148,7 +158,7 @@ STAR *destroy_star(STAR *star)
     return free_memory("STAR", star);
 }
 
-HERO *create_hero(float x, float y)
+HERO *_create_hero(float x, float y)
 {
     HERO *hero = NULL;
 
@@ -182,7 +192,7 @@ HERO *create_hero(float x, float y)
     return hero;
 }
 
-SCENE *create_scene()
+SCENE *_create_scene()
 {
     SCENE *scene = NULL;
     int r, c;
@@ -190,7 +200,7 @@ SCENE *create_scene()
 
     scene = alloc_memory("SCENE", sizeof(SCENE));
 
-    scene->hero = create_hero(TILE_SIZE, TILE_SIZE);
+    scene->hero = _create_hero(TILE_SIZE, TILE_SIZE);
 
     scene->stars = calloc_memory("STARS", MAX_STARS, sizeof(STAR));
     for (i = 0; i < MAX_STARS; i++) {
@@ -213,7 +223,7 @@ SCENE *create_scene()
     return scene;
 }
 
-void add_border(SCENE *scene)
+void _add_border(SCENE *scene)
 {
     TILE *tile;
     int r, c;
@@ -238,7 +248,7 @@ void add_border(SCENE *scene)
     }
 }
 
-IMAGE *get_block_image(int color)
+IMAGE *_get_block_image(int color)
 {
     static char *block_image_names[6] = {
         "block-red.png",
@@ -252,7 +262,7 @@ IMAGE *get_block_image(int color)
     return IMG(block_image_names[color]);
 }
 
-TILE *create_block(int color)
+TILE *_create_block(int color)
 {
     TILE *tile = alloc_memory("TILE", sizeof(TILE));
 
@@ -261,39 +271,39 @@ TILE *create_block(int color)
     tile->color = color;
 
     init_sprite(&tile->sprite, 0, 0);
-    add_frame(&tile->sprite, get_block_image(tile->color));
+    add_frame(&tile->sprite, _get_block_image(tile->color));
 
     return tile;
 }
 
-void add_blocks(SCENE *scene, int num_cols, int num_colors)
+void _add_blocks(SCENE *scene, int num_cols, int num_colors)
 {
     int r, c;
 
     for (r = 1; r < ROWS - 1; r++) {
         for (c = 0; c < num_cols; c++) {
-            scene->board[r][COLS - 2 - c] = create_block(random_number(0, num_colors - 1));
+            scene->board[r][COLS - 2 - c] = _create_block(random_number(0, num_colors - 1));
         }
     }
 }
 
 SCENE *create_scene_01()
 {
-    SCENE *scene = create_scene();
+    SCENE *scene = _create_scene();
 
-    add_border(scene);
-    add_blocks(scene, 4, 5);
+    _add_border(scene);
+    _add_blocks(scene, 4, 5);
 
     return scene;
 }
 
-HERO *destroy_hero(HERO *hero)
+HERO *_destroy_hero(HERO *hero)
 {
     if (hero == NULL) {
         return NULL;
     }
 
-    hero->star = destroy_star(hero->star);
+    hero->star = _destroy_star(hero->star);
 
     return free_memory("HERO", hero);
 }
@@ -308,11 +318,11 @@ SCENE *destroy_scene(SCENE *scene)
     }
 
     /* Hero */
-    scene->hero = destroy_hero(scene->hero);
+    scene->hero = _destroy_hero(scene->hero);
 
     /* Stars */
     for (i = 0; i < MAX_STARS; i++) {
-        scene->stars[i] = destroy_star(scene->stars[i]);
+        scene->stars[i] = _destroy_star(scene->stars[i]);
     }
     scene->stars = free_memory("STARS", scene->stars);
 
@@ -329,7 +339,7 @@ SCENE *destroy_scene(SCENE *scene)
     return free_memory("SCENE", scene);
 }
 
-int random_front_color(SCENE *scene)
+int _random_front_color(SCENE *scene)
 {
     int r, c;
     int colors[TOTAL_COLORS];
@@ -383,10 +393,10 @@ int random_front_color(SCENE *scene)
     }
 }
 
-int set_hero_star(HERO *hero, STAR *star)
+int _set_hero_star(HERO *hero, STAR *star)
 {
     if (hero->star != NULL) {
-        hero->star = destroy_star(hero->star);
+        hero->star = _destroy_star(hero->star);
     }
 
     hero->star = star;
@@ -394,13 +404,13 @@ int set_hero_star(HERO *hero, STAR *star)
     return EXIT_SUCCESS;
 }
 
-int shoot_star(SCENE *scene, int color, float x, float y)
+int _shoot_star(SCENE *scene, int color, float x, float y)
 {
     int i;
 
     for (i = 0; i < MAX_STARS; i++) {
         if (scene->stars[i] == NULL) {
-            scene->stars[i] = create_star(color);
+            scene->stars[i] = _create_star(color);
             scene->stars[i]->body.x = x;
             scene->stars[i]->body.y = y;
             scene->stars[i]->is_moving = 1;
@@ -412,7 +422,7 @@ int shoot_star(SCENE *scene, int color, float x, float y)
     return EXIT_FAILURE;
 }
 
-void control_hero(HERO *hero, ALLEGRO_EVENT *event)
+void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
 {
     int key = 0;
 
@@ -423,19 +433,19 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = 1;
-                hero->dy = -get_hero_speed();
+                hero->dy = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = 1;
-                hero->dy = get_hero_speed();
+                hero->dy = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = 1;
-                hero->dx = -get_hero_speed();
+                hero->dx = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 1;
-                hero->dx = get_hero_speed();
+                hero->dx = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_SPACE:
                 hero->is_shooting = 1;
@@ -453,19 +463,19 @@ void control_hero(HERO *hero, ALLEGRO_EVENT *event)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = 0;
-                hero->dy = hero->d ? get_hero_speed() : 0;
+                hero->dy = hero->d ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = 0;
-                hero->dy = hero->u ? -get_hero_speed() : 0;
+                hero->dy = hero->u ? -_get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = 0;
-                hero->dx = hero->r ? get_hero_speed() : 0;
+                hero->dx = hero->r ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = 0;
-                hero->dx = hero->l ? -get_hero_speed() : 0;
+                hero->dx = hero->l ? -_get_hero_speed() : 0;
                 break;
         }
     }
@@ -482,7 +492,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 
         if (key == ALLEGRO_KEY_ESCAPE) {
             /* ESC : Stop gameplay */
-            end_scene = 1;
+            end_gameplay = 1;
         } else if (key == ALLEGRO_KEY_S) {
             /* S : Toggle audio */
             toggle_audio();
@@ -490,10 +500,10 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 
     /* Hero control */
-    control_hero(scene->hero, event);
+    _control_hero(scene->hero, event);
 }
 
-TILE *is_board_collision(SCENE *scene, BODY *body)
+TILE *_is_board_collision(SCENE *scene, BODY *body)
 {
     TILE *tile = NULL;
     int r1 = (int)(body->y / TILE_SIZE);
@@ -524,32 +534,32 @@ TILE *is_board_collision(SCENE *scene, BODY *body)
     return NULL;
 }
 
-void update_hero(SCENE *scene)
+void _update_hero(SCENE *scene)
 {
     HERO *hero = scene->hero;
     float old_x = hero->body.x;
     float old_y = hero->body.y;
 
     /* Vertical movement */
-    hero->body.y += convert_pps_to_fps(hero->dy);
+    hero->body.y += _convert_pps_to_fps(hero->dy);
 
     /* Check for vertical collisions */
-    if (is_board_collision(scene, &hero->body) != NULL) {
+    if (_is_board_collision(scene, &hero->body) != NULL) {
         hero->body.y = old_y;
     }
 
     /* Horizontal movement */
-    hero->body.x += convert_pps_to_fps(hero->dx);
+    hero->body.x += _convert_pps_to_fps(hero->dx);
 
     /* Check for horizontal collisions */
-    if (is_board_collision(scene, &hero->body) != NULL) {
+    if (_is_board_collision(scene, &hero->body) != NULL) {
         hero->body.x = old_x;
     }
 
     if (hero->is_shooting) {
         if (hero->star != NULL) {
-            shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
-            set_hero_star(hero, create_star(random_front_color(scene)));
+            _shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
+            _set_hero_star(hero, _create_star(_random_front_color(scene)));
         }
         hero->is_shooting = 0;
     }
@@ -559,7 +569,7 @@ void update_hero(SCENE *scene)
         hero->star->body.x = hero->body.x + 20;
         hero->star->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
     } else {
-        set_hero_star(scene->hero, create_star(random_front_color(scene)));
+        _set_hero_star(scene->hero, _create_star(_random_front_color(scene)));
     }
 
     /* Graphics */
@@ -567,7 +577,7 @@ void update_hero(SCENE *scene)
     animate(&hero->star->sprite);
 }
 
-int update_star(SCENE *scene, STAR *star)
+int _update_star(SCENE *scene, STAR *star)
 {
     TILE *tile = NULL;
     float old_x = star->body.x;
@@ -575,13 +585,13 @@ int update_star(SCENE *scene, STAR *star)
 
     if (star->is_moving) {
         if (star->is_forward) {
-            star->body.x += convert_pps_to_fps(get_star_speed());
+            star->body.x += _convert_pps_to_fps(_get_star_speed());
         } else {
-            star->body.x -= convert_pps_to_fps(get_star_speed());
+            star->body.x -= _convert_pps_to_fps(_get_star_speed());
         }
     }
 
-    tile = is_board_collision(scene, &star->body);
+    tile = _is_board_collision(scene, &star->body);
 
     if (tile != NULL) {
 
@@ -599,6 +609,9 @@ int update_star(SCENE *scene, STAR *star)
         } else {
             /* Just bounce */
             star->hits--;
+            if (star->hits <= 0) {
+                play_sound(SND("star_disolve.wav"));
+            }
             star->is_forward = star->is_forward ? 0 : 1;
         }
     }
@@ -608,7 +621,7 @@ int update_star(SCENE *scene, STAR *star)
     return EXIT_SUCCESS;
 }
 
-int update_stars(SCENE *scene)
+int _update_stars(SCENE *scene)
 {
     STAR *star;
     int i, j;
@@ -619,13 +632,11 @@ int update_stars(SCENE *scene)
 
         if (star != NULL) {
 
-            update_star(scene, star);
+            _update_star(scene, star);
 
             /* Remove stars that have no hits left */
             if (star->hits <= 0) {
-                scene->stars[i] = destroy_star(star);
-                /* TODO: This plays when a block is destroyed too! */
-                /*play_sound(SND("star_disolve.wav"));*/
+                scene->stars[i] = _destroy_star(star);
             }
         }
     }
@@ -644,7 +655,7 @@ int update_stars(SCENE *scene)
     return EXIT_SUCCESS;
 }
 
-int update_board(SCENE *scene)
+int _update_board(SCENE *scene)
 {
     int r, c;
     TILE *tile;
@@ -678,15 +689,15 @@ int update_gameplay(void *data)
      */
 
     /* Hero */
-    update_hero(scene);
+    _update_hero(scene);
 
     /* Stars */
-    update_stars(scene);
+    _update_stars(scene);
 
     /* Board */
-    update_board(scene);
+    _update_board(scene);
 
-    return !end_scene;
+    return !end_gameplay;
 }
 
 void draw_gameplay(void *data)
