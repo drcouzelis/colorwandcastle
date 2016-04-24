@@ -93,6 +93,8 @@ typedef struct
     HERO *hero;
     STAR **stars;
     TILE ***board;
+
+    int **gameboard;
 } SCENE;
 
 static int _get_hero_speed()
@@ -220,6 +222,14 @@ SCENE *_create_scene()
         }
     }
 
+    /**
+     * Init the gameboard. Used for hit detection.
+     */
+    scene->gameboard = calloc_memory("GAMEBOARD", ROWS, sizeof(int *));
+    for (r = 0; r < ROWS; r++) {
+        scene->gameboard[r] = calloc_memory("GAMEBOARD", COLS, sizeof(int));
+    }
+
     return scene;
 }
 
@@ -334,6 +344,12 @@ SCENE *destroy_scene(SCENE *scene)
         scene->board[r] = free_memory("BOARD", scene->board[r]);
     }
     scene->board = free_memory("BOARD", scene->board);
+
+    /* Gameboard */
+    for (r = 0; r < ROWS; r++) {
+        scene->gameboard[r] = free_memory("GAMEBOARD", scene->gameboard[r]);
+    }
+    scene->gameboard = free_memory("GAMEBOARD", scene->gameboard);
 
     /* And the scene itself */
     return free_memory("SCENE", scene);
