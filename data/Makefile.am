@@ -1,1 +1,1 @@
-SUBDIRS = images sounds
+SUBDIRS = images levels sounds

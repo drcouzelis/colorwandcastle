@@ -47,6 +47,7 @@ AC_CONFIG_FILES([Makefile
                  data/Makefile
                  data/images/Makefile
                  data/sounds/Makefile
+                 data/levels/Makefile
                  src/Makefile
                  system/Makefile])
 
