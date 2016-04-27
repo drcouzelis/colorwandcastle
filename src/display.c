@@ -142,6 +142,9 @@ bool init_display(int width, int height, bool fullscreen)
 
     /* Scale and center the display as big as possible on this screen */
     _set_display_transform(scale, offset_x, offset_y, fullscreen);
+
+    /* Crop the drawing area, to not accidentally draw in the black borders */
+    al_set_clipping_rectangle(offset_x, offset_y, display_width * scale, display_height * scale);
   
     /* Hide the mouse cursor */
     al_hide_mouse_cursor(display);
@@ -157,6 +160,7 @@ bool toggle_fullscreen(void)
 
 void free_display()
 {
+    al_reset_clipping_rectangle();
     al_destroy_display(display);
     display = NULL;
 }
