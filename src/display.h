@@ -1,8 +1,14 @@
 #ifndef DISPLAY_HEADER
 #define DISPLAY_HEADER
 
-int get_max_display_scale(int window_w, int window_h);
+#include <allegro5/allegro.h>
 
-void set_display_scale(int scale);
+bool init_display(int width, int height, bool fullscreen);
+
+void free_display();
+
+ALLEGRO_DISPLAY *get_display(void);
+
+bool toggle_fullscreen(void);
 
 #endif

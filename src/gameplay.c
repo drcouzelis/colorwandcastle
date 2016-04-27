@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "display.h"
 #include "main.h"
 #include "memory.h"
 #include "sound.h"
@@ -512,6 +513,9 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
         } else if (key == ALLEGRO_KEY_S) {
             /* S : Toggle audio */
             toggle_audio();
+        } else if (key == ALLEGRO_KEY_F) {
+            /* F : Toggle fullscreen */
+            toggle_fullscreen();
         }
     }
 
