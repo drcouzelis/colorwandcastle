@@ -358,51 +358,64 @@ SCENE *destroy_scene(SCENE *scene)
 
 int _random_front_color(SCENE *scene)
 {
-    int r, c;
-    int colors[TOTAL_COLORS];
+    int colors[TOTAL_COLORS] = {0};
+    int color_count[TOTAL_COLORS] = {0};
     int num_colors = 0;
-    int i;
-    int exists;
 
-    /**
-     * TODO:
-     * Take in to account that the hero might be about to destroy
-     * the last block of this color!
-     *
-     * if (only one block of this block color is available to hit)
-     *   and
-     * if (it's the same color as the previous star color)
-     *     remove the color from the list of available colors
-     */ 
-    r = 0;
-    while (r < ROWS) {
-        c = 0;
-        while (c < COLS) {
-            if (scene->board[r][c] != NULL && scene->board[r][c]->color >= 0) {
+    /* Create a list of blocks that are available to hit */
+    for (int r = 0; r < ROWS; r++) {
+        for (int c = 0; c < COLS; c++) {
 
-                exists = 0;
+            TILE *tile = scene->board[r][c];
 
-                for (i = 0; i < num_colors && !exists; i++) {
-                    if (colors[i] == scene->board[r][c]->color) {
-                        exists = 1;
+            if (tile != NULL && tile->color >= 0) {
+
+                bool exists_in_list = false;
+
+                for (int i = 0; i < num_colors && !exists_in_list; i++) {
+                    if (colors[i] == tile->color) {
+                        exists_in_list = true;
                     }
                 }
 
-                if (!exists) {
-                    colors[num_colors] = scene->board[r][c]->color;
+                if (!exists_in_list) {
+                    colors[num_colors] = tile->color;
                     num_colors++;
+                    color_count[tile->color]++;
                 }
 
-                c = COLS;
-            } else {
-
-                c++;
+                break;
             }
         }
-
-        r++;
     }
 
+    /* Grab the color of the star that was just shot by the hero */
+    int star_color = NO_COLOR;
+    if (scene->hero && scene->hero->star) {
+        star_color = scene->hero->star->color;
+    }
+
+    /**
+     * If there's only one block left of the color of the star
+     * that was just shot by the hero then remove that color
+     * from the list of available colors to choose from. This
+     * prevents getting a star that's the same color as the
+     * block you just destroyed.
+     */
+    if (color_count[star_color] == 1) {
+        for (int i = 0; i < num_colors; i++) {
+            if (colors[i] == star_color) {
+                /* Remove the color from the list of options */
+                for (int j = i; j < num_colors - 1; j++) {
+                    colors[j] = colors[j + 1];
+                }
+                num_colors--;
+                break;
+            }
+        }
+    }
+
+    /* Randomly select a color from the list of available colors to hit */
     if (num_colors < 1) {
         return NO_COLOR;
     } else {
