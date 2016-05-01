@@ -195,45 +195,6 @@ HERO *_create_hero(float x, float y)
     return hero;
 }
 
-SCENE *_create_scene()
-{
-    SCENE *scene = NULL;
-    int r, c;
-    int i = 0;
-
-    scene = alloc_memory("SCENE", sizeof(SCENE));
-
-    scene->hero = _create_hero(TILE_SIZE, TILE_SIZE);
-
-    scene->stars = calloc_memory("STARS", MAX_STARS, sizeof(STAR));
-    for (i = 0; i < MAX_STARS; i++) {
-        scene->stars[i] = NULL;
-    }
-
-    /* Create the board */
-    scene->board = calloc_memory("BOARD", ROWS, sizeof(TILE *));
-    for (r = 0; r < ROWS; r++) {
-        scene->board[r] = calloc_memory("BOARD", COLS, sizeof(TILE));
-    }
-
-    /* Init the board */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
-            scene->board[r][c] = NULL;
-        }
-    }
-
-    /**
-     * Init the gameboard. Used for hit detection.
-     */
-    scene->gameboard = calloc_memory("GAMEBOARD", ROWS, sizeof(int *));
-    for (r = 0; r < ROWS; r++) {
-        scene->gameboard[r] = calloc_memory("GAMEBOARD", COLS, sizeof(int));
-    }
-
-    return scene;
-}
-
 void _add_border(SCENE *scene)
 {
     TILE *tile;
@@ -298,16 +259,6 @@ void _add_blocks(SCENE *scene, int num_cols, int num_colors)
     }
 }
 
-SCENE *create_scene_01()
-{
-    SCENE *scene = _create_scene();
-
-    _add_border(scene);
-    _add_blocks(scene, 4, 5);
-
-    return scene;
-}
-
 HERO *_destroy_hero(HERO *hero)
 {
     if (hero == NULL) {
@@ -359,8 +310,15 @@ SCENE *destroy_scene(SCENE *scene)
 int _random_front_color(SCENE *scene)
 {
     int colors[TOTAL_COLORS] = {0};
-    int color_count[TOTAL_COLORS] = {0};
     int num_colors = 0;
+
+    /**
+     * TODO:
+     * There's a bug, allowing a star to be created that's
+     * the same color as the one that was just destroyed,
+     * as if the color is being selected too soon, before
+     * the block disappears.
+     */
 
     /* Create a list of blocks that are available to hit */
     for (int r = 0; r < ROWS; r++) {
@@ -381,35 +339,8 @@ int _random_front_color(SCENE *scene)
                 if (!exists_in_list) {
                     colors[num_colors] = tile->color;
                     num_colors++;
-                    color_count[tile->color]++;
                 }
 
-                break;
-            }
-        }
-    }
-
-    /* Grab the color of the star that was just shot by the hero */
-    int star_color = NO_COLOR;
-    if (scene->hero && scene->hero->star) {
-        star_color = scene->hero->star->color;
-    }
-
-    /**
-     * If there's only one block left of the color of the star
-     * that was just shot by the hero then remove that color
-     * from the list of available colors to choose from. This
-     * prevents getting a star that's the same color as the
-     * block you just destroyed.
-     */
-    if (color_count[star_color] == 1) {
-        for (int i = 0; i < num_colors; i++) {
-            if (colors[i] == star_color) {
-                /* Remove the color from the list of options */
-                for (int j = i; j < num_colors - 1; j++) {
-                    colors[j] = colors[j + 1];
-                }
-                num_colors--;
                 break;
             }
         }
@@ -567,6 +498,66 @@ TILE *_is_board_collision(SCENE *scene, BODY *body)
     return NULL;
 }
 
+SCENE *_create_scene()
+{
+    SCENE *scene = NULL;
+    int r, c;
+    int i = 0;
+
+    scene = alloc_memory("SCENE", sizeof(SCENE));
+
+    scene->hero = _create_hero(TILE_SIZE, TILE_SIZE);
+
+    scene->stars = calloc_memory("STARS", MAX_STARS, sizeof(STAR));
+    for (i = 0; i < MAX_STARS; i++) {
+        scene->stars[i] = NULL;
+    }
+
+    /* Create the board */
+    scene->board = calloc_memory("BOARD", ROWS, sizeof(TILE *));
+    for (r = 0; r < ROWS; r++) {
+        scene->board[r] = calloc_memory("BOARD", COLS, sizeof(TILE));
+    }
+
+    /* Init the board */
+    for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+            scene->board[r][c] = NULL;
+        }
+    }
+
+    /**
+     * Init the gameboard. Used for hit detection.
+     */
+    scene->gameboard = calloc_memory("GAMEBOARD", ROWS, sizeof(int *));
+    for (r = 0; r < ROWS; r++) {
+        scene->gameboard[r] = calloc_memory("GAMEBOARD", COLS, sizeof(int));
+    }
+
+    return scene;
+}
+
+SCENE *create_scene_01()
+{
+    SCENE *scene = _create_scene();
+
+    _add_border(scene);
+    _add_blocks(scene, 4, 5);
+
+    /* Give the hero an initial star */
+    _set_hero_star(scene->hero, _create_star(_random_front_color(scene)));
+
+    return scene;
+}
+
+void _follow_hero(STAR *star, HERO *hero)
+{
+    if (hero != NULL && star != NULL) {
+        star->body.x = hero->body.x + 20;
+        star->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
+    }
+}
+
 void _update_hero(SCENE *scene)
 {
     HERO *hero = scene->hero;
@@ -592,18 +583,13 @@ void _update_hero(SCENE *scene)
     if (hero->is_shooting) {
         if (hero->star != NULL) {
             _shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
-            _set_hero_star(hero, _create_star(_random_front_color(scene)));
+            hero->star = _destroy_star(hero->star);
         }
         hero->is_shooting = 0;
     }
 
     /* Tell the hero's star to follow the hero */
-    if (hero->star != NULL) {
-        hero->star->body.x = hero->body.x + 20;
-        hero->star->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
-    } else {
-        _set_hero_star(scene->hero, _create_star(_random_front_color(scene)));
-    }
+    _follow_hero(hero->star, hero);
 
     /* Graphics */
     animate(&hero->sprite);
@@ -683,6 +669,18 @@ int _update_stars(SCENE *scene)
             }
             scene->stars[j] = NULL;
         }
+    }
+
+    /* Count the number of stars flying on the screen */
+    int num_stars = 0;
+    while (scene->stars[num_stars] != NULL) {
+        num_stars++;
+    }
+
+    /* The hero needs a new star to shoot! */
+    if (scene->hero->star == NULL && num_stars == 0) {
+        _set_hero_star(scene->hero, _create_star(_random_front_color(scene)));
+        _follow_hero(scene->hero->star, scene->hero);
     }
 
     return EXIT_SUCCESS;
