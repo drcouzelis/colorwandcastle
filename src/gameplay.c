@@ -461,6 +461,8 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
             /* F : Toggle fullscreen */
             toggle_fullscreen();
         }
+    } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+        end_gameplay = 1;
     }
 
     /* Hero control */

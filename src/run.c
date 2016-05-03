@@ -1,3 +1,4 @@
+#include "display.h"
 #include "run.h"
 
 static int run_fps = 60;
@@ -27,6 +28,7 @@ void run(void (*control)(void *data, ALLEGRO_EVENT *event),
     timer = al_create_timer(1.0 / run_fps);
     al_register_event_source(events, al_get_timer_event_source(timer));
     al_register_event_source(events, al_get_keyboard_event_source());
+    al_register_event_source(events, al_get_display_event_source(get_display()));
   
     al_start_timer(timer);
   
