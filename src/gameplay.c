@@ -16,7 +16,7 @@
  * HERO
  */
 
-static int end_gameplay = 0;
+static bool end_gameplay = false;
 
 typedef enum
 {
@@ -62,8 +62,8 @@ typedef struct
 
     BODY body;
 
-    int is_moving;
-    int is_forward;
+    bool is_moving;
+    bool is_forward;
 } STAR;
 
 typedef struct
@@ -74,15 +74,15 @@ typedef struct
 
     /* Movement toggles */
     /* True means the hero is moving in that direction */
-    int u;
-    int d;
-    int l;
-    int r;
+    bool u;
+    bool d;
+    bool l;
+    bool r;
 
     int dx;
     int dy;
 
-    int is_shooting;
+    bool is_shooting;
 
     STAR *star;
 } HERO;
@@ -141,8 +141,8 @@ STAR *_create_star(int color)
     add_frame(&star->sprite, _get_star_image(color, 1));
 
     star->color = color;
-    star->is_moving = 0;
-    star->is_forward = 0;
+    star->is_moving = false;
+    star->is_forward = false;
     star->hits = 2;
     star->body.x = 0;
     star->body.y = 0;
@@ -180,15 +180,15 @@ HERO *_create_hero(float x, float y)
     hero->body.w = 10;
     hero->body.h = 10;
 
-    hero->u = 0;
-    hero->d = 0;
-    hero->l = 0;
-    hero->r = 0;
+    hero->u = false;
+    hero->d = false;
+    hero->l = false;
+    hero->r = false;
 
     hero->dx = 0;
     hero->dy = 0;
 
-    hero->is_shooting = 0;
+    hero->is_shooting = false;
 
     hero->star = NULL;
 
@@ -374,8 +374,8 @@ int _shoot_star(SCENE *scene, int color, float x, float y)
             scene->stars[i] = _create_star(color);
             scene->stars[i]->body.x = x;
             scene->stars[i]->body.y = y;
-            scene->stars[i]->is_moving = 1;
-            scene->stars[i]->is_forward = 1;
+            scene->stars[i]->is_moving = true;
+            scene->stars[i]->is_forward = true;
             return EXIT_SUCCESS;
         }
     }
@@ -385,57 +385,57 @@ int _shoot_star(SCENE *scene, int color, float x, float y)
 
 void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
 {
-    int key = 0;
-
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
-        key = event->keyboard.keycode;
+        int key = event->keyboard.keycode;
 
         /* Hero key pressed */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero->u = 1;
+                hero->u = true;
                 hero->dy = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero->d = 1;
+                hero->d = true;
                 hero->dy = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero->l = 1;
+                hero->l = true;
                 hero->dx = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero->r = 1;
+                hero->r = true;
                 hero->dx = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_SPACE:
-                hero->is_shooting = 1;
+                hero->is_shooting = true;
                 break;
         }
     }
 
     if (event->type == ALLEGRO_EVENT_KEY_UP) {
-        key = event->keyboard.keycode;
+        int key = event->keyboard.keycode;
 
-        /* Hero key released */
-        /* These crazy conditionals allow the hero to continue moving */
-        /* if another key was still being held after a release. */
-        /* (It feels more natural this way.) */
+        /**
+         * Hero key released.
+         * These crazy conditionals allow the hero to continue moving
+         * if another key was still being held after a release.
+         * (It feels more natural this way.)
+         */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero->u = 0;
+                hero->u = false;
                 hero->dy = hero->d ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero->d = 0;
+                hero->d = false;
                 hero->dy = hero->u ? -_get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero->l = 0;
+                hero->l = false;
                 hero->dx = hero->r ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero->r = 0;
+                hero->r = false;
                 hero->dx = hero->l ? -_get_hero_speed() : 0;
                 break;
         }
@@ -445,15 +445,14 @@ void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
     SCENE *scene = (SCENE *)data;
-    int key = 0;
 
     /* General application control */
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
-        key = event->keyboard.keycode;
+        int key = event->keyboard.keycode;
 
         if (key == ALLEGRO_KEY_ESCAPE) {
             /* ESC : Stop gameplay */
-            end_gameplay = 1;
+            end_gameplay = true;
         } else if (key == ALLEGRO_KEY_S) {
             /* S : Toggle audio */
             toggle_audio();
@@ -462,7 +461,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
             toggle_fullscreen();
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-        end_gameplay = 1;
+        end_gameplay = true;
     }
 
     /* Hero control */
@@ -587,7 +586,7 @@ void _update_hero(SCENE *scene)
             _shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
             hero->star = _destroy_star(hero->star);
         }
-        hero->is_shooting = 0;
+        hero->is_shooting = false;
     }
 
     /* Tell the hero's star to follow the hero */
@@ -633,7 +632,7 @@ int _update_star(SCENE *scene, STAR *star)
             if (star->hits <= 0) {
                 play_sound(SND("star_disolve.wav"));
             }
-            star->is_forward = star->is_forward ? 0 : 1;
+            star->is_forward = star->is_forward ? false : true;
         }
     }
 
@@ -709,17 +708,33 @@ int _update_board(SCENE *scene)
     return EXIT_SUCCESS;
 }
 
+void _handle_collision_for_hero(HERO *hero, SCENE *scene)
+{
+}
+
+void _handle_collision_for_stars(STAR **stars, SCENE *scene)
+{
+}
+
+void _set_status_for_hero(HERO *hero, SCENE *scene)
+{
+}
+
+void _set_status_for_stars(STAR **stars, SCENE *scene)
+{
+}
+
+void _move_hero(HERO *hero, SCENE *scene)
+{
+}
+
+void _move_stars(STAR **stars, SCENE *scene)
+{
+}
+
 int update_gameplay(void *data)
 {
     SCENE *scene = (SCENE *)data;
-
-    /**
-     * TODO:
-     * Separate updates into sections:
-     *  . Handle collisions
-     *  . Set status
-     *  . Move
-     */
 
     /* Hero */
     _update_hero(scene);
@@ -730,45 +745,76 @@ int update_gameplay(void *data)
     /* Board */
     _update_board(scene);
 
+    /* TODO */
+
+    /* Check for collisions */
+    /**
+     * Hero checks for collision with any of the game board, tiles,
+     * stars, enemies, and so on.
+     */
+    _handle_collision_for_hero(scene->hero, scene);
+    /**
+     * Stars check for collision with blocks, walls, tiles, the hero,
+     * and so on.
+     */
+    _handle_collision_for_stars(scene->stars, scene);
+
+    /* Set status */
+    /**
+     * Modify the state of the hero based on the collision.
+     * Change movement variables, state variables, and so on.
+     */
+    _set_status_for_hero(scene->hero, scene);
+    /**
+     * Modify the state of the stars based on collision.
+     * Change directions, change hit points, and so on.
+     * This function will also remove dead stars.
+     */
+    _set_status_for_stars(scene->stars, scene);
+
+    /* Move */
+    /**
+     * Move the hero and stars in accordance with velocity.
+     */
+    _move_hero(scene->hero, scene);
+    _move_stars(scene->stars, scene);
+
     return !end_gameplay;
 }
 
 void draw_gameplay(void *data)
 {
     SCENE *scene = (SCENE *)data;
-    TILE *tile = NULL;
-    STAR *star = NULL;
-    HERO *hero = NULL;
-    int r, c;
-    int i;
 
     /* Draw the background behind everything else */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
+    for (int r = 0; r < ROWS; r++) {
+        for (int c = 0; c < COLS; c++) {
             al_draw_bitmap(IMG("background.png"), c * TILE_SIZE, r * TILE_SIZE, 0);
         }
     }
     
     /* Draw the game board */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
-            tile = scene->board[r][c];
+    for (int r = 0; r < ROWS; r++) {
+        for (int c = 0; c < COLS; c++) {
+            TILE *tile = scene->board[r][c];
             draw_sprite(&tile->sprite, c * TILE_SIZE, r * TILE_SIZE);
         }
     }
     
     /* Draw stars */
-    for (i = 0; i < MAX_STARS; i++) {
+    for (int i = 0; i < MAX_STARS; i++) {
         if (scene->stars[i] != NULL) {
-            star = scene->stars[i];
+            STAR *star = scene->stars[i];
             draw_sprite(&star->sprite, star->body.x, star->body.y);
         }
     }
 
     /* Draw the hero */
-    hero = scene->hero;
+    HERO *hero = scene->hero;
     draw_sprite(&hero->sprite, hero->body.x, hero->body.y);
-    star = hero->star;
+    
+    /* Draw the hero's star */
+    STAR *star = hero->star;
     if (star != NULL) {
         draw_sprite(&star->sprite, star->body.x, star->body.y);
     }
