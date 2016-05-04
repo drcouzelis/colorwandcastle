@@ -18,6 +18,10 @@
 
 static bool end_gameplay = false;
 
+/**
+ * TODO:
+ * Make these just general "star numbers".
+ */
 typedef enum
 {
     NO_COLOR = -1,
@@ -83,8 +87,6 @@ typedef struct
     int dy;
 
     bool is_shooting;
-
-    STAR *star;
 } HERO;
 
 #define MAX_STARS 32
@@ -92,6 +94,7 @@ typedef struct
 typedef struct
 {
     HERO *hero;
+    STAR *star; /* TODO: Move the hero / star logic "up" one level */
     STAR **stars;
     TILE ***board;
 
@@ -190,8 +193,6 @@ HERO *_create_hero(float x, float y)
 
     hero->is_shooting = false;
 
-    hero->star = NULL;
-
     return hero;
 }
 
@@ -265,8 +266,6 @@ HERO *_destroy_hero(HERO *hero)
         return NULL;
     }
 
-    hero->star = _destroy_star(hero->star);
-
     return free_memory("HERO", hero);
 }
 
@@ -281,6 +280,9 @@ SCENE *destroy_scene(SCENE *scene)
 
     /* Hero */
     scene->hero = _destroy_hero(scene->hero);
+
+    /* Hero's star */
+    scene->star = _destroy_star(scene->star);
 
     /* Stars */
     for (i = 0; i < MAX_STARS; i++) {
@@ -354,13 +356,13 @@ int _random_front_color(SCENE *scene)
     }
 }
 
-int _set_hero_star(HERO *hero, STAR *star)
+int _set_hero_star(SCENE *scene, STAR *star)
 {
-    if (hero->star != NULL) {
-        hero->star = _destroy_star(hero->star);
+    if (scene->star != NULL) {
+        scene->star = _destroy_star(scene->star);
     }
 
-    hero->star = star;
+    scene->star = star;
 
     return EXIT_SUCCESS;
 }
@@ -509,6 +511,8 @@ SCENE *_create_scene()
 
     scene->hero = _create_hero(TILE_SIZE, TILE_SIZE);
 
+    scene->star = NULL;
+
     scene->stars = calloc_memory("STARS", MAX_STARS, sizeof(STAR));
     for (i = 0; i < MAX_STARS; i++) {
         scene->stars[i] = NULL;
@@ -546,7 +550,7 @@ SCENE *create_scene_01()
     _add_blocks(scene, 4, 5);
 
     /* Give the hero an initial star */
-    _set_hero_star(scene->hero, _create_star(_random_front_color(scene)));
+    _set_hero_star(scene, _create_star(_random_front_color(scene)));
 
     return scene;
 }
@@ -582,19 +586,19 @@ void _update_hero(SCENE *scene)
     }
 
     if (hero->is_shooting) {
-        if (hero->star != NULL) {
-            _shoot_star(scene, hero->star->color, hero->star->body.x, hero->star->body.y);
-            hero->star = _destroy_star(hero->star);
+        if (scene->star != NULL) {
+            _shoot_star(scene, scene->star->color, scene->star->body.x, scene->star->body.y);
+            scene->star = _destroy_star(scene->star);
         }
         hero->is_shooting = false;
     }
 
     /* Tell the hero's star to follow the hero */
-    _follow_hero(hero->star, hero);
+    _follow_hero(scene->star, hero);
 
     /* Graphics */
     animate(&hero->sprite);
-    animate(&hero->star->sprite);
+    animate(&scene->star->sprite);
 }
 
 int _update_star(SCENE *scene, STAR *star)
@@ -679,9 +683,9 @@ int _update_stars(SCENE *scene)
     }
 
     /* The hero needs a new star to shoot! */
-    if (scene->hero->star == NULL && num_stars == 0) {
-        _set_hero_star(scene->hero, _create_star(_random_front_color(scene)));
-        _follow_hero(scene->hero->star, scene->hero);
+    if (scene->star == NULL && num_stars == 0) {
+        _set_hero_star(scene, _create_star(_random_front_color(scene)));
+        _follow_hero(scene->star, scene->hero);
     }
 
     return EXIT_SUCCESS;
@@ -814,7 +818,7 @@ void draw_gameplay(void *data)
     draw_sprite(&hero->sprite, hero->body.x, hero->body.y);
     
     /* Draw the hero's star */
-    STAR *star = hero->star;
+    STAR *star = scene->star;
     if (star != NULL) {
         draw_sprite(&star->sprite, star->body.x, star->body.y);
     }
