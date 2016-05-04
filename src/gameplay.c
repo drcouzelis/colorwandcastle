@@ -356,17 +356,6 @@ int _random_front_color(SCENE *scene)
     }
 }
 
-int _set_hero_star(SCENE *scene, STAR *star)
-{
-    if (scene->star != NULL) {
-        scene->star = _destroy_star(scene->star);
-    }
-
-    scene->star = star;
-
-    return EXIT_SUCCESS;
-}
-
 int _shoot_star(SCENE *scene, int color, float x, float y)
 {
     int i;
@@ -550,7 +539,8 @@ SCENE *create_scene_01()
     _add_blocks(scene, 4, 5);
 
     /* Give the hero an initial star */
-    _set_hero_star(scene, _create_star(_random_front_color(scene)));
+    assert(scene->star == NULL);
+    scene->star = _create_star(_random_front_color(scene));
 
     return scene;
 }
@@ -684,7 +674,8 @@ int _update_stars(SCENE *scene)
 
     /* The hero needs a new star to shoot! */
     if (scene->star == NULL && num_stars == 0) {
-        _set_hero_star(scene, _create_star(_random_front_color(scene)));
+        assert(scene->star == NULL);
+        scene->star = _create_star(_random_front_color(scene));
         _follow_hero(scene->star, scene->hero);
     }
 
