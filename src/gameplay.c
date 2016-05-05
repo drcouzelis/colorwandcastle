@@ -583,6 +583,19 @@ void _update_hero(SCENE *scene)
         hero->is_shooting = false;
     }
 
+    /* Count the number of stars flying on the screen */
+    int num_stars = 0;
+    while (scene->stars[num_stars] != NULL) {
+        num_stars++;
+    }
+
+    /* The hero needs a new star to shoot! */
+    if (scene->star == NULL && num_stars == 0) {
+        assert(scene->star == NULL);
+        scene->star = _create_star(_random_front_color(scene));
+        _follow_hero(scene->star, scene->hero);
+    }
+
     /* Tell the hero's star to follow the hero */
     _follow_hero(scene->star, hero);
 
@@ -666,19 +679,6 @@ int _update_stars(SCENE *scene)
         }
     }
 
-    /* Count the number of stars flying on the screen */
-    int num_stars = 0;
-    while (scene->stars[num_stars] != NULL) {
-        num_stars++;
-    }
-
-    /* The hero needs a new star to shoot! */
-    if (scene->star == NULL && num_stars == 0) {
-        assert(scene->star == NULL);
-        scene->star = _create_star(_random_front_color(scene));
-        _follow_hero(scene->star, scene->hero);
-    }
-
     return EXIT_SUCCESS;
 }
 
@@ -743,11 +743,13 @@ int update_gameplay(void *data)
     /* TODO */
 
     /* Check for collisions */
+
     /**
      * Hero checks for collision with any of the game board, tiles,
      * stars, enemies, and so on.
      */
     _handle_collision_for_hero(scene->hero, scene);
+
     /**
      * Stars check for collision with blocks, walls, tiles, the hero,
      * and so on.
@@ -755,11 +757,13 @@ int update_gameplay(void *data)
     _handle_collision_for_stars(scene->stars, scene);
 
     /* Set status */
+
     /**
      * Modify the state of the hero based on the collision.
      * Change movement variables, state variables, and so on.
      */
     _set_status_for_hero(scene->hero, scene);
+
     /**
      * Modify the state of the stars based on collision.
      * Change directions, change hit points, and so on.
