@@ -17,6 +17,8 @@ dist_imagesdata_DATA = \
   icon.png \
   makayla-01.png \
   makayla-02.png \
+  rawson-01.png \
+  rawson-02.png \
   star-blue-1.png \
   star-blue-2.png \
   star-green-1.png \

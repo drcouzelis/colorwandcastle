@@ -171,8 +171,8 @@ HERO *_create_hero(float x, float y)
     hero = alloc_memory("HERO", sizeof(HERO));
 
     init_sprite(&hero->sprite, 1, 10);
-    add_frame(&hero->sprite, IMG("makayla-01.png"));
-    add_frame(&hero->sprite, IMG("makayla-02.png"));
+    add_frame(&hero->sprite, IMG("rawson-01.png"));
+    add_frame(&hero->sprite, IMG("rawson-02.png"));
     hero->sprite.x_offset = -10;
     hero->sprite.y_offset = -10;
 
