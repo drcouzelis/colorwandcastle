@@ -10,6 +10,7 @@ dist_imagesdata_DATA = \
   block-blue.png \
   block-green.png \
   block-orange.png \
+  block-mask.png \
   block-purple.png \
   block-red.png \
   block-yellow.png \
@@ -23,6 +24,8 @@ dist_imagesdata_DATA = \
   star-blue-2.png \
   star-green-1.png \
   star-green-2.png \
+  star-mask-1.png \
+  star-mask-2.png \
   star-orange-1.png \
   star-orange-2.png \
   star-purple-1.png \

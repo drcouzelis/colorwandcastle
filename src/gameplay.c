@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "display.h"
 #include "main.h"
+#include "mask.h"
 #include "memory.h"
 #include "sound.h"
 #include "sprite.h"
@@ -260,6 +261,8 @@ void _add_blocks(SCENE *scene, int num_cols, int num_colors)
     for (r = 1; r < ROWS - 1; r++) {
         for (c = 0; c < num_cols; c++) {
             scene->board[r][COLS - 2 - c] = _create_block(random_number(0, num_colors - 1));
+            /* TESTING purposes */
+            mask_bitmap(NULL, NULL);
         }
     }
 }
