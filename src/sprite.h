@@ -1,12 +1,9 @@
 #ifndef SPRITE_HEADER
 #define SPRITE_HEADER
 
-
 #include "resources.h"
 
-
 #define MAX_FRAMES 16
-
 
 typedef struct
 {
@@ -16,70 +13,68 @@ typedef struct
     int speed;
     int fudge;
     
-    int done;
+    bool done;
   
     /* A sprite is drawn with respect to its offset */
     int x_offset;
     int y_offset;
   
-    int loop;
+    bool loop;
   
-    int rotate;
-    int mirror;
-    int flip;
+    bool rotate;
+    bool mirror;
+    bool flip;
 } SPRITE;
-
 
 /**
  * The FPS must be greater than 0.
  * Use this before any other sprite functions.
  */
-int set_animation_fps(int fps);
+void set_animation_fps(int fps);
 
 /**
  * Initialize a sprite.
  * It will have no frames of animation by default.
  */
-int init_sprite(SPRITE *s, int loop, int speed);
+void init_sprite(SPRITE *sprite, bool loop, int speed);
 
 /**
  * Copy an existing sprite.
  * Useful when you want the same sprite but rotated.
  */
-int copy_sprite(SPRITE *copy, SPRITE *orig);
+void copy_sprite(SPRITE *copy, SPRITE *orig);
 
 /**
  * Animate a sprite.
  */
-int animate(SPRITE *s);
+void animate(SPRITE *sprite);
 
 /**
  * Returns a pointer to the current frame of animation.
  */
-IMAGE *get_frame(SPRITE *s);
+IMAGE *get_frame(SPRITE *sprite);
 
 /**
  * Add a frame to the sprite.
  */
-int add_frame(SPRITE *s, IMAGE *frame);
+void add_frame(SPRITE *sprite, IMAGE *frame);
 
 /**
  * Reset a sprite to the beginning of its
  * animation sequence.
  */
-int reset_sprite(SPRITE *s);
+void reset_sprite(SPRITE *sprite);
 
 /**
  * Draw the sprite at location x and y,
  * taking into account the offsets.
  */
-void draw_sprite(SPRITE *s, float x, float y);
+void draw_sprite(SPRITE *sprite, float x, float y);
 
 /**
  * Width and height.
  */
-int get_sprite_width(SPRITE *s);
-int get_sprite_height(SPRITE *s);
-
+int get_sprite_width(SPRITE *sprite);
+int get_sprite_height(SPRITE *sprite);
 
 #endif

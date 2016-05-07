@@ -1,76 +1,46 @@
 #include <stdio.h>
 #include "sprite.h"
 
-
 static int sprite_fps = -1;
 
-
-int set_animation_fps(int fps)
+void set_animation_fps(int fps)
 {
-    if (fps <= 0) {
-        fprintf(stderr, "SPRITE: FPS must be greater than 0.\n");
-        return EXIT_FAILURE;
-    }
-
+    assert(fps > 0);
     sprite_fps = fps;
-
-    return EXIT_SUCCESS;
 }
 
-
-int init_sprite(SPRITE *s, int loop, int speed)
+void init_sprite(SPRITE *sprite, bool loop, int speed)
 {
-    int i;
-
-    if (sprite_fps < 0) {
-        fprintf(stderr, "SPRITE: System not initialized.\n");
-        return EXIT_FAILURE;
+    assert(sprite_fps > 0);
+    assert(sprite != NULL);
+    
+    for (int i = 0; i < MAX_FRAMES; i++) {
+        sprite->frames[i] = NULL;
     }
     
-    /* Exit if NULL */
-    if (s == NULL) {
-        return EXIT_FAILURE;
-    }
+    sprite->speed = speed < 0 ? 0 : speed;
+    sprite->loop = loop;
 
-    for (i = 0; i < MAX_FRAMES; i++) {
-        s->frames[i] = NULL;
-    }
-    
-    s->speed = speed < 0 ? 0 : speed;
-    s->loop = loop;
-
-    s->len = 0;
-    s->pos = 0;
-    s->done = 0;
-    s->fudge = 0;
-    s->x_offset = 0;
-    s->y_offset = 0;
-    s->rotate = 0;
-    s->mirror = 0;
-    s->flip = 0;
-
-    return EXIT_SUCCESS;
+    sprite->len = 0;
+    sprite->pos = 0;
+    sprite->done = false;
+    sprite->fudge = 0;
+    sprite->x_offset = 0;
+    sprite->y_offset = 0;
+    sprite->rotate = false;
+    sprite->mirror = false;
+    sprite->flip = false;
 }
 
-
-int copy_sprite(SPRITE *copy, SPRITE *orig)
+void copy_sprite(SPRITE *copy, SPRITE *orig)
 {
-    int i;
+    /* We can't copy without some sprites */
+    assert(copy != NULL);
+    assert(orig != NULL);
 
-    if (copy == NULL) {
-        /* Nothing to do */
-        return EXIT_FAILURE;
-    }
-
-    if (orig == NULL) {
-        /* There's no original sprite to copy */
-        init_sprite(copy, 0, 0);
-        return EXIT_FAILURE;
-    }
-  
     init_sprite(copy, orig->loop, orig->speed);
     
-    for (i = 0; i < orig->len; i++) {
+    for (int i = 0; i < orig->len; i++) {
         add_frame(copy, orig->frames[i]);
     }
     
@@ -81,62 +51,45 @@ int copy_sprite(SPRITE *copy, SPRITE *orig)
     copy->flip = orig->flip;
   
     reset_sprite(copy);
-
-    return EXIT_SUCCESS;
 }
 
-
-int reset_sprite(SPRITE *s)
+void reset_sprite(SPRITE *sprite)
 {
-    if (s == NULL) {
-        return EXIT_FAILURE;
+    if (sprite == NULL) {
+        return;
     }
 
-    s->pos = 0;
-    s->done = 0;
-    s->fudge = 0;
-
-    return EXIT_SUCCESS;
+    sprite->pos = 0;
+    sprite->done = false;
+    sprite->fudge = 0;
 }
 
-
-IMAGE *get_frame(SPRITE *s)
+IMAGE *get_frame(SPRITE *sprite)
 {
-    if (s == NULL || s->len == 0) {
+    if (sprite == NULL || sprite->len == 0) {
         return NULL;
     }
 
-    return s->frames[s->pos];
+    return sprite->frames[sprite->pos];
 }
 
-
-int add_frame(SPRITE *s, IMAGE *frame)
+void add_frame(SPRITE *sprite, IMAGE *frame)
 {
-    if (s->len == MAX_FRAMES) {
-        fprintf(stderr, "SPRITE: Too many frames of animation.\n");
-        return EXIT_FAILURE;
-    }
+    assert(sprite != NULL);
+    assert(frame != NULL);
+    assert(sprite->len <= MAX_FRAMES);
 
-    if (frame) {
-        s->frames[s->len] = frame;
-        s->len++;
-    }
-
-    return EXIT_SUCCESS;
+    sprite->frames[sprite->len] = frame;
+    sprite->len++;
 }
 
-void _draw_image(ALLEGRO_BITMAP *img, float x, float y, int rotate, int mirror, int flip)
+void _draw_image(ALLEGRO_BITMAP *img, float x, float y, bool rotate, bool mirror, bool flip)
 {
-    int cx = 0;
-    int cy = 0;
-
-    if (img == NULL) {
-        return;
-    }
+    assert(img != NULL);
   
     /* Find the center of the image */
-    cx = al_get_bitmap_width(img) / 2;
-    cy = al_get_bitmap_height(img) / 2;
+    int cx = al_get_bitmap_width(img) / 2;
+    int cy = al_get_bitmap_height(img) / 2;
 
     if (rotate && mirror && flip) {
         /* 270 degrees */
@@ -161,72 +114,67 @@ void _draw_image(ALLEGRO_BITMAP *img, float x, float y, int rotate, int mirror, 
     }
 }
 
-void draw_sprite(SPRITE *s, float x, float y)
+void draw_sprite(SPRITE *sprite, float x, float y)
 {
-    if (s == NULL || s->len == 0) {
+    if (sprite == NULL || sprite->len == 0) {
         return;
     }
-  
+
     /* Apply the offset */
-    x += s->x_offset;
-    y += s->y_offset;
+    x += sprite->x_offset;
+    y += sprite->y_offset;
     
-    _draw_image(get_frame(s), x, y, s->rotate, s->mirror, s->flip);
+    _draw_image(get_frame(sprite), x, y, sprite->rotate, sprite->mirror, sprite->flip);
 }
 
-
 /* Animate the sprite */
-int animate(SPRITE *s)
+void animate(SPRITE *sprite)
 {
-    if (s == NULL) {
-        return EXIT_FAILURE;
+    if (sprite == NULL) {
+        return;
     }
 
     /* If there's actually anything to animate...*/
-    if (s->len > 1 && s->speed != 0) {
+    if (sprite->len > 1 && sprite->speed != 0) {
      
-        s->fudge += s->speed;
+        sprite->fudge += sprite->speed;
       
         /**
          * Cycle through as many frames as necessary for the
          * amount of time that has passed.
          */
-        while (s->fudge >= sprite_fps) {
-            s->pos++;
-            if (s->pos == s->len) {
-                if (s->loop) {
-                    s->pos = 0;
+        while (sprite->fudge >= sprite_fps) {
+            sprite->pos++;
+            if (sprite->pos == sprite->len) {
+                if (sprite->loop) {
+                    sprite->pos = 0;
                 } else {
-                    s->pos--;
-                    s->done = 1;
+                    sprite->pos--;
+                    sprite->done = true;
                 }
             }
-            s->fudge -= sprite_fps;
+            sprite->fudge -= sprite_fps;
         }
       
     } else {
-        s->done = 1;
+        sprite->done = true;
     }
-
-    return EXIT_SUCCESS;
 }
 
-
-int get_sprite_width(SPRITE *s)
+int get_sprite_width(SPRITE *sprite)
 {
-    if (s == NULL || s->len == 0) {
+    if (sprite == NULL || sprite->len == 0) {
         return 0;
     }
 
-    return al_get_bitmap_width(get_frame(s));
+    return al_get_bitmap_width(get_frame(sprite));
 }
 
-
-int get_sprite_height(SPRITE *s)
+int get_sprite_height(SPRITE *sprite)
 {
-    if (s == NULL || s->len == 0) {
+    if (sprite == NULL || sprite->len == 0) {
         return 0;
     }
 
-    return al_get_bitmap_height(get_frame(s));
+    return al_get_bitmap_height(get_frame(sprite));
 }

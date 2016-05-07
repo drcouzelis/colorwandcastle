@@ -39,7 +39,7 @@ typedef struct
     SPRITE sprite;
 
     /* A character cannot pass through a solid tile */
-    int solid;
+    bool solid;
 
     /* The tile will be removed if hits is 0 */
     /* Indestructable if < 0 */
@@ -94,8 +94,12 @@ typedef struct
 typedef struct
 {
     HERO *hero;
+
     STAR *star; /* TODO: Move the hero / star logic "up" one level */
+
+    /* Number of shooting stars in the scene */
     STAR **stars;
+
     TILE ***board;
 
     int **gameboard;
@@ -209,7 +213,7 @@ void _add_border(SCENE *scene)
                 init_sprite(&tile->sprite, 0, 0);
                 add_frame(&tile->sprite, IMG("bricks.png"));
 
-                tile->solid = 1;
+                tile->solid = true;
                 tile->color = NO_COLOR;
                 tile->hits = -1;
 
@@ -239,7 +243,7 @@ TILE *_create_block(int color)
 {
     TILE *tile = alloc_memory("TILE", sizeof(TILE));
 
-    tile->solid = 1;
+    tile->solid = true;
     tile->hits = 1;
     tile->color = color;
 
@@ -755,4 +759,11 @@ void draw_gameplay(void *data)
     if (star != NULL) {
         draw_sprite(&star->sprite, star->body.x, star->body.y);
     }
+}
+
+SCENE *open_scene(char **filename)
+{
+    SCENE *scene = _create_scene();
+
+    return scene;
 }
