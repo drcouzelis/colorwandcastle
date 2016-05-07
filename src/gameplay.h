@@ -6,7 +6,7 @@
 typedef struct SCENE SCENE;
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event);
-int update_gameplay(void *data);
+bool update_gameplay(void *data);
 void draw_gameplay(void *data);
 
 SCENE *create_scene_01();

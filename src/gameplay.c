@@ -703,31 +703,7 @@ int _update_board(SCENE *scene)
     return EXIT_SUCCESS;
 }
 
-void _handle_collision_for_hero(HERO *hero, SCENE *scene)
-{
-}
-
-void _handle_collision_for_stars(STAR **stars, SCENE *scene)
-{
-}
-
-void _set_status_for_hero(HERO *hero, SCENE *scene)
-{
-}
-
-void _set_status_for_stars(STAR **stars, SCENE *scene)
-{
-}
-
-void _move_hero(HERO *hero, SCENE *scene)
-{
-}
-
-void _move_stars(STAR **stars, SCENE *scene)
-{
-}
-
-int update_gameplay(void *data)
+bool update_gameplay(void *data)
 {
     SCENE *scene = (SCENE *)data;
 
@@ -739,44 +715,6 @@ int update_gameplay(void *data)
 
     /* Board */
     _update_board(scene);
-
-    /* TODO */
-
-    /* Check for collisions */
-
-    /**
-     * Hero checks for collision with any of the game board, tiles,
-     * stars, enemies, and so on.
-     */
-    _handle_collision_for_hero(scene->hero, scene);
-
-    /**
-     * Stars check for collision with blocks, walls, tiles, the hero,
-     * and so on.
-     */
-    _handle_collision_for_stars(scene->stars, scene);
-
-    /* Set status */
-
-    /**
-     * Modify the state of the hero based on the collision.
-     * Change movement variables, state variables, and so on.
-     */
-    _set_status_for_hero(scene->hero, scene);
-
-    /**
-     * Modify the state of the stars based on collision.
-     * Change directions, change hit points, and so on.
-     * This function will also remove dead stars.
-     */
-    _set_status_for_stars(scene->stars, scene);
-
-    /* Move */
-    /**
-     * Move the hero and stars in accordance with velocity.
-     */
-    _move_hero(scene->hero, scene);
-    _move_stars(scene->stars, scene);
 
     return !end_gameplay;
 }

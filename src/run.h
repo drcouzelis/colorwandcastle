@@ -5,7 +5,9 @@
 
 void set_fps(int fps);
 
+void set_display(ALLEGRO_DISPLAY *display);
+
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
-        int (*update)(void *data), void (*draw)(void *data), void *data);
+       bool (*update)(void *data), void (*draw)(void *data), void *data);
 
 #endif

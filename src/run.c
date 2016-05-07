@@ -9,52 +9,44 @@ void set_fps(int fps)
     run_fps = fps;
 }
 
-void run(void (*control)(void *data, ALLEGRO_EVENT *event),
-        int (*update)(void *data), void (*draw)(void *data), void *data)
+void set_display(ALLEGRO_DISPLAY *display)
 {
-    ALLEGRO_TIMER *timer = NULL;
-    int keep_running = 1;
-    int redraw = 1;
+}
 
-    ALLEGRO_EVENT_QUEUE *events = NULL;
-    ALLEGRO_EVENT event;
-
+void run(void (*control)(void *data, ALLEGRO_EVENT *event),
+        bool (*update)(void *data), void (*draw)(void *data), void *data)
+{
     assert(control);
     assert(update);
     assert(update);
   
-    events = al_create_event_queue();
+    ALLEGRO_EVENT_QUEUE *events = al_create_event_queue();
 
-    timer = al_create_timer(1.0 / run_fps);
+    ALLEGRO_TIMER *timer = al_create_timer(1.0 / run_fps);
     al_register_event_source(events, al_get_timer_event_source(timer));
     al_register_event_source(events, al_get_keyboard_event_source());
     al_register_event_source(events, al_get_display_event_source(get_display()));
   
+    ALLEGRO_EVENT event;
+    bool keep_running = true;
+    bool redraw = true;
+
     al_start_timer(timer);
   
     while (keep_running) {
   
         al_wait_for_event(events, &event);
-    
-        control(data, &event);
+        control(data, &event); /* CONTROL */
     
         if (event.type == ALLEGRO_EVENT_TIMER) {
-    
-            /* Update */
-            keep_running = update(data);
-    
-            redraw = 1;
+            keep_running = update(data); /* UPDATE */
+            redraw = true;
         }
     
         if (redraw && al_is_event_queue_empty(events)) {
-    
-            redraw = 0;
-    
-            /* Draw */
-            draw(data);
-    
-            /* Update the screen */
+            draw(data); /* DRAW */
             al_flip_display();
+            redraw = false;
         }
     }
   
