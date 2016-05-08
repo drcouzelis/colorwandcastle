@@ -261,8 +261,6 @@ void _add_blocks(SCENE *scene, int num_cols, int num_colors)
     for (r = 1; r < ROWS - 1; r++) {
         for (c = 0; c < num_cols; c++) {
             scene->board[r][COLS - 2 - c] = _create_block(random_number(0, num_colors - 1));
-            /* TESTING purposes */
-            mask_bitmap(NULL, NULL);
         }
     }
 }
@@ -762,6 +760,9 @@ void draw_gameplay(void *data)
     if (star != NULL) {
         draw_sprite(&star->sprite, star->body.x, star->body.y);
     }
+
+    /* TESTING */
+    mask_bitmap(NULL, NULL);
 }
 
 SCENE *open_scene(char **filename)
