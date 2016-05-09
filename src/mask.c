@@ -19,8 +19,8 @@ void mask_bitmap(ALLEGRO_BITMAP *bmp, ALLEGRO_BITMAP *mask)
     al_set_target_bitmap(test_canvas);
     al_clear_to_color(al_map_rgb(255, 0, 255));
     al_draw_bitmap(test_mask, 0, 0, 0);
-    /*al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);*/
-    al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ONE, ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+    al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
+    /*al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ONE, ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);*/
     al_draw_bitmap(test_texture, 0, 0, 0);
 
     /* RESTORE state */
