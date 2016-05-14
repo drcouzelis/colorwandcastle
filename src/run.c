@@ -16,10 +16,6 @@ void set_display(ALLEGRO_DISPLAY *display)
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
         bool (*update)(void *data), void (*draw)(void *data), void *data)
 {
-    assert(control);
-    assert(update);
-    assert(update);
-  
     ALLEGRO_EVENT_QUEUE *events = al_create_event_queue();
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0 / run_fps);
@@ -36,17 +32,26 @@ void run(void (*control)(void *data, ALLEGRO_EVENT *event),
     while (keep_running) {
   
         al_wait_for_event(events, &event);
-        control(data, &event); /* CONTROL */
+
+        if (control != NULL) {
+            control(data, &event); /* CONTROL */
+        }
     
         if (event.type == ALLEGRO_EVENT_TIMER) {
-            keep_running = update(data); /* UPDATE */
-            redraw = true;
+            if (update != NULL) {
+                keep_running = update(data); /* UPDATE */
+                redraw = true;
+            } else {
+                keep_running = false;
+            }
         }
     
         if (redraw && al_is_event_queue_empty(events)) {
-            draw(data); /* DRAW */
-            al_flip_display();
-            redraw = false;
+            if (draw != NULL) {
+                draw(data); /* DRAW */
+                al_flip_display();
+                redraw = false;
+            }
         }
     }
   
