@@ -760,9 +760,6 @@ void draw_gameplay(void *data)
     if (star != NULL) {
         draw_sprite(&star->sprite, star->body.x, star->body.y);
     }
-
-    /* TESTING */
-    mask_bitmap(NULL, NULL);
 }
 
 SCENE *open_scene(char **filename)

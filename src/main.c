@@ -24,7 +24,7 @@ int main(int argc, char **argv)
    
     /* Add keyboard support */
     if (!al_install_keyboard()) {
-        printf("Warinng: Failed to init keyboard.\n");
+        printf("Warning: Failed to init keyboard.\n");
     }
 
     /* Add mouse support */
@@ -58,7 +58,6 @@ int main(int argc, char **argv)
     set_fps(GAME_TICKER);
 
     /* START THE GAME */
-    /* TODO: Relpace this with a GAMEPLAY that has a SCENE */
     scene = create_scene_01();
     run(control_gameplay, update_gameplay, draw_gameplay, scene);
     destroy_scene(scene);
