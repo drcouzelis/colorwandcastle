@@ -60,6 +60,11 @@ IMAGE *get_frame(SPRITE *sprite);
 void add_frame(SPRITE *sprite, IMAGE *frame);
 
 /**
+ * Delete all frames.
+ */
+void delete_frames(SPRITE *sprite);
+
+/**
  * Reset a sprite to the beginning of its
  * animation sequence.
  */

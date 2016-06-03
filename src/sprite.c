@@ -83,6 +83,18 @@ void add_frame(SPRITE *sprite, IMAGE *frame)
     sprite->len++;
 }
 
+void delete_frames(SPRITE *sprite)
+{
+    assert(sprite != NULL);
+    reset_sprite(sprite);
+
+    /**
+     * Just set the length to zero. The images will be handled
+     * by the resource manager.
+     */
+    sprite->len = 0;
+}
+
 void _draw_image(ALLEGRO_BITMAP *img, float x, float y, bool rotate, bool mirror, bool flip)
 {
     assert(img != NULL);

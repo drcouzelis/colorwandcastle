@@ -19,6 +19,14 @@
 
 static bool end_gameplay = false;
 
+typedef enum
+{
+    HERO_TYPE_MAKAYLA = 0,
+    HERO_TYPE_RAWSON
+} HERO_TYPE;
+
+static HERO_TYPE hero_type = 0;
+
 /**
  * TODO:
  * Make these just general "star numbers".
@@ -176,8 +184,8 @@ HERO *_create_hero(float x, float y)
     hero = alloc_memory("HERO", sizeof(HERO));
 
     init_sprite(&hero->sprite, 1, 10);
-    add_frame(&hero->sprite, IMG("rawson-01.png"));
-    add_frame(&hero->sprite, IMG("rawson-02.png"));
+    add_frame(&hero->sprite, IMG("makayla-01.png"));
+    add_frame(&hero->sprite, IMG("makayla-02.png"));
     hero->sprite.x_offset = -10;
     hero->sprite.y_offset = -10;
 
@@ -438,6 +446,20 @@ void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
     }
 }
 
+void _toggle_hero(HERO *hero)
+{
+    delete_frames(&hero->sprite);
+    if (hero_type == HERO_TYPE_MAKAYLA) {
+        hero_type = HERO_TYPE_RAWSON;
+        add_frame(&hero->sprite, IMG("rawson-01.png"));
+        add_frame(&hero->sprite, IMG("rawson-02.png"));
+    } else if (hero_type == HERO_TYPE_RAWSON) {
+        hero_type = HERO_TYPE_MAKAYLA;
+        add_frame(&hero->sprite, IMG("makayla-01.png"));
+        add_frame(&hero->sprite, IMG("makayla-02.png"));
+    }
+}
+
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
     SCENE *scene = (SCENE *)data;
@@ -449,12 +471,14 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
         if (key == ALLEGRO_KEY_ESCAPE) {
             /* ESC : Stop gameplay */
             end_gameplay = true;
-        } else if (key == ALLEGRO_KEY_S) {
+        } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_SEMICOLON) {
             /* S : Toggle audio */
             toggle_audio();
-        } else if (key == ALLEGRO_KEY_F) {
+        } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_Y) {
             /* F : Toggle fullscreen */
             toggle_fullscreen();
+        } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
+            _toggle_hero(scene->hero);
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
