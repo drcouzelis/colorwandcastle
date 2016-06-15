@@ -16,6 +16,18 @@ dist_imagesdata_DATA = \
   block-red.png \
   block-yellow.png \
   bricks.png \
+  bullet-blue-1.png \
+  bullet-blue-2.png \
+  bullet-green-1.png \
+  bullet-green-2.png \
+  bullet-orange-1.png \
+  bullet-orange-2.png \
+  bullet-purple-1.png \
+  bullet-purple-2.png \
+  bullet-red-1.png \
+  bullet-red-2.png \
+  bullet-yellow-1.png \
+  bullet-yellow-2.png \
   icon.png \
   makayla-01.png \
   makayla-02.png \

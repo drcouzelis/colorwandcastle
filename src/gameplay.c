@@ -132,16 +132,26 @@ static float _convert_pps_to_fps(int pps)
 
 IMAGE *_get_star_image(int color, int frame)
 {
-    static char *star_image_names[6][2] = {
-        {"star-red-1.png", "star-red-2.png"},
-        {"star-orange-1.png", "star-orange-2.png"},
-        {"star-yellow-1.png", "star-yellow-2.png"},
-        {"star-green-1.png", "star-green-2.png"},
-        {"star-blue-1.png", "star-blue-2.png"},
-        {"star-purple-1.png", "star-purple-2.png"}
+    static char *star_image_names[2][6][2] = {
+        {
+            {"star-red-1.png", "star-red-2.png"},
+            {"star-orange-1.png", "star-orange-2.png"},
+            {"star-yellow-1.png", "star-yellow-2.png"},
+            {"star-green-1.png", "star-green-2.png"},
+            {"star-blue-1.png", "star-blue-2.png"},
+            {"star-purple-1.png", "star-purple-2.png"}
+        },
+        {
+            {"bullet-red-1.png", "bullet-red-2.png"},
+            {"bullet-orange-1.png", "bullet-orange-2.png"},
+            {"bullet-yellow-1.png", "bullet-yellow-2.png"},
+            {"bullet-green-1.png", "bullet-green-2.png"},
+            {"bullet-blue-1.png", "bullet-blue-2.png"},
+            {"bullet-purple-1.png", "bullet-purple-2.png"}
+        }
     };
 
-    return IMG(star_image_names[color][frame]);
+    return IMG(star_image_names[hero_type][color][frame]);
 }
 
 STAR *_create_star(int color)
@@ -446,17 +456,22 @@ void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
     }
 }
 
-void _toggle_hero(HERO *hero)
+void _toggle_hero(HERO *hero, STAR *star)
 {
     delete_frames(&hero->sprite);
+    delete_frames(&star->sprite);
     if (hero_type == HERO_TYPE_MAKAYLA) {
         hero_type = HERO_TYPE_RAWSON;
         add_frame(&hero->sprite, IMG("rawson-01.png"));
         add_frame(&hero->sprite, IMG("rawson-02.png"));
+        add_frame(&star->sprite, _get_star_image(star->color, 0));
+        add_frame(&star->sprite, _get_star_image(star->color, 1));
     } else if (hero_type == HERO_TYPE_RAWSON) {
         hero_type = HERO_TYPE_MAKAYLA;
         add_frame(&hero->sprite, IMG("makayla-01.png"));
         add_frame(&hero->sprite, IMG("makayla-02.png"));
+        add_frame(&star->sprite, _get_star_image(star->color, 0));
+        add_frame(&star->sprite, _get_star_image(star->color, 1));
     }
 }
 
@@ -471,14 +486,15 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
         if (key == ALLEGRO_KEY_ESCAPE) {
             /* ESC : Stop gameplay */
             end_gameplay = true;
-        } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_SEMICOLON) {
+        } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_O) {
             /* S : Toggle audio */
             toggle_audio();
         } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_Y) {
             /* F : Toggle fullscreen */
             toggle_fullscreen();
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
-            _toggle_hero(scene->hero);
+            /* Toggle the hero */
+            _toggle_hero(scene->hero, scene->star);
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
