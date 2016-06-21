@@ -1,41 +1,94 @@
-20 200
+# Hero start position
+START 20 200
 
+# Size of the level
+# Defaults to 16x12
+SIZE 16 12
+
+# 1
+TILE
+  IMAGE bricks.png
+END
+
+# 2
+TILE
+  IMAGE background.png
+END
+
+# Tiles drawn underneath everything else
+# Tiles are represented by their corresponding integer value
+# . (period) for an empty tile
+BACKGROUND
+. . . . . . . . . . . . . . . .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
+. . . . . . . . . . . . . . . .
+
+# Tiles on the same plane as the hero
+# Tiles are represented by their corresponding integer value
+# . (period) for an empty tile
+FOREGROUND
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 0 0 0 0 1 1 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1
+1 . . . . 1 1 . . . . . . . . 1
+1 . . . . . 1 . . . . . . . . 1
+1 . . . . . . . . . . . . . . 1
+1 . . . . . . . . . . . . . . 1
+1 . . . . . . . . . . . . . . 1
+1 . . . . . . . . . . . . . . 1
+1 . . . . . . . . . . . . . . 1
+1 . . . . . . . . . . . . . . 1
+1 . . . 1 . . . . . . . . . . 1
+1 . . 1 1 . . . . . . . . . . 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 
-* bricks.png
-_ background.png
-
+# Collision map
+# * (asterisk) is un-passable
+# . (period) is able to be passed through
+COLLISION
 * * * * * * * * * * * * * * * *
-* _ _ _ _ * * _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ * _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ _ _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ _ _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ _ _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ _ _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ _ _ _ _ _ _ _ _ _ *
-* _ _ _ _ _ _ _ _ _ _ _ _ _ _ *
-* _ _ _ * _ _ _ _ _ _ _ _ _ _ *
-* _ _ * * _ _ _ _ _ _ _ _ _ _ *
+* . . . . * * . . . . . . . . *
+* . . . . . * . . . . . . . . *
+* . . . . . . . . . . . . . . *
+* . . . . . . . . . . . . . . *
+* . . . . . . . . . . . . . . *
+* . . . . . . . . . . . . . . *
+* . . . . . . . . . . . . . . *
+* . . . . . . . . . . . . . . *
+* . . . * . . . . . . . . . . *
+* . . * * . . . . . . . . . . *
 * * * * * * * * * * * * * * * *
 
-R block-red.png
-O block-orange.png
-Y block-yellow.png
-G block-green.png
-B block-blue.png
-P block-purple.png
+# 1
+BLOCK block-red.png
 
+#2
+BLOCK block-orange.png
+
+#3
+BLOCK block-yellow.png
+
+#4
+BLOCK block-green.png
+
+#5
+BLOCK block-blue.png
+
+#6
+BLOCK block-purple.png
+
+# Block placement
+# Enter an integer for a specific block
+# ? (question mark) for a random block
+# . (period) for blank
+BLOCKS
 . . . . . . . . . . . . . . . .
 . . . . . . . . . . . ? ? ? ? .
 . . . . . . . . . . . ? ? ? ? .
