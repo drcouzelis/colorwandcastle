@@ -483,7 +483,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
 
-        if (key == ALLEGRO_KEY_ESCAPE || ALLEGRO_KEY_Q || ALLEGRO_KEY_QUOTE) {
+        if (key == ALLEGRO_KEY_ESCAPE || key == ALLEGRO_KEY_Q || key == ALLEGRO_KEY_QUOTE) {
             /* ESC : Stop gameplay */
             end_gameplay = true;
         } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_O) {
