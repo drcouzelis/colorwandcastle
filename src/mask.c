@@ -12,19 +12,16 @@ void mask_bitmap(ALLEGRO_BITMAP *bmp, ALLEGRO_BITMAP *mask)
     /* STORE state */
     al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
 
-    //ALLEGRO_BITMAP *test_mask_highlights = IMG("block-mask-highlights.png");
-    ALLEGRO_BITMAP *test_mask_shadows = IMG("block-mask-shadows.png");
+    ALLEGRO_BITMAP *test_mask = IMG("block-mask.png");
     ALLEGRO_BITMAP *test_texture = IMG("red-bricks.png");
     ALLEGRO_BITMAP *test_canvas = al_create_bitmap(al_get_bitmap_width(test_texture), al_get_bitmap_height(test_texture));
 
     al_set_target_bitmap(test_canvas);
     al_clear_to_color(al_map_rgb(255, 0, 255));
     al_draw_bitmap(test_texture, 0, 0, 0);
-    //al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
-    //al_draw_bitmap(test_mask_highlights, 0, 0, 0);
-    //al_set_blender(ALLEGRO_ADD, ALLEGRO_INVERSE_SRC_COLOR, ALLEGRO_ONE);
-    al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE, ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ZERO);
-    al_draw_bitmap(test_mask_shadows, 0, 0, 0);
+    al_set_blender(ALLEGRO_SRC_MINUS_DEST, ALLEGRO_ONE, ALLEGRO_ONE);
+    al_draw_bitmap(test_mask, 0, 0, 0);
+    al_draw_bitmap(test_mask, 0, 0, 0);
 
     /* RESTORE state */
     al_restore_state(&state);
