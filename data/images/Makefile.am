@@ -10,8 +10,6 @@ dist_imagesdata_DATA = \
   block-blue.png \
   block-green.png \
   block-orange.png \
-  block-mask-highlights.png \
-  block-mask-shadows.png \
   block-mask.png \
   block-purple.png \
   block-red.png \
