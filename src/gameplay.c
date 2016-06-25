@@ -255,7 +255,7 @@ IMAGE *_get_block_image(int color)
         "block-purple.png"
     };
 
-    return IMG(block_image_names[color]);
+    return MASKED_IMG(block_image_names[color], "block-mask.png");
 }
 
 TILE *_create_block(int color)

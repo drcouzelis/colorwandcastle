@@ -2,32 +2,56 @@
 #include <stdio.h>
 
 #include "main.h"
-#include "resources.h"
+#include "mask.h"
 
-void mask_bitmap(ALLEGRO_BITMAP *bmp, ALLEGRO_BITMAP *mask)
+IMAGE *get_masked_image(const char *name, const char *mask)
 {
+    int max_filename_len = 256;
+    char complete_name[max_filename_len];
+    complete_name[0] = '\0';
+    strncat(complete_name, name, max_filename_len);
+    strncat(complete_name, mask, max_filename_len);
+
+    /* If the image has already been added, just return it */
+    IMAGE *masked_img = IMG(complete_name);
+    if (masked_img != NULL) {
+        return masked_img;
+    }
+
+    /* Load the image */
+    IMAGE *orig_img = IMG(name);
+    assert(orig_img);
+
+    /* Load the mask */
+    IMAGE *mask_img = IMG(mask);
+    assert(mask_img);
+
+    /* Create a canvas to draw the newly created image to */
+    IMAGE *canvas = al_create_bitmap(al_get_bitmap_width(orig_img), al_get_bitmap_height(orig_img));
+    assert(canvas);
+
+    /* STORE Allegro state */
     /* See http://liballeg.org/a5docs/trunk/graphics.html#drawing-operations */
     ALLEGRO_STATE state;
-
-    /* STORE state */
     al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
 
-    ALLEGRO_BITMAP *test_mask = IMG("block-mask.png");
-    ALLEGRO_BITMAP *test_texture = IMG("red-bricks.png");
-    ALLEGRO_BITMAP *test_canvas = al_create_bitmap(al_get_bitmap_width(test_texture), al_get_bitmap_height(test_texture));
-
-    al_set_target_bitmap(test_canvas);
+    /* First, draw the original image to the canvas */
+    al_set_target_bitmap(canvas);
     al_clear_to_color(al_map_rgb(255, 0, 255));
-    al_draw_bitmap(test_texture, 0, 0, 0);
-    al_set_blender(ALLEGRO_SRC_MINUS_DEST, ALLEGRO_ONE, ALLEGRO_ONE);
-    al_draw_bitmap(test_mask, 0, 0, 0);
-    al_draw_bitmap(test_mask, 0, 0, 0);
+    al_draw_bitmap(orig_img, 0, 0, 0);
 
-    /* RESTORE state */
+    /* Second, add the mask */
+    al_set_blender(ALLEGRO_SRC_MINUS_DEST, ALLEGRO_ONE, ALLEGRO_ONE);
+    al_draw_bitmap(mask_img, 0, 0, 0);
+
+    /* TODO: WHAT THE HECK WHAT DOES THIS DO WHY DO I NEED A SECOND CALL??? */
+    al_draw_bitmap(mask_img, 0, 0, 0);
+
+    /* RESTORE Allegro state */
     al_restore_state(&state);
 
-    /* DRAW */
-    al_draw_bitmap(test_canvas, 2 * TILE_SIZE, 2 * TILE_SIZE, 0);
+    /* Add it to the collection of resources */
+    insert_image_resource(complete_name, canvas);
 
-    al_destroy_bitmap(test_canvas);
+    return canvas;
 }

@@ -38,4 +38,10 @@ SOUND *get_sound(const char *name);
 #define IMG(name) (get_image(name))
 #define SND(name) (get_sound(name))
 
+/**
+ * Insert your own image resource.
+ * It can be retrieved by calling "get_image" with the given name.
+ */
+void insert_image_resource(const char *name, IMAGE *image);
+
 #endif

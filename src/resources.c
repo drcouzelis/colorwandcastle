@@ -92,6 +92,24 @@ RESOURCE *_create_resource(const char *name, RESOURCE_TYPE type, void *data)
     return resource;
 }
 
+bool _is_space_for_new_resource()
+{
+    /* See if we have space to load another resource... */
+    if (num_resources == MAX_RESOURCES) {
+        fprintf(stderr, "RESOURCES: Failed to load resource, try increasing MAX_RESOURCES.\n");
+        return false;
+    }
+    return true;
+}
+
+void _add_resource_to_list(RESOURCE *resource)
+{
+    if (_is_space_for_new_resource()) {
+        resources[num_resources] = resource;
+        num_resources++;
+    }
+}
+
 void *_get_resource(const char *name, RESOURCE_TYPE type)
 {
     void *data = NULL;
@@ -99,24 +117,31 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
     int i;
 
     /**
-     * Check the loaded resource
+     * Check the resources that have already been loaded
      */
     for (i = 0; i < num_resources; i++) {
+        assert(resources[i]);
         if (resources[i] == NULL) {
             printf("Resource %d is NULL\n", i);
         }
         if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
+            /* The resource has been found! Return it */
             return resources[i]->data;
         }
     }
 
-    if (num_resources == MAX_RESOURCES) {
-        fprintf(stderr, "RESOURCES: Failed to load resource, try increasing MAX_RESOURCES.\n");
+    /**
+     * Uh oh. The resource WASN'T found.
+     */
+    if (!_is_space_for_new_resource()) {
         return NULL;
     }
 
     /**
-     * Try finding it in the list of resource paths.
+     * Next, try finding a file with the given filename in
+     * the list of resource paths.
+     *
+     * If found, return it!
      */
     for (i = 0; i < num_resource_paths; i++) {
 
@@ -124,15 +149,16 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
         strncat(fullpath, resource_paths[i], MAX_FILENAME_LEN);
         strncat(fullpath, name, MAX_FILENAME_LEN);
 
+        /* Load the resource, based on the filetype */
         if (type == RESOURCE_TYPE_IMAGE) {
             data = _load_bitmap_with_magic_pink(fullpath);
         } else if (type == RESOURCE_TYPE_SOUND) {
             data = al_load_sample(fullpath);
         }
 
-        if (data) {
-            resources[num_resources] = _create_resource(name, type, data);
-            num_resources++;
+        /* The resource has been created! Return it */
+        if (data != NULL) {
+            _add_resource_to_list(_create_resource(name, type, data));
             return data;
         }
     }
@@ -149,4 +175,16 @@ IMAGE *get_image(const char *name)
 SOUND *get_sound(const char *name)
 {
     return (SOUND *)_get_resource(name, RESOURCE_TYPE_SOUND);
+}
+
+void insert_image_resource(const char *name, IMAGE *image)
+{
+    assert(image);
+
+    /* Check if the image has already been added */
+    if (get_image(name) != NULL) {
+        return;
+    }
+
+    _add_resource_to_list(_create_resource(name, RESOURCE_TYPE_IMAGE, image));
 }
