@@ -19,6 +19,8 @@ dist_imagesdata_DATA = \
   bullet-blue-2.png \
   bullet-green-1.png \
   bullet-green-2.png \
+  bullet-mask-1.png \
+  bullet-mask-2.png \
   bullet-orange-1.png \
   bullet-orange-2.png \
   bullet-purple-1.png \
@@ -46,4 +48,7 @@ dist_imagesdata_DATA = \
   star-red-1.png \
   star-red-2.png \
   star-yellow-1.png \
-  star-yellow-2.png
+  star-yellow-2.png \
+  texture-makaylahead.png \
+  texture-rawsonhead.png \
+  texture-water.png

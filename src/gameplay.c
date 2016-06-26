@@ -134,24 +134,29 @@ IMAGE *_get_star_image(int color, int frame)
 {
     static char *star_image_names[2][6][2] = {
         {
-            {"star-red-1.png", "star-red-2.png"},
-            {"star-orange-1.png", "star-orange-2.png"},
-            {"star-yellow-1.png", "star-yellow-2.png"},
+            {"texture-water.png", "texture-water.png"},
+            {"texture-rawsonhead.png", "texture-rawsonhead.png"},
+            {"texture-makaylahead.png", "texture-makaylahead.png"},
             {"star-green-1.png", "star-green-2.png"},
             {"star-blue-1.png", "star-blue-2.png"},
             {"star-purple-1.png", "star-purple-2.png"}
         },
         {
-            {"bullet-red-1.png", "bullet-red-2.png"},
-            {"bullet-orange-1.png", "bullet-orange-2.png"},
-            {"bullet-yellow-1.png", "bullet-yellow-2.png"},
+            {"texture-water.png", "texture-water.png"},
+            {"texture-rawsonhead.png", "texture-rawsonhead.png"},
+            {"texture-makaylahead.png", "texture-makaylahead.png"},
             {"bullet-green-1.png", "bullet-green-2.png"},
             {"bullet-blue-1.png", "bullet-blue-2.png"},
             {"bullet-purple-1.png", "bullet-purple-2.png"}
         }
     };
 
-    return IMG(star_image_names[hero_type][color][frame]);
+    static char *star_mask_names[2][2] = {
+        {"star-mask-1.png", "star-mask-2.png"},
+        {"bullet-mask-1.png", "bullet-mask-2.png"}
+    };
+
+    return MASKED_IMG(star_image_names[hero_type][color][frame], star_mask_names[hero_type][frame]);
 }
 
 STAR *_create_star(int color)
@@ -247,9 +252,9 @@ void _add_border(SCENE *scene)
 IMAGE *_get_block_image(int color)
 {
     static char *block_image_names[6] = {
-        "block-red.png",
-        "block-orange.png",
-        "block-yellow.png",
+        "texture-water.png",
+        "texture-rawsonhead.png",
+        "texture-makaylahead.png",
         "block-green.png",
         "block-blue.png",
         "block-purple.png"
