@@ -49,8 +49,7 @@ void free_resources()
 void add_resource_path(const char *path)
 {
     if (num_resource_paths >= MAX_RESOURCE_PATHS) {
-        fprintf(stderr, "RESOURCES: Failed to add path.\n");
-        fprintf(stderr, "RESOURCES: Try increasing MAX_RESOURCE_PATHS.\n");
+        fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_RESOURCE_PATHS.\n");
         return;
     }
 
@@ -163,7 +162,7 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
         }
     }
 
-    fprintf(stderr, "RESOURCES: Failed to load resource: \"%s\".\n", name);
+    /*fprintf(stderr, "RESOURCES: Failed to load resource: \"%s\".\n", name);*/
     return NULL;
 }
 

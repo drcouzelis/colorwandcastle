@@ -98,7 +98,12 @@ typedef struct
     bool is_shooting;
 } HERO;
 
+#define MAX_LEVEL_COLS 16
+#define MAX_LEVEL_ROWS 12
 #define MAX_STARS 32
+#define MAX_TILES 256
+#define MAX_BLOCKS 256
+#define MAX_FILENAME_SIZE 256
 
 typedef struct
 {
@@ -113,6 +118,37 @@ typedef struct
 
     int **gameboard;
 } SCENE;
+
+typedef struct
+{
+    /* Size of the level */
+    int cols;
+    int rows;
+
+    /* Starting position for the hero */
+    int startx;
+    int starty;
+    
+    HERO *hero;
+    STAR *star;
+
+    /* Number of shooting stars in the scene */
+    STAR *stars[MAX_STARS];
+
+    int collision_map[MAX_LEVEL_COLS][MAX_LEVEL_ROWS];
+
+    /* List of tiles used in the level */
+    TILE *tile_list[MAX_TILES];
+    int background_map[MAX_LEVEL_COLS][MAX_LEVEL_ROWS];
+    int foreground_map[MAX_LEVEL_COLS][MAX_LEVEL_ROWS];
+
+    /* List of blocks used in the level */
+    char block_list[MAX_BLOCKS][MAX_FILENAME_SIZE];
+    int block_map[MAX_LEVEL_COLS][MAX_LEVEL_ROWS];
+
+    /* The starting position of blocks */
+    int block_map_default[MAX_LEVEL_COLS][MAX_LEVEL_ROWS];
+} LEVEL;
 
 static int _get_hero_speed()
 {
@@ -591,6 +627,25 @@ SCENE *create_scene_01()
     /* Give the hero an initial star */
     assert(scene->star == NULL);
     scene->star = _create_star(_random_front_color(scene));
+
+    LEVEL level = {
+        .cols = 16,
+        .rows = 12,
+        .startx = 20,
+        .starty = 200,
+        .hero = NULL,
+        .star = NULL,
+        .stars = { NULL },
+        .collision_map = {{ 0 }},
+        .tile_list = { NULL },
+        .background_map = {{ 0 }},
+        .foreground_map = {{ 0 }},
+        .block_list = {{ "" }},
+        .block_map = {{ 0 }},
+        .block_map_default = {{ 0 }}
+    };
+
+    level = level;
 
     return scene;
 }
