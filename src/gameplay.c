@@ -138,7 +138,7 @@ typedef struct
     int collision_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
 
     /* List of tiles used in the level */
-    TILE *tile_list[MAX_TILES];
+    SPRITE *tile_list[MAX_TILES];
     int background_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
     int foreground_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
 
@@ -149,6 +149,8 @@ typedef struct
     /* The starting position of blocks */
     int block_map_default[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
 } LEVEL;
+
+static LEVEL *level = NULL;
 
 static int _get_hero_speed()
 {
@@ -335,9 +337,6 @@ HERO *_destroy_hero(HERO *hero)
 
 SCENE *destroy_scene(SCENE *scene)
 {
-    int r, c;
-    int i;
-
     if (scene == NULL) {
         return NULL;
     }
@@ -349,14 +348,14 @@ SCENE *destroy_scene(SCENE *scene)
     scene->star = _destroy_star(scene->star);
 
     /* Stars */
-    for (i = 0; i < MAX_STARS; i++) {
+    for (int i = 0; i < MAX_STARS; i++) {
         scene->stars[i] = _destroy_star(scene->stars[i]);
     }
     scene->stars = free_memory("STARS", scene->stars);
 
     /* Board */
-    for (r = 0; r < ROWS; r++) {
-        for (c = 0; c < COLS; c++) {
+    for (int r = 0; r < ROWS; r++) {
+        for (int c = 0; c < COLS; c++) {
             scene->board[r][c] = free_memory("TILE", scene->board[r][c]);
         }
         scene->board[r] = free_memory("BOARD", scene->board[r]);
@@ -364,10 +363,13 @@ SCENE *destroy_scene(SCENE *scene)
     scene->board = free_memory("BOARD", scene->board);
 
     /* Gameboard */
-    for (r = 0; r < ROWS; r++) {
+    for (int r = 0; r < ROWS; r++) {
         scene->gameboard[r] = free_memory("GAMEBOARD", scene->gameboard[r]);
     }
     scene->gameboard = free_memory("GAMEBOARD", scene->gameboard);
+
+    free_memory("SPRITE", level->tile_list[0]);
+    free_memory("SPRITE", level->tile_list[1]);
 
     /* And the scene itself */
     return free_memory("SCENE", scene);
@@ -628,7 +630,7 @@ SCENE *create_scene_01()
     assert(scene->star == NULL);
     scene->star = _create_star(_random_front_color(scene));
 
-    LEVEL level = {
+    LEVEL level_01 = {
         .cols = 16,
         .rows = 12,
         .startx = 20,
@@ -710,7 +712,15 @@ SCENE *create_scene_01()
         },
     };
 
-    level = level;
+    level_01.tile_list[0] = alloc_memory("SPRITE", sizeof(SPRITE));
+    init_sprite(level_01.tile_list[0], 0, 0);
+    add_frame(level_01.tile_list[0], IMG("bricks.png"));
+
+    level_01.tile_list[1] = alloc_memory("SPRITE", sizeof(SPRITE));
+    init_sprite(level_01.tile_list[1], 0, 0);
+    add_frame(level_01.tile_list[1], IMG("background.png"));
+
+    level = &level_01;
 
     return scene;
 }
