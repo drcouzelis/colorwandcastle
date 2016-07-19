@@ -134,19 +134,24 @@ typedef struct
 
     /* Number of shooting stars in the scene */
     STAR *stars[MAX_STARS];
+    int num_stars;
 
     int collision_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
 
     /* List of tiles used in the level */
-    SPRITE *tile_list[MAX_TILES];
+    SPRITE *tiles[MAX_TILES];
+    int num_tiles;
     int background_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
     int foreground_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
 
-    /* List of blocks used in the level */
-    char block_list[MAX_BLOCKS][MAX_FILENAME_SIZE];
-    int block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    /* List of textures used to make blocks and stars in the level */
+    char textures[MAX_BLOCKS][MAX_FILENAME_SIZE];
+    int num_textures;
 
     /* The starting position of blocks */
+    int block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+
+    /* For restarting the level */
     int block_map_default[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
 } LEVEL;
 
@@ -368,8 +373,10 @@ SCENE *destroy_scene(SCENE *scene)
     }
     scene->gameboard = free_memory("GAMEBOARD", scene->gameboard);
 
-    free_memory("SPRITE", level->tile_list[0]);
-    free_memory("SPRITE", level->tile_list[1]);
+    for (int i = 0; i < level->num_tiles; i++) {
+        free_memory("SPRITE", level->tiles[i]);
+    }
+    level->num_tiles = 0;
 
     /* And the scene itself */
     return free_memory("SCENE", scene);
@@ -638,6 +645,7 @@ SCENE *create_scene_01()
         .hero = NULL,
         .star = NULL,
         .stars = { NULL },
+        .num_stars = 0,
         .collision_map = {
             {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
             {'*', '.', '.', '.', '.', '*', '*', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
@@ -652,7 +660,8 @@ SCENE *create_scene_01()
             {'*', '.', '.', '*', '*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
             {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
         },
-        .tile_list = { NULL },
+        .tiles = { NULL },
+        .num_tiles = 0,
         .background_map = {
             {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
             {'.', '2', '2', '2', '2', '.', '.', '2', '2', '2', '2', '2', '2', '2', '2', '.'},
@@ -681,7 +690,8 @@ SCENE *create_scene_01()
             {'1', '.', '.', '1', '1', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '1'},
             {'1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'}
         },
-        .block_list = {{ "" }},
+        .textures = {{ "" }},
+        .num_textures = 0,
         .block_map = {
             {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
             {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '?', '?', '.'},
@@ -712,13 +722,22 @@ SCENE *create_scene_01()
         },
     };
 
-    level_01.tile_list[0] = alloc_memory("SPRITE", sizeof(SPRITE));
-    init_sprite(level_01.tile_list[0], 0, 0);
-    add_frame(level_01.tile_list[0], IMG("bricks.png"));
+    level_01.tiles[0] = alloc_memory("SPRITE", sizeof(SPRITE));
+    init_sprite(level_01.tiles[0], 0, 0);
+    add_frame(level_01.tiles[0], IMG("bricks.png"));
 
-    level_01.tile_list[1] = alloc_memory("SPRITE", sizeof(SPRITE));
-    init_sprite(level_01.tile_list[1], 0, 0);
-    add_frame(level_01.tile_list[1], IMG("background.png"));
+    level_01.tiles[1] = alloc_memory("SPRITE", sizeof(SPRITE));
+    init_sprite(level_01.tiles[1], 0, 0);
+    add_frame(level_01.tiles[1], IMG("background.png"));
+
+    level_01.num_tiles = 2;
+
+    strncpy(level_01.textures[0], "block-red.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[1], "block-orange.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[2], "block-yellow.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[3], "block-green.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[4], "block-blue.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[5], "block-purple.png", MAX_FILENAME_SIZE);
 
     level = &level_01;
 
