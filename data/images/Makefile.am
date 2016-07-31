@@ -6,21 +6,10 @@ imagesdatadir = $(pkgdatadir)/images
 # The "DATA" suffix marks this as data files for
 # the package.
 dist_imagesdata_DATA = \
-  background.png \
-  block-blue.png \
-  block-green.png \
-  block-orange.png \
-  block-mask.png \
-  block-purple.png \
-  block-red.png \
-  block-yellow.png \
-  bricks.png \
   bullet-blue-1.png \
   bullet-blue-2.png \
   bullet-green-1.png \
   bullet-green-2.png \
-  bullet-mask-1.png \
-  bullet-mask-2.png \
   bullet-orange-1.png \
   bullet-orange-2.png \
   bullet-purple-1.png \
@@ -29,18 +18,20 @@ dist_imagesdata_DATA = \
   bullet-red-2.png \
   bullet-yellow-1.png \
   bullet-yellow-2.png \
+  hero-makayla-01.png \
+  hero-makayla-02.png \
+  hero-rawson-01.png \
+  hero-rawson-02.png \
   icon.png \
-  makayla-01.png \
-  makayla-02.png \
-  rawson-01.png \
-  rawson-02.png \
-  red-bricks.png \
+  mask-block.png \
+  mask-plasma-1.png \
+  mask-plasma-2.png \
+  mask-star-1.png \
+  mask-star-2.png \
   star-blue-1.png \
   star-blue-2.png \
   star-green-1.png \
   star-green-2.png \
-  star-mask-1.png \
-  star-mask-2.png \
   star-orange-1.png \
   star-orange-2.png \
   star-purple-1.png \
@@ -49,6 +40,12 @@ dist_imagesdata_DATA = \
   star-red-2.png \
   star-yellow-1.png \
   star-yellow-2.png \
-  texture-makaylahead.png \
-  texture-rawsonhead.png \
-  texture-water.png
+  texture-blue.png \
+  texture-green.png \
+  texture-orange.png \
+  texture-purple.png \
+  texture-red.png \
+  texture-yellow.png \
+  tile-bricks.png \
+  tile-door.png \
+  tile-gray-wall.png

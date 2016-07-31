@@ -177,26 +177,26 @@ IMAGE *_get_star_image(int color, int frame)
 {
     static char *star_image_names[2][6][2] = {
         {
-            {"texture-water.png", "texture-water.png"},
-            {"texture-rawsonhead.png", "texture-rawsonhead.png"},
-            {"texture-makaylahead.png", "texture-makaylahead.png"},
-            {"star-green-1.png", "star-green-2.png"},
-            {"star-blue-1.png", "star-blue-2.png"},
-            {"star-purple-1.png", "star-purple-2.png"}
+            {"texture-red.png", "texture-red.png"},
+            {"texture-orange.png", "texture-orange.png"},
+            {"texture-yellow.png", "texture-yellow.png"},
+            {"texture-green.png", "texture-green.png"},
+            {"texture-blue.png", "texture-blue.png"},
+            {"texture-purple.png", "texture-purple.png"}
         },
         {
-            {"texture-water.png", "texture-water.png"},
-            {"texture-rawsonhead.png", "texture-rawsonhead.png"},
-            {"texture-makaylahead.png", "texture-makaylahead.png"},
-            {"bullet-green-1.png", "bullet-green-2.png"},
-            {"bullet-blue-1.png", "bullet-blue-2.png"},
-            {"bullet-purple-1.png", "bullet-purple-2.png"}
+            {"texture-red.png", "texture-red.png"},
+            {"texture-orange.png", "texture-orange.png"},
+            {"texture-yellow.png", "texture-yellow.png"},
+            {"texture-green.png", "texture-green.png"},
+            {"texture-blue.png", "texture-blue.png"},
+            {"texture-purple.png", "texture-purple.png"}
         }
     };
 
     static char *star_mask_names[2][2] = {
-        {"star-mask-1.png", "star-mask-2.png"},
-        {"bullet-mask-1.png", "bullet-mask-2.png"}
+        {"mask-star-1.png", "mask-star-2.png"},
+        {"mask-plasma-1.png", "mask-plasma-2.png"}
     };
 
     return MASKED_IMG(star_image_names[hero_type][color][frame], star_mask_names[hero_type][frame]);
@@ -242,8 +242,8 @@ HERO *_create_hero(float x, float y)
     hero = alloc_memory("HERO", sizeof(HERO));
 
     init_sprite(&hero->sprite, 1, 10);
-    add_frame(&hero->sprite, IMG("makayla-01.png"));
-    add_frame(&hero->sprite, IMG("makayla-02.png"));
+    add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
+    add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
     hero->sprite.x_offset = -10;
     hero->sprite.y_offset = -10;
 
@@ -278,7 +278,7 @@ void _add_border(SCENE *scene)
             if (c == 0 || r == 0 || c == COLS - 1 || r == ROWS - 1) {
                 tile = alloc_memory("TILE", sizeof(TILE));
                 init_sprite(&tile->sprite, 0, 0);
-                add_frame(&tile->sprite, IMG("bricks.png"));
+                add_frame(&tile->sprite, IMG("tile-bricks.png"));
 
                 tile->solid = true;
                 tile->color = NO_COLOR;
@@ -295,15 +295,15 @@ void _add_border(SCENE *scene)
 IMAGE *_get_block_image(int color)
 {
     static char *block_image_names[6] = {
-        "texture-water.png",
-        "texture-rawsonhead.png",
-        "texture-makaylahead.png",
-        "block-green.png",
-        "block-blue.png",
-        "block-purple.png"
+        "texture-red.png",
+        "texture-orange.png",
+        "texture-yellow.png",
+        "texture-green.png",
+        "texture-blue.png",
+        "texture-purple.png"
     };
 
-    return MASKED_IMG(block_image_names[color], "block-mask.png");
+    return MASKED_IMG(block_image_names[color], "mask-block.png");
 }
 
 TILE *_create_block(int color)
@@ -512,14 +512,14 @@ void _toggle_hero(HERO *hero, STAR *star)
     delete_frames(&star->sprite);
     if (hero_type == HERO_TYPE_MAKAYLA) {
         hero_type = HERO_TYPE_RAWSON;
-        add_frame(&hero->sprite, IMG("rawson-01.png"));
-        add_frame(&hero->sprite, IMG("rawson-02.png"));
+        add_frame(&hero->sprite, IMG("hero-rawson-01.png"));
+        add_frame(&hero->sprite, IMG("hero-rawson-02.png"));
         add_frame(&star->sprite, _get_star_image(star->color, 0));
         add_frame(&star->sprite, _get_star_image(star->color, 1));
     } else if (hero_type == HERO_TYPE_RAWSON) {
         hero_type = HERO_TYPE_MAKAYLA;
-        add_frame(&hero->sprite, IMG("makayla-01.png"));
-        add_frame(&hero->sprite, IMG("makayla-02.png"));
+        add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
+        add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
         add_frame(&star->sprite, _get_star_image(star->color, 0));
         add_frame(&star->sprite, _get_star_image(star->color, 1));
     }
@@ -724,20 +724,20 @@ SCENE *create_scene_01()
 
     level_01.tiles[0] = alloc_memory("SPRITE", sizeof(SPRITE));
     init_sprite(level_01.tiles[0], 0, 0);
-    add_frame(level_01.tiles[0], IMG("bricks.png"));
+    add_frame(level_01.tiles[0], IMG("tile-bricks.png"));
 
     level_01.tiles[1] = alloc_memory("SPRITE", sizeof(SPRITE));
     init_sprite(level_01.tiles[1], 0, 0);
-    add_frame(level_01.tiles[1], IMG("background.png"));
+    add_frame(level_01.tiles[1], IMG("tile-gray-wall.png"));
 
     level_01.num_tiles = 2;
 
-    strncpy(level_01.textures[0], "block-red.png", MAX_FILENAME_SIZE);
-    strncpy(level_01.textures[1], "block-orange.png", MAX_FILENAME_SIZE);
-    strncpy(level_01.textures[2], "block-yellow.png", MAX_FILENAME_SIZE);
-    strncpy(level_01.textures[3], "block-green.png", MAX_FILENAME_SIZE);
-    strncpy(level_01.textures[4], "block-blue.png", MAX_FILENAME_SIZE);
-    strncpy(level_01.textures[5], "block-purple.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[0], "texture-red.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[1], "texture-orange.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[2], "texture-yellow.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[3], "texture-green.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[4], "texture-blue.png", MAX_FILENAME_SIZE);
+    strncpy(level_01.textures[5], "texture-purple.png", MAX_FILENAME_SIZE);
 
     level = &level_01;
 
@@ -925,7 +925,7 @@ void draw_gameplay(void *data)
     /* Draw the background behind everything else */
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
-            al_draw_bitmap(IMG("background.png"), c * TILE_SIZE, r * TILE_SIZE, 0);
+            al_draw_bitmap(IMG("tile-gray-wall.png"), c * TILE_SIZE, r * TILE_SIZE, 0);
         }
     }
     

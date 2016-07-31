@@ -30,18 +30,6 @@ AC_CHECK_LIB([allegro_audio], [al_install_audio], [],
 AC_CHECK_LIB([allegro_image], [al_init_image_addon], [],
              [AC_MSG_ERROR([liballegro_image not found.])])
 
-# Check for SDL
-AC_CHECK_LIB([SDL2], [SDL_Init], [],
-             [AC_MSG_ERROR([libSDL2 not found.])])
-
-#SDL_VERSION=2.0.4
-#AM_PATH_SDL2($SDL_VERSION,
-#          :,
-#          AC_MSG_ERROR([SDL version $SDL_VERSION not found!])
-#)
-#CFLAGS="$CFLAGS $SDL_CFLAGS"
-#LIBS="$LIBS $SDL_LIBS"
-
 # A list of the Makefiles that need to be created.
 AC_CONFIG_FILES([Makefile
                  data/Makefile
