@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv)
 {
-    SCENE *scene = NULL;
+    LEVEL *level = NULL;
 
     al_set_app_name("colorwandcastle");
     al_set_org_name("drcouzelis");
@@ -58,9 +58,9 @@ int main(int argc, char **argv)
     set_fps(GAME_TICKER);
 
     /* START THE GAME */
-    scene = create_scene_01();
-    run(control_gameplay, update_gameplay, draw_gameplay, scene);
-    destroy_scene(scene);
+    level = create_level_01();
+    run(control_gameplay, update_gameplay, draw_gameplay, level);
+    destroy_level(level);
   
     /* DONE, clean up */
     free_resources();
