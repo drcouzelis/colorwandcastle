@@ -112,7 +112,7 @@ static int _get_hero_speed()
     return TILE_SIZE * 4;
 }
 
-static int _get_star_speed()
+static int _get_bullet_speed()
 {
     return TILE_SIZE * 10;
 }
@@ -122,17 +122,17 @@ static float _convert_pps_to_fps(int pps)
     return pps / (float)(GAME_TICKER);
 }
 
-IMAGE *_get_star_image(LEVEL *level, int texture, int frame)
+IMAGE *_get_bullet_image(LEVEL *level, int texture, int frame)
 {
-    static char *star_mask_names[2][2] = {
+    static char *bullet_mask_names[2][2] = {
         {"mask-star-1.png", "mask-star-2.png"},
         {"mask-plasma-1.png", "mask-plasma-2.png"}
     };
 
-    return MASKED_IMG(level->textures[texture], star_mask_names[hero_type][frame]);
+    return MASKED_IMG(level->textures[texture], bullet_mask_names[hero_type][frame]);
 }
 
-BULLET *_create_star(LEVEL *level, int texture)
+BULLET *_create_bullet(LEVEL *level, int texture)
 {
     if (texture == NO_TEXTURE) {
         return NULL;
@@ -143,8 +143,8 @@ BULLET *_create_star(LEVEL *level, int texture)
     init_sprite(&bullet->sprite, 1, 4);
 
     bullet->texture = texture;
-    add_frame(&bullet->sprite, _get_star_image(level, bullet->texture, 0));
-    add_frame(&bullet->sprite, _get_star_image(level, bullet->texture, 1));
+    add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 0));
+    add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 1));
 
     bullet->is_moving = false;
     bullet->is_forward = false;
@@ -157,7 +157,7 @@ BULLET *_create_star(LEVEL *level, int texture)
     return bullet;
 }
 
-BULLET *_destroy_star(BULLET *bullet)
+BULLET *_destroy_bullet(BULLET *bullet)
 {
     if (bullet == NULL) {
         return NULL;
@@ -224,11 +224,11 @@ LEVEL *destroy_level(LEVEL *level)
     level->hero = _destroy_hero(level->hero);
 
     /* Hero's bullet */
-    level->bullet = _destroy_star(level->bullet);
+    level->bullet = _destroy_bullet(level->bullet);
 
     /* Stars */
     for (int i = 0; i < level->num_bullets; i++) {
-        level->bullets[i] = _destroy_star(level->bullets[i]);
+        level->bullets[i] = _destroy_bullet(level->bullets[i]);
     }
 
     /* Tiles */
@@ -289,11 +289,11 @@ int _random_front_texture(LEVEL *level)
     }
 }
 
-bool _move_star(LEVEL *level, BULLET *bullet, float new_x, float new_y);
+bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y);
 
-void _shoot_star(LEVEL *level, int texture, float x, float y)
+void _shoot_bullet(LEVEL *level, int texture, float x, float y)
 {
-    BULLET *bullet = _create_star(level, texture);
+    BULLET *bullet = _create_bullet(level, texture);
     bullet->body.x = x;
     bullet->body.y = y;
     bullet->is_moving = true;
@@ -310,7 +310,7 @@ void _shoot_star(LEVEL *level, int texture, float x, float y)
     float orig_x = bullet->body.x;
 
     for (bullet->body.x = level->hero->body.x - 8; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!_move_star(level, bullet, bullet->body.x + 1, bullet->body.y)) {
+        if (!_move_bullet(level, bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
     }
@@ -386,14 +386,14 @@ void _toggle_hero(LEVEL *level)
         hero_type = HERO_TYPE_RAWSON;
         add_frame(&hero->sprite, IMG("hero-rawson-01.png"));
         add_frame(&hero->sprite, IMG("hero-rawson-02.png"));
-        add_frame(&bullet->sprite, _get_star_image(level, bullet->texture, 0));
-        add_frame(&bullet->sprite, _get_star_image(level, bullet->texture, 1));
+        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 0));
+        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 1));
     } else if (hero_type == HERO_TYPE_RAWSON) {
         hero_type = HERO_TYPE_MAKAYLA;
         add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
         add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
-        add_frame(&bullet->sprite, _get_star_image(level, bullet->texture, 0));
-        add_frame(&bullet->sprite, _get_star_image(level, bullet->texture, 1));
+        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 0));
+        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 1));
     }
 }
 
@@ -740,15 +740,15 @@ void _update_hero(LEVEL *level)
 
     if (hero->is_shooting) {
         if (level->bullet != NULL) {
-            _shoot_star(level, level->bullet->texture, level->bullet->body.x, level->bullet->body.y);
-            level->bullet = _destroy_star(level->bullet);
+            _shoot_bullet(level, level->bullet->texture, level->bullet->body.x, level->bullet->body.y);
+            level->bullet = _destroy_bullet(level->bullet);
         }
         hero->is_shooting = false;
     }
 
     if (level->bullet == NULL && level->num_bullets == 0) {
         /* The hero needs a new bullet to shoot! */
-        level->bullet = _create_star(level, _random_front_texture(level));
+        level->bullet = _create_bullet(level, _random_front_texture(level));
         _follow_hero(level->bullet, level->hero);
     }
 
@@ -760,7 +760,7 @@ void _update_hero(LEVEL *level)
     animate(&level->bullet->sprite);
 }
 
-bool _move_star(LEVEL *level, BULLET *bullet, float new_x, float new_y)
+bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
 {
     float old_x = bullet->body.x;
     float old_y = bullet->body.y;
@@ -810,34 +810,34 @@ bool _move_star(LEVEL *level, BULLET *bullet, float new_x, float new_y)
     return true;
 }
 
-void _update_star(LEVEL *level, BULLET *bullet)
+void _update_bullet(LEVEL *level, BULLET *bullet)
 {
     float new_x = 0;
 
     if (bullet->is_moving) {
         if (bullet->is_forward) {
-            new_x = bullet->body.x + _convert_pps_to_fps(_get_star_speed());
+            new_x = bullet->body.x + _convert_pps_to_fps(_get_bullet_speed());
         } else {
-            new_x = bullet->body.x - _convert_pps_to_fps(_get_star_speed());
+            new_x = bullet->body.x - _convert_pps_to_fps(_get_bullet_speed());
         }
     }
 
-    _move_star(level, bullet, new_x, bullet->body.y);
+    _move_bullet(level, bullet, new_x, bullet->body.y);
 
     animate(&bullet->sprite);
 }
 
-void _update_stars(LEVEL *level)
+void _update_bullets(LEVEL *level)
 {
     for (int i = 0; i < level->num_bullets; i++) {
 
         BULLET *bullet = level->bullets[i];
 
-        _update_star(level, bullet);
+        _update_bullet(level, bullet);
 
         /* Remove bullets that have no hits left */
         if (bullet->hits <= 0) {
-            level->bullets[i] = _destroy_star(bullet);
+            level->bullets[i] = _destroy_bullet(bullet);
             level->num_bullets--;
         }
     }
@@ -864,7 +864,7 @@ bool update_gameplay(void *data)
     _update_hero(level);
 
     /* Stars */
-    _update_stars(level);
+    _update_bullets(level);
 
     return !end_gameplay;
 }
