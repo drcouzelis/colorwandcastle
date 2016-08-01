@@ -151,8 +151,8 @@ BULLET *_create_bullet(LEVEL *level, int texture)
     bullet->hits = 2;
     bullet->body.x = 0;
     bullet->body.y = 0;
-    bullet->body.w = TILE_SIZE - 1;
-    bullet->body.h = TILE_SIZE - 1;
+    bullet->body.w = 10;
+    bullet->body.h = 10;
 
     return bullet;
 }
@@ -309,7 +309,7 @@ void _shoot_bullet(LEVEL *level, int texture, float x, float y)
      */
     float orig_x = bullet->body.x;
 
-    for (bullet->body.x = level->hero->body.x - 8; bullet->body.x < orig_x; bullet->body.x++) {
+    for (bullet->body.x = level->hero->body.x; bullet->body.x < orig_x; bullet->body.x++) {
         if (!_move_bullet(level, bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
