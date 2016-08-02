@@ -784,6 +784,7 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
             bullet->hits--;
             /* Bounce */
             bullet->is_forward = bullet->is_forward ? false : true;
+            play_sound(SND("star_disolve.wav"));
         }
 
         return false;
@@ -802,6 +803,7 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
         } else {
             /* Bounce */
             bullet->is_forward = bullet->is_forward ? false : true;
+            play_sound(SND("star_disolve.wav"));
         }
 
         return false;
