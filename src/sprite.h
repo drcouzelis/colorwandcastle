@@ -35,6 +35,7 @@ void set_animation_fps(int fps);
 /**
  * Initialize a sprite.
  * It will have no frames of animation by default.
+ * Speed is in frames per second.
  */
 void init_sprite(SPRITE *sprite, bool loop, int speed);
 
