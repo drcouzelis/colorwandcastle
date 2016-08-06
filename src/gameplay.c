@@ -20,6 +20,12 @@ typedef enum
     HERO_TYPE_RAWSON
 } HERO_TYPE;
 
+typedef enum
+{
+    ENEMY_TYPE_BAT = 0,
+    ENEMY_TYPE_SPIDER
+} ENEMY_TYPE;
+
 static HERO_TYPE hero_type = 0;
 
 #define NO_TEXTURE -1
@@ -65,9 +71,22 @@ typedef struct
     bool is_shooting;
 } HERO;
 
+typedef struct
+{
+    ENEMY_TYPE type;
+
+    SPRITE sprite;
+
+    BODY body;
+
+    int dx;
+    int dy;
+} ENEMY;
+
 #define MAX_LEVEL_COLS 16
 #define MAX_LEVEL_ROWS 12
 #define MAX_BULLETS 32
+#define MAX_ENEMIES 32
 #define MAX_TILES 256
 #define MAX_TEXTURES 256
 #define MAX_FILENAME_SIZE 256
@@ -109,6 +128,10 @@ typedef struct
 
     /* For restarting the level */
     int active_block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+
+    /* Enemies */
+    ENEMY *enemies[MAX_ENEMIES];
+    int num_enemies;
 } LEVEL;
 
 static int _get_hero_speed()
@@ -173,9 +196,7 @@ BULLET *_destroy_bullet(BULLET *bullet)
 
 HERO *_create_hero(float x, float y)
 {
-    HERO *hero = NULL;
-
-    hero = alloc_memory("HERO", sizeof(HERO));
+    HERO *hero = alloc_memory("HERO", sizeof(HERO));
 
     init_sprite(&hero->sprite, 1, 10);
     add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
@@ -203,6 +224,45 @@ HERO *_create_hero(float x, float y)
     return hero;
 }
 
+ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
+{
+    ENEMY *enemy = alloc_memory("ENEMY", sizeof(ENEMY));
+
+    enemy->type = type;
+
+    if (type == ENEMY_TYPE_BAT) {
+        init_sprite(&enemy->sprite, true, 20);
+        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+    } else if (type == ENEMY_TYPE_SPIDER) {
+        init_sprite(&enemy->sprite, true, 8);
+        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+    }
+
+    /* Set the starting position */
+    enemy->body.x = x;
+    enemy->body.y = y;
+
+    enemy->body.w = 10;
+    enemy->body.h = 10;
+
+    enemy->dx = 0;
+    enemy->dy = 0;
+
+    return enemy;
+}
+
 IMAGE *_get_block_image(LEVEL *level, int texture)
 {
     assert(texture >= 0 && texture < level->num_textures);
@@ -217,6 +277,15 @@ HERO *_destroy_hero(HERO *hero)
     }
 
     return free_memory("HERO", hero);
+}
+
+ENEMY *_destroy_enemy(ENEMY *enemy)
+{
+    if (enemy == NULL) {
+        return NULL;
+    }
+
+    return free_memory("ENEMY", enemy);
 }
 
 LEVEL *destroy_level(LEVEL *level)
@@ -709,6 +778,11 @@ LEVEL *create_level_01()
              */
         }
     }
+
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        level->enemies[i] = NULL;
+    }
+    level->num_enemies = 0;
 
     init_sprite(&bat_sprite, true, 20);
     add_frame(&bat_sprite, IMG("enemy-bat-1.png"));
