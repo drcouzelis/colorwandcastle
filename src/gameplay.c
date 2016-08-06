@@ -8,8 +8,9 @@
 #include "utilities.h"
 
 /* TODO */
-/* Create a REAL bat! */
+/* Create REAL enemies! */
 static SPRITE bat_sprite;
+static SPRITE spider_sprite;
 
 static bool end_gameplay = false;
 
@@ -718,6 +719,15 @@ LEVEL *create_level_01()
     bat_sprite.x_offset = -10;
     bat_sprite.y_offset = -10;
 
+    init_sprite(&spider_sprite, true, 8);
+    add_frame(&spider_sprite, IMG("enemy-spider-1.png"));
+    add_frame(&spider_sprite, IMG("enemy-spider-2.png"));
+    add_frame(&spider_sprite, IMG("enemy-spider-3.png"));
+    add_frame(&spider_sprite, IMG("enemy-spider-4.png"));
+    add_frame(&spider_sprite, IMG("enemy-spider-5.png"));
+    spider_sprite.x_offset = -10;
+    spider_sprite.y_offset = -10;
+
     return level;
 }
 
@@ -882,6 +892,7 @@ bool update_gameplay(void *data)
     _update_bullets(level);
 
     animate(&bat_sprite);
+    animate(&spider_sprite);
 
     return !end_gameplay;
 }
@@ -917,6 +928,7 @@ void draw_gameplay(void *data)
     }
 
     draw_sprite(&bat_sprite, (TILE_SIZE * 8) - 5, (TILE_SIZE * 2) - 5);
+    draw_sprite(&spider_sprite, (TILE_SIZE * 12) - 5, (TILE_SIZE * 2) - 5);
     
     /* Draw bullets */
     for (int i = 0; i < level->num_bullets; i++) {

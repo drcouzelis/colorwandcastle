@@ -9,6 +9,11 @@ dist_imagesdata_DATA = \
   enemy-bat-1.png \
   enemy-bat-2.png \
   enemy-bat-3.png \
+  enemy-spider-1.png \
+  enemy-spider-2.png \
+  enemy-spider-3.png \
+  enemy-spider-4.png \
+  enemy-spider-5.png \
   hero-makayla-01.png \
   hero-makayla-02.png \
   hero-rawson-01.png \
