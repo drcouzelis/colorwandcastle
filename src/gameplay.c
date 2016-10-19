@@ -81,6 +81,8 @@ typedef struct
 
     int dx;
     int dy;
+
+    int state;
 } ENEMY;
 
 #define MAX_LEVEL_COLS 16
@@ -259,6 +261,9 @@ ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
 
     enemy->dx = 0;
     enemy->dy = 0;
+
+    /* State 0 represents a newly created enemy */
+    enemy->state = 0;
 
     return enemy;
 }
