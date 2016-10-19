@@ -5,99 +5,119 @@ START 20 200
 # Defaults to 16x12
 SIZE 16 12
 
+# Load a default set of tiles and blocks
+#LOAD tiles-castle.dat
+#LOAD blocks-colored.dat
+
+# Tiles
+
 # 1
 TILE
-  IMAGE bricks.png
+  IMAGE tile-bricks.png
 END
 
 # 2
 TILE
-  IMAGE background.png
+  IMAGE tile-gray-wall.png
 END
 
-# Tiles drawn underneath everything else
-# Tiles are represented by their corresponding integer value
-# . (period) for an empty tile
-BACKGROUND
-. . . . . . . . . . . . . . . .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. 2 2 2 2 2 2 2 2 2 2 2 2 2 2 .
-. . . . . . . . . . . . . . . .
+# Blocks
 
-# Tiles on the same plane as the hero
+# 1
+BLOCK
+  IMAGE texture-red.png
+END
+
+# 2
+BLOCK
+  IMAGE texture-orange.png
+END
+
+# 3
+BLOCK
+  IMAGE texture-yellow.png
+END
+
+# 4
+BLOCK
+  IMAGE texture-green.png
+END
+
+# 5
+BLOCK
+  IMAGE texture-blue.png
+END
+
+# 6
+BLOCK
+  IMAGE texture-purple.png
+END
+
+# The background is tiles that are drawn underneath everything else
 # Tiles are represented by their corresponding integer value
-# . (period) for an empty tile
+# 0 (zero) is an empty tile
+BACKGROUND
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+# The foreground is tiles on the same plane as the hero
+# Tiles are represented by their corresponding integer value
+# 0 (zero) is an empty tile
 FOREGROUND
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 . . . . 1 1 . . . . . . . . 1
-1 . . . . . 1 . . . . . . . . 1
-1 . . . . . . . . . . . . . . 1
-1 . . . . . . . . . . . . . . 1
-1 . . . . . . . . . . . . . . 1
-1 . . . . . . . . . . . . . . 1
-1 . . . . . . . . . . . . . . 1
-1 . . . . . . . . . . . . . . 1
-1 . . . 1 . . . . . . . . . . 1
-1 . . 1 1 . . . . . . . . . . 1
+1 0 0 0 0 1 1 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 
 # Collision map
-# * (asterisk) is un-passable
-# . (period) is able to be passed through
+# 1 (one) is solid
+# 0 (zero) is able to be passed through
 COLLISION
-* * * * * * * * * * * * * * * *
-* . . . . * * . . . . . . . . *
-* . . . . . * . . . . . . . . *
-* . . . . . . . . . . . . . . *
-* . . . . . . . . . . . . . . *
-* . . . . . . . . . . . . . . *
-* . . . . . . . . . . . . . . *
-* . . . . . . . . . . . . . . *
-* . . . . . . . . . . . . . . *
-* . . . * . . . . . . . . . . *
-* . . * * . . . . . . . . . . *
-* * * * * * * * * * * * * * * *
-
-# 1
-BLOCK block-red.png
-
-#2
-BLOCK block-orange.png
-
-#3
-BLOCK block-yellow.png
-
-#4
-BLOCK block-green.png
-
-#5
-BLOCK block-blue.png
-
-#6
-BLOCK block-purple.png
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 0 0 0 0 1 1 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 
 # Block placement
 # Enter an integer for a specific block
-# ? (question mark) for a random block
-# . (period) for blank
+# ? (question mark) will display a random block
+# 0 (zero) is for blank
 BLOCKS
-. . . . . . . . . . . . . . . .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . ? ? ? ? .
-. . . . . . . . . . . . . . . .
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 ? ? ? ? 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
