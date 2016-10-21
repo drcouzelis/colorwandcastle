@@ -79,9 +79,18 @@ gamedata.c / h
 gameplay.c / h
 . init_gameplay
 . load_level_from_file
-. global hero, enemy list, room
+. global hero, enemy list, room, hero bullets, enemy bullets
 . update_gameplay points to update_active_gamelay / update_paused_gameplay
 
 . "Levels" don't exist, it's just a single set of data stored in gameplay
 * "Blocks" and "tiles" don't exist, they're just sprites
 . Gameplay can run even if no level has been loaded
+
+. Put bullet inside hero
+  . SPRITE bullet
+  . int texture
+
+In room:
+. List of textures
+. List of tiles
+. List of blocks
