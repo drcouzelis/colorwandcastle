@@ -2,8 +2,7 @@
 #define GAMEPLAY_HEADER
 
 #include <allegro5/allegro.h>
-
-typedef struct LEVEL LEVEL;
+#include "gamedata.h"
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event);
 bool update_gameplay(void *data);

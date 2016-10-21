@@ -8,6 +8,8 @@ bin_PROGRAMS = colorwandcastle
 colorwandcastle_SOURCES = \
   display.c \
   display.h \
+  gamedata.c \
+  gamedata.h \
   gameplay.c \
   gameplay.h \
   main.c \

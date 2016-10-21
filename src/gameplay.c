@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "display.h"
+#include "gameplay.h"
 #include "main.h"
 #include "mask.h"
 #include "memory.h"
@@ -14,127 +15,16 @@ static SPRITE spider_sprite;
 
 static bool end_gameplay = false;
 
-typedef enum
-{
-    HERO_TYPE_MAKAYLA = 0,
-    HERO_TYPE_RAWSON
-} HERO_TYPE;
-
-typedef enum
-{
-    ENEMY_TYPE_BAT = 0,
-    ENEMY_TYPE_SPIDER
-} ENEMY_TYPE;
-
 static HERO_TYPE hero_type = 0;
 
-#define NO_TEXTURE -1
-#define NO_BLOCK -1
+/* Don't do anything if the gameplay hasn't been initialized! */
+//static bool is_gameplay_init = false;
 
-typedef struct
-{
-    float x;
-    float y;
-    int w;
-    int h;
-} BODY;
-
-typedef struct
-{
-    SPRITE sprite;
-    int texture;
-
-    int hits;
-
-    BODY body;
-
-    bool is_moving;
-    bool is_forward;
-} BULLET;
-
-typedef struct
-{
-    SPRITE sprite;
-
-    BODY body;
-
-    /* Movement toggles */
-    /* True means the hero is moving in that direction */
-    bool u;
-    bool d;
-    bool l;
-    bool r;
-
-    int dx;
-    int dy;
-
-    bool is_shooting;
-} HERO;
-
-typedef struct
-{
-    ENEMY_TYPE type;
-
-    SPRITE sprite;
-
-    BODY body;
-
-    int dx;
-    int dy;
-
-    int state;
-} ENEMY;
-
-#define MAX_LEVEL_COLS 16
-#define MAX_LEVEL_ROWS 12
-#define MAX_BULLETS 32
-#define MAX_ENEMIES 32
-#define MAX_TILES 256
-#define MAX_TEXTURES 256
-#define MAX_FILENAME_SIZE 256
-
-typedef struct
-{
-    /* Size of the level */
-    int cols;
-    int rows;
-
-    /* Starting position for the hero */
-    int startx;
-    int starty;
-    
-    HERO *hero;
-    BULLET *bullet;
-
-    /* Number of shooting bullets in the level */
-    BULLET *bullets[MAX_BULLETS];
-    int num_bullets;
-
-    int collision_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
-
-    /* List of tiles used in the level */
-    SPRITE *tiles[MAX_TILES];
-    int num_tiles;
-    int background_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
-    int foreground_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
-
-    /* List of textures used to make blocks and bullets in the level */
-    char textures[MAX_TEXTURES][MAX_FILENAME_SIZE];
-    int num_textures;
-
-    /* Blocks */
-    SPRITE *blocks[MAX_TEXTURES];
-
-    /* The starting position of blocks */
-    int block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
-
-    /* For restarting the level */
-    int active_block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
-
-    /* Enemies */
-    ENEMY *enemies[MAX_ENEMIES];
-    int num_enemies;
-} LEVEL;
+/* The primary gameplay characters! */
+static HERO hero;
+static BULLET *hero_bullet; /* Follows the hero around */
+static BULLET *hero_bullets[MAX_BULLETS]; /* Shooting bullets */
+static int num_hero_bullets;
 
 static int _get_hero_speed()
 {
@@ -162,7 +52,7 @@ IMAGE *_get_bullet_image(LEVEL *level, int texture, int frame)
     return MASKED_IMG(level->textures[texture], bullet_mask_names[hero_type][frame]);
 }
 
-BULLET *_create_bullet(LEVEL *level, int texture)
+BULLET *_create_hero_bullet(LEVEL *level, int texture)
 {
     if (texture == NO_TEXTURE) {
         return NULL;
@@ -184,6 +74,8 @@ BULLET *_create_bullet(LEVEL *level, int texture)
     bullet->body.w = 10;
     bullet->body.h = 10;
 
+    bullet->is_active = true;
+
     return bullet;
 }
 
@@ -193,37 +85,35 @@ BULLET *_destroy_bullet(BULLET *bullet)
         return NULL;
     }
 
+    bullet->is_active = false;
+
     return free_memory("BULLET", bullet);
 }
 
-HERO *_create_hero(float x, float y)
+void _init_hero(float x, float y)
 {
-    HERO *hero = alloc_memory("HERO", sizeof(HERO));
-
-    init_sprite(&hero->sprite, 1, 10);
-    add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
-    add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
-    hero->sprite.x_offset = -10;
-    hero->sprite.y_offset = -10;
+    init_sprite(&hero.sprite, 1, 10);
+    add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
+    add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
+    hero.sprite.x_offset = -10;
+    hero.sprite.y_offset = -10;
 
     /* Set the starting position */
-    hero->body.x = x;
-    hero->body.y = y;
+    hero.body.x = x;
+    hero.body.y = y;
 
-    hero->body.w = 10;
-    hero->body.h = 10;
+    hero.body.w = 10;
+    hero.body.h = 10;
 
-    hero->u = false;
-    hero->d = false;
-    hero->l = false;
-    hero->r = false;
+    hero.u = false;
+    hero.d = false;
+    hero.l = false;
+    hero.r = false;
 
-    hero->dx = 0;
-    hero->dy = 0;
+    hero.dx = 0;
+    hero.dy = 0;
 
-    hero->is_shooting = false;
-
-    return hero;
+    hero.is_shooting = false;
 }
 
 ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
@@ -275,15 +165,6 @@ IMAGE *_get_block_image(LEVEL *level, int texture)
     return MASKED_IMG(level->textures[texture], "mask-block.png");
 }
 
-HERO *_destroy_hero(HERO *hero)
-{
-    if (hero == NULL) {
-        return NULL;
-    }
-
-    return free_memory("HERO", hero);
-}
-
 ENEMY *_destroy_enemy(ENEMY *enemy)
 {
     if (enemy == NULL) {
@@ -299,15 +180,12 @@ LEVEL *destroy_level(LEVEL *level)
         return NULL;
     }
 
-    /* Hero */
-    level->hero = _destroy_hero(level->hero);
-
     /* Hero's bullet */
-    level->bullet = _destroy_bullet(level->bullet);
+    hero_bullet = _destroy_bullet(hero_bullet);
 
     /* Stars */
-    for (int i = 0; i < level->num_bullets; i++) {
-        level->bullets[i] = _destroy_bullet(level->bullets[i]);
+    for (int i = 0; i < num_hero_bullets; i++) {
+        hero_bullets[i] = _destroy_bullet(hero_bullets[i]);
     }
 
     /* Tiles */
@@ -372,14 +250,14 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y);
 
 void _shoot_bullet(LEVEL *level, int texture, float x, float y)
 {
-    BULLET *bullet = _create_bullet(level, texture);
+    BULLET *bullet = _create_hero_bullet(level, texture);
     bullet->body.x = x;
     bullet->body.y = y;
     bullet->is_moving = true;
     bullet->is_forward = true;
 
-    level->bullets[level->num_bullets] = bullet;
-    level->num_bullets++;
+    hero_bullets[num_hero_bullets] = bullet;
+    num_hero_bullets++;
 
     /**
      * Do some fancy footwork to find out if this bullet
@@ -388,14 +266,14 @@ void _shoot_bullet(LEVEL *level, int texture, float x, float y)
      */
     float orig_x = bullet->body.x;
 
-    for (bullet->body.x = level->hero->body.x; bullet->body.x < orig_x; bullet->body.x++) {
+    for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
         if (!_move_bullet(level, bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
     }
 }
 
-void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
+void _control_hero(ALLEGRO_EVENT *event)
 {
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
@@ -403,23 +281,23 @@ void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
         /* Hero key pressed */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero->u = true;
-                hero->dy = -_get_hero_speed();
+                hero.u = true;
+                hero.dy = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero->d = true;
-                hero->dy = _get_hero_speed();
+                hero.d = true;
+                hero.dy = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero->l = true;
-                hero->dx = -_get_hero_speed();
+                hero.l = true;
+                hero.dx = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero->r = true;
-                hero->dx = _get_hero_speed();
+                hero.r = true;
+                hero.dx = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_SPACE:
-                hero->is_shooting = true;
+                hero.is_shooting = true;
                 break;
         }
     }
@@ -435,20 +313,20 @@ void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
          */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero->u = false;
-                hero->dy = hero->d ? _get_hero_speed() : 0;
+                hero.u = false;
+                hero.dy = hero.d ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero->d = false;
-                hero->dy = hero->u ? -_get_hero_speed() : 0;
+                hero.d = false;
+                hero.dy = hero.u ? -_get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero->l = false;
-                hero->dx = hero->r ? _get_hero_speed() : 0;
+                hero.l = false;
+                hero.dx = hero.r ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero->r = false;
-                hero->dx = hero->l ? -_get_hero_speed() : 0;
+                hero.r = false;
+                hero.dx = hero.l ? -_get_hero_speed() : 0;
                 break;
         }
     }
@@ -456,23 +334,21 @@ void _control_hero(HERO *hero, ALLEGRO_EVENT *event)
 
 void _toggle_hero(LEVEL *level)
 {
-    HERO *hero = level->hero;
-    BULLET *bullet = level->bullet;
+    delete_frames(&hero.sprite);
+    delete_frames(&hero_bullet->sprite);
 
-    delete_frames(&hero->sprite);
-    delete_frames(&bullet->sprite);
     if (hero_type == HERO_TYPE_MAKAYLA) {
         hero_type = HERO_TYPE_RAWSON;
-        add_frame(&hero->sprite, IMG("hero-rawson-01.png"));
-        add_frame(&hero->sprite, IMG("hero-rawson-02.png"));
-        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 0));
-        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 1));
+        add_frame(&hero.sprite, IMG("hero-rawson-01.png"));
+        add_frame(&hero.sprite, IMG("hero-rawson-02.png"));
+        add_frame(&hero_bullet->sprite, _get_bullet_image(level, hero_bullet->texture, 0));
+        add_frame(&hero_bullet->sprite, _get_bullet_image(level, hero_bullet->texture, 1));
     } else if (hero_type == HERO_TYPE_RAWSON) {
         hero_type = HERO_TYPE_MAKAYLA;
-        add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
-        add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
-        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 0));
-        add_frame(&bullet->sprite, _get_bullet_image(level, bullet->texture, 1));
+        add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
+        add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
+        add_frame(&hero_bullet->sprite, _get_bullet_image(level, hero_bullet->texture, 0));
+        add_frame(&hero_bullet->sprite, _get_bullet_image(level, hero_bullet->texture, 1));
     }
 }
 
@@ -502,7 +378,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 
     /* Hero control */
-    _control_hero(level->hero, event);
+    _control_hero(event);
 }
 
 bool _is_board_collision(LEVEL *level, BODY *body)
@@ -598,13 +474,13 @@ LEVEL *_create_level()
     level->startx = TILE_SIZE;
     level->starty = TILE_SIZE;
 
-    level->hero = _create_hero(level->startx, level->starty);
-    level->bullet = NULL;
+    _init_hero(level->startx, level->starty);
+    hero_bullet = NULL;
 
     for (int i = 0; i < MAX_BULLETS; i++) {
-        level->bullets[i] = NULL;
+        hero_bullets[i] = NULL;
     }
-    level->num_bullets = 0;
+    num_hero_bullets = 0;
 
     for (int r = 0; r < level->rows; r++) {
         for (int c = 0; c < level->cols; c++) {
@@ -810,56 +686,54 @@ LEVEL *create_level_01()
     return level;
 }
 
-void _follow_hero(BULLET *bullet, HERO *hero)
+void _place_bullet_near_hero()
 {
-    if (hero != NULL && bullet != NULL) {
-        bullet->body.x = hero->body.x + 20;
-        bullet->body.y = (((int)hero->body.y  + 5) / TILE_SIZE) * TILE_SIZE;
+    if (hero_bullet != NULL) {
+        hero_bullet->body.x = hero.body.x + 20;
+        hero_bullet->body.y = (((int)hero.body.y  + 5) / TILE_SIZE) * TILE_SIZE;
     }
 }
 
 void _update_hero(LEVEL *level)
 {
-    HERO *hero = level->hero;
-    float old_x = hero->body.x;
-    float old_y = hero->body.y;
+    float old_x = hero.body.x;
+    float old_y = hero.body.y;
 
     /* Vertical movement */
-    hero->body.y += _convert_pps_to_fps(hero->dy);
+    hero.body.y += _convert_pps_to_fps(hero.dy);
 
     /* Check for vertical collisions */
-    if (_is_board_collision(level, &hero->body) || _is_block_collision(level, &hero->body)) {
-        hero->body.y = old_y;
+    if (_is_board_collision(level, &hero.body) || _is_block_collision(level, &hero.body)) {
+        hero.body.y = old_y;
     }
 
     /* Horizontal movement */
-    hero->body.x += _convert_pps_to_fps(hero->dx);
+    hero.body.x += _convert_pps_to_fps(hero.dx);
 
     /* Check for horizontal collisions */
-    if (_is_board_collision(level, &hero->body) || _is_block_collision(level, &hero->body)) {
-        hero->body.x = old_x;
+    if (_is_board_collision(level, &hero.body) || _is_block_collision(level, &hero.body)) {
+        hero.body.x = old_x;
     }
 
-    if (hero->is_shooting) {
-        if (level->bullet != NULL) {
-            _shoot_bullet(level, level->bullet->texture, level->bullet->body.x, level->bullet->body.y);
-            level->bullet = _destroy_bullet(level->bullet);
+    if (hero.is_shooting) {
+        if (hero_bullet != NULL) {
+            _shoot_bullet(level, hero_bullet->texture, hero_bullet->body.x, hero_bullet->body.y);
+            hero_bullet = _destroy_bullet(hero_bullet);
         }
-        hero->is_shooting = false;
+        hero.is_shooting = false;
     }
 
-    if (level->bullet == NULL && level->num_bullets == 0) {
+    if (hero_bullet == NULL && num_hero_bullets == 0) {
         /* The hero needs a new bullet to shoot! */
-        level->bullet = _create_bullet(level, _random_front_texture(level));
-        _follow_hero(level->bullet, level->hero);
+        hero_bullet = _create_hero_bullet(level, _random_front_texture(level));
     }
 
     /* Tell the hero's bullet to follow the hero */
-    _follow_hero(level->bullet, hero);
+    _place_bullet_near_hero();
 
     /* Graphics */
-    animate(&hero->sprite);
-    animate(&level->bullet->sprite);
+    animate(&hero.sprite);
+    animate(&hero_bullet->sprite);
 }
 
 bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
@@ -933,29 +807,29 @@ void _update_bullet(LEVEL *level, BULLET *bullet)
 
 void _update_bullets(LEVEL *level)
 {
-    for (int i = 0; i < level->num_bullets; i++) {
+    for (int i = 0; i < num_hero_bullets; i++) {
 
-        BULLET *bullet = level->bullets[i];
+        BULLET *bullet = hero_bullets[i];
 
         _update_bullet(level, bullet);
 
         /* Remove bullets that have no hits left */
         if (bullet->hits <= 0) {
-            level->bullets[i] = _destroy_bullet(bullet);
-            level->num_bullets--;
+            hero_bullets[i] = _destroy_bullet(bullet);
+            num_hero_bullets--;
         }
     }
 
     /* Remove any empty spaces in the list of bullets */
     /* Keeps things on screen looking nice and in order */
     for (int i = 0; i < MAX_BULLETS; i++) {
-        if (level->bullets[i] == NULL) {
+        if (hero_bullets[i] == NULL) {
             int j = i;
             while (j < MAX_BULLETS - 1) {
-                level->bullets[j] = level->bullets[j + 1];
+                hero_bullets[j] = hero_bullets[j + 1];
                 j++;
             }
-            level->bullets[j] = NULL;
+            hero_bullets[j] = NULL;
         }
     }
 }
@@ -1010,18 +884,16 @@ void draw_gameplay(void *data)
     draw_sprite(&spider_sprite, (TILE_SIZE * 12) - 5, (TILE_SIZE * 2) - 5);
     
     /* Draw bullets */
-    for (int i = 0; i < level->num_bullets; i++) {
-        BULLET *bullet = level->bullets[i];
+    for (int i = 0; i < num_hero_bullets; i++) {
+        BULLET *bullet = hero_bullets[i];
         draw_sprite(&bullet->sprite, bullet->body.x, bullet->body.y);
     }
 
     /* Draw the hero */
-    HERO *hero = level->hero;
-    draw_sprite(&hero->sprite, hero->body.x, hero->body.y);
+    draw_sprite(&hero.sprite, hero.body.x, hero.body.y);
     
     /* Draw the hero's bullet */
-    BULLET *bullet = level->bullet;
-    if (bullet != NULL) {
-        draw_sprite(&bullet->sprite, bullet->body.x, bullet->body.y);
+    if (hero_bullet != NULL) {
+        draw_sprite(&hero_bullet->sprite, hero_bullet->body.x, hero_bullet->body.y);
     }
 }

@@ -66,3 +66,22 @@ Standard function prefixes:
 * set
   . The first parameter is the data that is being modified
   . Alternatively, set a global
+
+----
+
+gamedata.c / h
+* hero
+* enemy
+. room
+* init_hero
+. change_hero_type
+
+gameplay.c / h
+. init_gameplay
+. load_level_from_file
+. global hero, enemy list, room
+. update_gameplay points to update_active_gamelay / update_paused_gameplay
+
+. "Levels" don't exist, it's just a single set of data stored in gameplay
+* "Blocks" and "tiles" don't exist, they're just sprites
+. Gameplay can run even if no level has been loaded
