@@ -15,7 +15,7 @@ static SPRITE spider_sprite;
 
 static bool end_gameplay = false;
 
-static HERO_TYPE hero_type = 0;
+static HERO_TYPE hero_type = HERO_TYPE_MAKAYLA;
 
 /* Don't do anything if the gameplay hasn't been initialized! */
 //static bool is_gameplay_init = false;
@@ -59,6 +59,15 @@ IMAGE *_get_hero_bullet_image(LEVEL *level, int texture, int frame)
     return MASKED_IMG(level->textures[texture], bullet_mask_names[hero_type][frame]);
 }
 
+void _init_hero_bullet_sprite(LEVEL *level, SPRITE *sprite, int texture)
+{
+    if (texture != NO_TEXTURE) {
+        delete_frames(sprite);
+        add_frame(sprite, _get_hero_bullet_image(level, texture, 0));
+        add_frame(sprite, _get_hero_bullet_image(level, texture, 1));
+    }
+}
+
 BULLET *_create_hero_bullet(LEVEL *level, int texture)
 {
     if (texture == NO_TEXTURE) {
@@ -70,8 +79,7 @@ BULLET *_create_hero_bullet(LEVEL *level, int texture)
     init_sprite(&bullet->sprite, 1, 4);
 
     bullet->texture = texture;
-    add_frame(&bullet->sprite, _get_hero_bullet_image(level, texture, 0));
-    add_frame(&bullet->sprite, _get_hero_bullet_image(level, texture, 1));
+    _init_hero_bullet_sprite(level, &bullet->sprite, hero.texture);
 
     bullet->is_moving = false;
     bullet->is_forward = false;
@@ -97,11 +105,23 @@ BULLET *_destroy_bullet(BULLET *bullet)
     return free_memory("BULLET", bullet);
 }
 
+void _init_hero_sprite()
+{
+    delete_frames(&hero.sprite);
+
+    if (hero_type == HERO_TYPE_MAKAYLA) {
+        add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
+        add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
+    } else if (hero_type == HERO_TYPE_RAWSON) {
+        add_frame(&hero.sprite, IMG("hero-rawson-01.png"));
+        add_frame(&hero.sprite, IMG("hero-rawson-02.png"));
+    }
+}
+
 void _init_hero(float x, float y)
 {
     init_sprite(&hero.sprite, 1, 10);
-    add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
-    add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
+    _init_hero_sprite();
     hero.sprite.x_offset = -10;
     hero.sprite.y_offset = -10;
 
@@ -344,23 +364,15 @@ void _control_hero(ALLEGRO_EVENT *event)
 
 void _toggle_hero(LEVEL *level)
 {
-    delete_frames(&hero.sprite);
-
+    /* Toggle the hero type */
     if (hero_type == HERO_TYPE_MAKAYLA) {
         hero_type = HERO_TYPE_RAWSON;
-        add_frame(&hero.sprite, IMG("hero-rawson-01.png"));
-        add_frame(&hero.sprite, IMG("hero-rawson-02.png"));
     } else if (hero_type == HERO_TYPE_RAWSON) {
         hero_type = HERO_TYPE_MAKAYLA;
-        add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
-        add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
     }
 
-    if (hero.texture != NO_TEXTURE) {
-        delete_frames(&hero.bullet);
-        add_frame(&hero.bullet, _get_hero_bullet_image(level, hero.texture, 0));
-        add_frame(&hero.bullet, _get_hero_bullet_image(level, hero.texture, 1));
-    }
+    _init_hero_sprite();
+    _init_hero_bullet_sprite(level, &hero.bullet, hero.texture);
 }
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
@@ -732,9 +744,7 @@ void _update_hero(LEVEL *level)
         /* The hero needs a new bullet to shoot! */
         hero.texture = _random_front_texture(level);
         if (hero.texture != NO_TEXTURE) {
-            delete_frames(&hero.bullet);
-            add_frame(&hero.bullet, _get_hero_bullet_image(level, hero.texture, 0));
-            add_frame(&hero.bullet, _get_hero_bullet_image(level, hero.texture, 1));
+            _init_hero_bullet_sprite(level, &hero.bullet, hero.texture);
             hero.has_bullet = true;
         }
     }
