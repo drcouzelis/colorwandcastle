@@ -40,8 +40,12 @@ TODO:
 * Endless retries, level resets after death
 
 POWERUPS:
-* Mega star
-* Flashing star
+* Mega star, clears any two complete rows of blocks
+* Flashing star, clears any color block
+* Rapid star, shoot multiple stars at once
+* Speed star, shoots fast
+* Slow star, shoots slow
+* Fragile star, doesn't bounce
 
 IDEAS:
 * Vertical levels?

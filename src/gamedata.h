@@ -2,13 +2,7 @@
 #define GAMEDATA_HEADER
 
 #include <stdio.h>
-//#include "display.h"
-//#include "main.h"
-//#include "mask.h"
-//#include "memory.h"
-//#include "sound.h"
 #include "sprite.h"
-//#include "utilities.h"
 
 #define NO_TEXTURE -1
 #define NO_BLOCK -1
@@ -68,10 +62,18 @@ typedef struct
     bool l;
     bool r;
 
+    /* If this is true, then shoot a bullet! */
+    bool shoot;
+
     int dx;
     int dy;
 
-    bool is_shooting;
+    /* The picture of the bullet that follows the hero around */
+    bool has_bullet;
+    SPRITE bullet;
+    float bullet_x;
+    float bullet_y;
+    int texture;
 } HERO;
 
 typedef struct
