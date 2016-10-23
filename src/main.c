@@ -6,6 +6,7 @@
 #include "main.h"
 #include "memory.h"
 #include "run.h"
+#include "sound.h"
 #include "sprite.h"
 #include "resources.h"
 
@@ -56,6 +57,10 @@ int main(int argc, char **argv)
 
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
+
+    /* TEMP */
+    /* Turn off audio, I don't want to hear it during development */
+    toggle_audio();
 
     /* START THE GAME */
     level = create_level_01();
