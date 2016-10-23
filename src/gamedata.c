@@ -61,8 +61,8 @@ void init_hero(HERO *hero)
     _init_hero_sprite(hero);
 
     /* Set the starting position */
-    hero->body.x = 0;
-    hero->body.y = 0;
+    hero->body.x = TILE_SIZE;
+    hero->body.y = TILE_SIZE;
 
     hero->body.w = 10;
     hero->body.h = 10;

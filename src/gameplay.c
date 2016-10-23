@@ -287,8 +287,13 @@ void init_gameplay()
         return;
     }
 
+    /* Hero */
+    init_hero(&hero);
+
     /* Room */
     init_room(&room);
+
+    is_gameplay_init = true;
 }
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
