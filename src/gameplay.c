@@ -283,10 +283,6 @@ void _control_hero(ALLEGRO_EVENT *event)
 
 void init_gameplay()
 {
-    if (is_gameplay_init) {
-        return;
-    }
-
     /* Hero */
     init_hero(&hero);
 
@@ -298,7 +294,7 @@ void init_gameplay()
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
-    init_gameplay();
+    assert(is_gameplay_init);
 
     LEVEL *level = (LEVEL *)data;
 
@@ -777,7 +773,7 @@ void _update_hero_bullets(LEVEL *level)
 
 bool update_gameplay(void *data)
 {
-    init_gameplay();
+    assert(is_gameplay_init);
 
     LEVEL *level = (LEVEL *)data;
 
@@ -795,7 +791,7 @@ bool update_gameplay(void *data)
 
 void draw_gameplay(void *data)
 {
-    init_gameplay();
+    assert(is_gameplay_init);
 
     LEVEL *level = (LEVEL *)data;
 

@@ -36,6 +36,12 @@ typedef struct
     int h;
 } BODY;
 
+typedef struct EFFECT
+{
+    SPRITE sprite;
+    void (*update)(struct EFFECT *effect, void *data);
+} EFFECT;
+
 typedef struct
 {
     /* If false, this bullet data is not used */
