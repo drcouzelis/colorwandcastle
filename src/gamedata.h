@@ -11,6 +11,7 @@
 #define MAX_LEVEL_ROWS 12
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 16
+#define MAX_EFFECTS 8
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
 #define MAX_FILENAME_SIZE 128
@@ -38,7 +39,12 @@ typedef struct
 
 typedef struct EFFECT
 {
+    bool is_active;
+
     SPRITE sprite;
+    float x;
+    float y;
+
     void (*update)(struct EFFECT *effect, void *data);
 } EFFECT;
 
@@ -58,7 +64,7 @@ typedef struct
     int dy; /* In pixels per second */
 } BULLET;
 
-typedef struct
+typedef struct HERO
 {
     HERO_TYPE type;
 
@@ -84,9 +90,11 @@ typedef struct
     float bullet_x;
     float bullet_y;
     int texture;
+
+    void (*update)(struct HERO *hero, void *data);
 } HERO;
 
-typedef struct
+typedef struct ENEMY
 {
     bool is_active;
 
@@ -99,7 +107,7 @@ typedef struct
     int dx;
     int dy;
 
-    int state;
+    void (*update)(struct ENEMY *enemy, void *data);
 } ENEMY;
 
 typedef struct
@@ -196,5 +204,10 @@ void toggle_hero(HERO *hero, LEVEL *level);
 
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
+
+/* Load a room from the data in the given file */
+void load_room_from_file(ROOM *room, char *filename);
+
+void init_effect(EFFECT *effect);
 
 #endif

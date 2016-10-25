@@ -17,6 +17,7 @@ static bool is_gameplay_init = false;
 static HERO hero;
 static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
+static EFFECT effects[MAX_EFFECTS];
 
 /* TODO */
 /* Create REAL enemies! */
@@ -37,6 +38,15 @@ static int _get_bullet_speed()
 static float _convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
+}
+
+void _update_effect_until_done_animating(EFFECT *effect, void *data)
+{
+    animate(&effect->sprite);
+
+    if (effect->sprite.done) {
+        effect->is_active = false;
+    }
 }
 
 ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
@@ -75,8 +85,7 @@ ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
     enemy->dx = 0;
     enemy->dy = 0;
 
-    /* State 0 represents a newly created enemy */
-    enemy->state = 0;
+    enemy->update = NULL;
 
     return enemy;
 }
@@ -288,6 +297,11 @@ void init_gameplay()
 
     /* Room */
     init_room(&room);
+
+    /* Effects */
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        init_effect(&effects[i]);
+    }
 
     is_gameplay_init = true;
 }
@@ -694,6 +708,32 @@ void _update_hero(LEVEL *level)
     animate(&hero.bullet);
 }
 
+int _find_available_effect_index()
+{
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        if (!effects[i].is_active) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void _init_poof_effect(EFFECT *effect, float x, float y)
+{
+    init_sprite(&effect->sprite, false, 15);
+    add_frame(&effect->sprite, IMG("effect-poof-1.png"));
+    add_frame(&effect->sprite, IMG("effect-poof-2.png"));
+    add_frame(&effect->sprite, IMG("effect-poof-3.png"));
+    add_frame(&effect->sprite, IMG("effect-poof-4.png"));
+    effect->sprite.x_offset = -10;
+    effect->sprite.y_offset = -10;
+    effect->x = x;
+    effect->y = y;
+    effect->update = _update_effect_until_done_animating;
+    effect->is_active = true;
+}
+
 bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
 {
     float old_x = bullet->body.x;
@@ -713,6 +753,7 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
             /* Remove the bullet and the block */
             bullet->hits = 0;
             play_sound(SND("star_hit.wav"));
+            _init_poof_effect(&effects[_find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
             level->active_block_map[r][c] = NO_BLOCK;
         } else {
             bullet->hits--;
@@ -786,6 +827,13 @@ bool update_gameplay(void *data)
     animate(&bat_sprite);
     animate(&spider_sprite);
 
+    /* Effects */
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        if (effects[i].is_active && effects[i].update != NULL) {
+            effects[i].update(&effects[i], NULL);
+        }
+    }
+
     return !end_gameplay;
 }
 
@@ -838,4 +886,20 @@ void draw_gameplay(void *data)
     if (hero.has_bullet) {
         draw_sprite(&hero.bullet, hero.bullet_x, hero.bullet_y);
     }
+
+    /* Draw effects */
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        if (effects[i].is_active) {
+            draw_sprite(&effects[i].sprite, effects[i].x, effects[i].y);
+        }
+    }
+}
+
+void init_gameplay_room(char *filename)
+{
+    assert(is_gameplay_init);
+
+    load_room_from_file(&room, filename);
+
+    /* After a room is loaded, setup other things like the hero's position */
 }

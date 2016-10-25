@@ -82,6 +82,8 @@ void init_hero(HERO *hero)
     hero->bullet_y = 0;
     hero->texture = NO_TEXTURE;
     hero->has_bullet = false;
+
+    hero->update = NULL;
 }
 
 void init_room(ROOM *room)
@@ -133,4 +135,18 @@ void init_room(ROOM *room)
     for (int i = 0; i < MAX_ENEMIES; i++) {
         room->enemies[i].is_active = false;
     }
+}
+
+void load_room_from_file(ROOM *room, char *filename)
+{
+    printf("Pretending to load room from file...\n");
+}
+
+void init_effect(EFFECT *effect)
+{
+    effect->is_active = false;
+    effect->update = NULL;
+    init_sprite(&effect->sprite, false, 0);
+    effect->x = 0;
+    effect->y = 0;
 }

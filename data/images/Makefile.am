@@ -6,6 +6,10 @@ imagesdatadir = $(pkgdatadir)/images
 # The "DATA" suffix marks this as data files for
 # the package.
 dist_imagesdata_DATA = \
+  effect-poof-1.png \
+  effect-poof-2.png \
+  effect-poof-3.png \
+  effect-poof-4.png \
   enemy-bat-1.png \
   enemy-bat-2.png \
   enemy-bat-3.png \

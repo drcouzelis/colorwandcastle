@@ -11,4 +11,7 @@ void draw_gameplay(void *data);
 LEVEL *create_level_01();
 LEVEL *destroy_level(LEVEL *level);
 
+void init_gameplay();
+void init_gameplay_room(char *filename);
+
 #endif
