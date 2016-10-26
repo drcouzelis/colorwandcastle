@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "gamedata.h"
 #include "main.h"
 #include "mask.h"
@@ -140,6 +141,31 @@ void init_room(ROOM *room)
 void load_room_from_file(ROOM *room, char *filename)
 {
     printf("Pretending to load room from file...\n");
+    init_room(room);
+
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
+        return;
+    }
+
+    char string[MAX_STRING_SIZE];
+
+    while (fscanf(file, "%s", string) != EOF) {
+
+        /* Ignore comments (lines that begin with a hash) */
+        if (string[0] == '#') {
+            fgets(string, MAX_STRING_SIZE, file);
+            continue;
+        }
+
+        if (strncmp(string, "START", MAX_STRING_SIZE) == 0) {
+            if (fscanf(file, "%d %d", &room->startx, &room->starty) != 2) {
+                fprintf(stderr, "Failed to load startx and starty.\n");
+            }
+            printf("START %d %d\n", room->startx, room->starty);
+        }
+    }
 }
 
 void init_effect(EFFECT *effect)

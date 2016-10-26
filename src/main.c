@@ -62,19 +62,18 @@ int main(int argc, char **argv)
     /* Turn off audio, I don't want to hear it during development */
     toggle_audio();
 
+    /* TODO */
+    /* START THE GAME */
+    /* New method */
     init_gameplay();
+    init_gameplay_room( PKGDATADIR "/levels/level01.dat"); // This can eventually be chosen from a menu
+    //run(control_gameplay, update_gameplay, draw_gameplay, NULL);
  
     /* START THE GAME */
     level = create_level_01();
     run(control_gameplay, update_gameplay, draw_gameplay, level);
     destroy_level(level);
 
-    /* TODO */
-    /* START THE GAME */
-    /* New method */
-    //init_gameplay_room("level01.dat"); // This can eventually be chosen from a menu
-    //run(control_gameplay, update_gameplay, draw_gameplay, NULL);
-  
     /* DONE, clean up */
     free_resources();
     free_display();
