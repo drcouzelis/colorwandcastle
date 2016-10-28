@@ -206,7 +206,7 @@ void toggle_hero(HERO *hero, LEVEL *level);
 void init_room(ROOM *room);
 
 /* Load a room from the data in the given file */
-void load_room_from_file(ROOM *room, char *filename);
+void load_room_from_filename(ROOM *room, char *filename);
 
 void init_effect(EFFECT *effect);
 

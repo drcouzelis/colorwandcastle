@@ -899,7 +899,7 @@ void init_gameplay_room(char *filename)
 {
     assert(is_gameplay_init);
 
-    load_room_from_file(&room, filename);
+    load_room_from_filename(&room, filename);
 
     /* After a room is loaded, setup other things like the hero's position */
     hero.body.x = room.startx;

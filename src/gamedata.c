@@ -138,7 +138,41 @@ void init_room(ROOM *room)
     }
 }
 
-void load_room_from_file(ROOM *room, char *filename)
+void _load_sprite_from_file(SPRITE *sprite, FILE *file)
+{
+    assert(file != NULL);
+
+    char string[MAX_STRING_SIZE];
+
+    while (fscanf(file, "%s", string) != EOF) {
+
+        /* Ignore comments (lines that begin with a hash) */
+        if (string[0] == '#') {
+            fgets(string, MAX_STRING_SIZE, file);
+            continue;
+        }
+
+        if (strncmp(string, "IMAGE", MAX_STRING_SIZE) == 0) {
+            if (fscanf(file, "%s", string) != 1) {
+                fprintf(stderr, "Failed to load IMAGE.\n");
+            }
+            add_frame(sprite, IMG(string));
+            printf("IMAGE %s\n", string);
+            continue;
+        }
+
+        if (strncmp(string, "END", MAX_STRING_SIZE) == 0) {
+            break;
+        }
+    }
+}
+
+void _load_map_from_file(int *map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS], FILE *file, int cols, int rows)
+{
+    // Consider changing the 2D array to a 1D array with math
+}
+
+void load_room_from_filename(ROOM *room, char *filename)
 {
     printf("Pretending to load room from file...\n");
     init_room(room);
@@ -159,12 +193,63 @@ void load_room_from_file(ROOM *room, char *filename)
             continue;
         }
 
+        /* Hero starting position */
         if (strncmp(string, "START", MAX_STRING_SIZE) == 0) {
             if (fscanf(file, "%d %d", &room->startx, &room->starty) != 2) {
                 fprintf(stderr, "Failed to load startx and starty.\n");
             }
             printf("START %d %d\n", room->startx, room->starty);
+            continue;
         }
+
+        /* Size of the room, in tiles */
+        if (strncmp(string, "SIZE", MAX_STRING_SIZE) == 0) {
+            if (fscanf(file, "%d %d", &room->cols, &room->rows) != 2) {
+                fprintf(stderr, "Failed to load cols and rows.\n");
+            }
+            printf("SIZE %d %d\n", room->cols, room->rows);
+            continue;
+        }
+
+        /* A tile (sprite) */
+        if (strncmp(string, "TILE", MAX_STRING_SIZE) == 0) {
+            if (room->num_tiles < MAX_TILES) {
+                _load_sprite_from_file(&room->tiles[room->num_tiles], file);
+                printf("Loaded TILE %d\n", room->num_tiles);
+                room->num_tiles++;
+            } else {
+                fprintf(stderr, "Failed to load tile, max number reached\n");
+            }
+            continue;
+        }
+
+        /* A texture name (used to color blocks and bullets) */
+        if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
+            if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", string) == 1) {
+                printf("Loaded TEXTURE %d %s\n", room->num_textures, string);
+                room->num_textures++;
+            } else {
+                fprintf(stderr, "Failed to load texture, max number reached\n");
+            }
+            continue;
+        }
+
+        /* Background map */
+        if (strncmp(string, "BACKGROUND", MAX_STRING_SIZE) == 0) {
+            // YOU LEFT OFF HERE!!!
+            //_load_map_from_file(&room->collision_map, file, room->cols, room->rows);
+            printf("BACKGROUND\n");
+            for (int r = 0; r < room->rows; r++) {
+                for (int c = 0; c < room->cols; c++) {
+                    printf("%d ", room->background_map[c][r] - 'a');
+                }
+                printf("\n");
+            }
+            continue;
+        }
+
+        /* WHAT THE HECK SHOULD I DO WITH THIS COMMAND??? */
+        fprintf(stderr, "Failed to recognize %s\n", string);
     }
 }
 

@@ -24,34 +24,22 @@ END
 # Blocks
 
 # 1
-BLOCK
-  IMAGE texture-red.png
-END
+TEXTURE texture-red.png
 
 # 2
-BLOCK
-  IMAGE texture-orange.png
-END
+TEXTURE texture-orange.png
 
 # 3
-BLOCK
-  IMAGE texture-yellow.png
-END
+TEXTURE texture-yellow.png
 
 # 4
-BLOCK
-  IMAGE texture-green.png
-END
+TEXTURE texture-green.png
 
 # 5
-BLOCK
-  IMAGE texture-blue.png
-END
+TEXTURE texture-blue.png
 
 # 6
-BLOCK
-  IMAGE texture-purple.png
-END
+TEXTURE texture-purple.png
 
 # The background is tiles that are drawn underneath everything else
 # Tiles are represented by their corresponding integer value
