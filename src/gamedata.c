@@ -97,8 +97,8 @@ void init_room(ROOM *room)
     strncpy(room->title, "", MAX_STRING_SIZE);
 
     /* Size */
-    room->cols = MAX_LEVEL_COLS;
-    room->rows = MAX_LEVEL_ROWS;
+    room->cols = MAX_ROOM_COLS;
+    room->rows = MAX_ROOM_ROWS;
 
     /* Starting position */
     room->startx = TILE_SIZE;
@@ -114,13 +114,11 @@ void init_room(ROOM *room)
     /* Foreground map */
     /* Collision map */
     /* Block map */
-    for (int r = 0; r < MAX_LEVEL_ROWS; r++) {
-        for (int c = 0; c < MAX_LEVEL_COLS; c++) {
-            room->background_map[r][c] = 0;
-            room->foreground_map[r][c] = 0;
-            room->collision_map[r][c] = 0;
-            room->block_map[r][c] = 0;
-        }
+    for (int i = 0; i < MAX_ROOM_SIZE; i++) {
+        room->background_map[i] = 0;
+        room->foreground_map[i] = 0;
+        room->collision_map[i] = 0;
+        room->block_map[i] = 0;
     }
 
     /* Texture list */
@@ -167,9 +165,25 @@ void _load_sprite_from_file(SPRITE *sprite, FILE *file)
     }
 }
 
-void _load_map_from_file(int *map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS], FILE *file, int cols, int rows)
+void _load_map_from_file(int *map, int cols, int rows, FILE *file)
 {
-    // Consider changing the 2D array to a 1D array with math
+    assert(file != NULL);
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            fscanf(file, "%d", &map[(r * cols) + c]);
+        }
+    }
+}
+
+void _print_map(int *map, int cols, int rows)
+{
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            printf("%d ", map[(r * cols) + c] - 'a');
+        }
+        printf("\n");
+    }
 }
 
 void load_room_from_filename(ROOM *room, char *filename)
@@ -190,6 +204,23 @@ void load_room_from_filename(ROOM *room, char *filename)
         /* Ignore comments (lines that begin with a hash) */
         if (string[0] == '#') {
             fgets(string, MAX_STRING_SIZE, file);
+            continue;
+        }
+
+        /* Import from another data file */
+        if (strncmp(string, "IMPORT", MAX_STRING_SIZE) == 0) {
+            if (fscanf(file, "%s", string) != 1) {
+                fprintf(stderr, "Failed to import.\n");
+            }
+            printf("IMPORT %s\n", string);
+            load_room_from_filename(room, string);
+            continue;
+        }
+
+        /* Title (name) of the room */
+        if (strncmp(string, "TITLE", MAX_STRING_SIZE) == 0) {
+            fgets(room->title, MAX_STRING_SIZE, file);
+            printf("TITLE %s\n", room->title);
             continue;
         }
 
@@ -236,19 +267,38 @@ void load_room_from_filename(ROOM *room, char *filename)
 
         /* Background map */
         if (strncmp(string, "BACKGROUND", MAX_STRING_SIZE) == 0) {
-            // YOU LEFT OFF HERE!!!
-            //_load_map_from_file(&room->collision_map, file, room->cols, room->rows);
-            printf("BACKGROUND\n");
-            for (int r = 0; r < room->rows; r++) {
-                for (int c = 0; c < room->cols; c++) {
-                    printf("%d ", room->background_map[c][r] - 'a');
-                }
-                printf("\n");
-            }
+            _load_map_from_file(room->background_map, room->cols, room->rows, file);
+            printf("%s\n", string);
+            _print_map(room->background_map, room->cols, room->rows);
+            continue;
+        }
+
+        /* Foreground map */
+        if (strncmp(string, "FOREGROUND", MAX_STRING_SIZE) == 0) {
+            _load_map_from_file(room->foreground_map, room->cols, room->rows, file);
+            printf("%s\n", string);
+            _print_map(room->foreground_map, room->cols, room->rows);
+            continue;
+        }
+
+        /* Collision map */
+        if (strncmp(string, "COLLISION", MAX_STRING_SIZE) == 0) {
+            _load_map_from_file(room->collision_map, room->cols, room->rows, file);
+            printf("%s\n", string);
+            _print_map(room->collision_map, room->cols, room->rows);
+            continue;
+        }
+
+        /* Block map */
+        if (strncmp(string, "BLOCKS", MAX_STRING_SIZE) == 0) {
+            _load_map_from_file(room->block_map, room->cols, room->rows, file);
+            printf("%s\n", string);
+            _print_map(room->block_map, room->cols, room->rows);
             continue;
         }
 
         /* WHAT THE HECK SHOULD I DO WITH THIS COMMAND??? */
+        /* Just ignore it */
         fprintf(stderr, "Failed to recognize %s\n", string);
     }
 }

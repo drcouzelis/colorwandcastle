@@ -424,8 +424,8 @@ LEVEL *_create_level()
 
     level = alloc_memory("LEVEL", sizeof(LEVEL));
 
-    level->cols = MAX_LEVEL_COLS;
-    level->rows = MAX_LEVEL_ROWS;
+    level->cols = MAX_ROOM_COLS;
+    level->rows = MAX_ROOM_ROWS;
 
     level->startx = TILE_SIZE;
     level->starty = TILE_SIZE;
@@ -488,7 +488,7 @@ LEVEL *_create_level()
 
 LEVEL *create_level_01()
 {
-    int collision_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS] = {
+    int collision_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
         {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
         {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
         {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
@@ -503,7 +503,7 @@ LEVEL *create_level_01()
         {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
     };
 
-    int background_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS] = {
+    int background_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
         {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
         {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
@@ -518,7 +518,7 @@ LEVEL *create_level_01()
         {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
     };
 
-    int foreground_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS] = {
+    int foreground_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
         {01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01},
         {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
         {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
@@ -533,7 +533,7 @@ LEVEL *create_level_01()
         {01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01}
     };
 
-    int block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS] = {
+    int block_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
         {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
         {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '.'},
         {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '.'},

@@ -7,8 +7,9 @@
 #define NO_TEXTURE -1
 #define NO_BLOCK -1
 
-#define MAX_LEVEL_COLS 16
-#define MAX_LEVEL_ROWS 12
+#define MAX_ROOM_COLS 16
+#define MAX_ROOM_ROWS 12
+#define MAX_ROOM_SIZE (MAX_ROOM_COLS * MAX_ROOM_ROWS)
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 16
 #define MAX_EFFECTS 8
@@ -130,15 +131,15 @@ typedef struct
 
     /* The background is drawn behind everything else */
     /* Each entry is an index number for the list of tiles */
-    int background_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int background_map[MAX_ROOM_SIZE];
 
     /* The foreground is what the hero interacts with */
     /* Each entry is an index number for the list of tiles */
-    int foreground_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int foreground_map[MAX_ROOM_SIZE];
 
     /* Collision detection map for the hero and bullets */
     /* Most likely, this will line up exactly with the foreground map */
-    int collision_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int collision_map[MAX_ROOM_SIZE];
 
     /* List of textures used to make blocks and bullets in the level */
     char textures[MAX_TEXTURES][MAX_FILENAME_SIZE];
@@ -149,7 +150,7 @@ typedef struct
 
     /* The position of blocks */
     /* Each entry is an index number for the list of blocks */
-    int block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int block_map[MAX_ROOM_SIZE];
 
     /* TODO */
     /* Enemies */
@@ -166,13 +167,13 @@ typedef struct
     int startx;
     int starty;
     
-    int collision_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int collision_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
 
     /* List of tiles used in the level */
     SPRITE *tiles[MAX_TILES];
     int num_tiles;
-    int background_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
-    int foreground_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int background_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
+    int foreground_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
 
     /* List of textures used to make blocks and bullets in the level */
     char textures[MAX_TEXTURES][MAX_FILENAME_SIZE];
@@ -182,10 +183,10 @@ typedef struct
     SPRITE *blocks[MAX_TEXTURES];
 
     /* The starting position of blocks */
-    int block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int block_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
 
     /* For restarting the level */
-    int active_block_map[MAX_LEVEL_ROWS][MAX_LEVEL_COLS];
+    int active_block_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
 
     /* Enemies */
     ENEMY *enemies[MAX_ENEMIES];
