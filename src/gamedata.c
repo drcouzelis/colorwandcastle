@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include "gamedata.h"
 #include "main.h"
@@ -180,10 +181,43 @@ void _print_map(int *map, int cols, int rows)
 {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-            printf("%d ", map[(r * cols) + c] - 'a');
+            printf("%02d ", map[(r * cols) + c]);
         }
         printf("\n");
     }
+}
+
+void _trim(char *string, int len)
+{
+    int front, back;
+
+    printf("len %d\n", len);
+
+    for (front = 0; front < len; front++) {
+        if (!isspace(string[front])) {
+            break;
+        }
+    }
+
+    printf("front %d\n", front);
+
+    for (back = len - 1; len >= 0; back--) {
+        if (!isspace(string[back])) {
+            break;
+        }
+    }
+
+    printf("back %d\n", back);
+
+    int i;
+
+    for (i = 0; i < back - front + 1; i++) {
+        string[i] = string[i + front];
+    }
+
+    printf("i %d\n", i);
+
+    string[i] = '\0';
 }
 
 void load_room_from_filename(ROOM *room, char *filename)
@@ -220,7 +254,9 @@ void load_room_from_filename(ROOM *room, char *filename)
         /* Title (name) of the room */
         if (strncmp(string, "TITLE", MAX_STRING_SIZE) == 0) {
             fgets(room->title, MAX_STRING_SIZE, file);
-            printf("TITLE %s\n", room->title);
+            /* Get rid of the spaces at the beginning */
+            _trim(room->title, strnlen(room->title, MAX_STRING_SIZE));
+            printf("TITLE \"%s\"\n", room->title);
             continue;
         }
 
@@ -245,8 +281,8 @@ void load_room_from_filename(ROOM *room, char *filename)
         /* A tile (sprite) */
         if (strncmp(string, "TILE", MAX_STRING_SIZE) == 0) {
             if (room->num_tiles < MAX_TILES) {
+                printf("TILE %d\n", room->num_tiles);
                 _load_sprite_from_file(&room->tiles[room->num_tiles], file);
-                printf("Loaded TILE %d\n", room->num_tiles);
                 room->num_tiles++;
             } else {
                 fprintf(stderr, "Failed to load tile, max number reached\n");
@@ -257,7 +293,7 @@ void load_room_from_filename(ROOM *room, char *filename)
         /* A texture name (used to color blocks and bullets) */
         if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
             if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", string) == 1) {
-                printf("Loaded TEXTURE %d %s\n", room->num_textures, string);
+                printf("TEXTURE %d %s\n", room->num_textures, string);
                 room->num_textures++;
             } else {
                 fprintf(stderr, "Failed to load texture, max number reached\n");
@@ -301,6 +337,8 @@ void load_room_from_filename(ROOM *room, char *filename)
         /* Just ignore it */
         fprintf(stderr, "Failed to recognize %s\n", string);
     }
+
+    fclose(file);
 }
 
 void init_effect(EFFECT *effect)

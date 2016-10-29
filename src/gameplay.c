@@ -632,7 +632,7 @@ LEVEL *create_level_01()
     bat_sprite.y_offset = -10;
 
     init_sprite(&spider_sprite, true, 8);
-    add_frame(&spider_sprite, IMG("enemy-spider-1.png"));
+    //add_frame(&spider_sprite, IMG("enemy-spider-1.png"));
     add_frame(&spider_sprite, IMG("enemy-spider-2.png"));
     add_frame(&spider_sprite, IMG("enemy-spider-3.png"));
     add_frame(&spider_sprite, IMG("enemy-spider-4.png"));
