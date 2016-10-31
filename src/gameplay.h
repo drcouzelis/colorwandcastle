@@ -8,10 +8,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event);
 bool update_gameplay(void *data);
 void draw_gameplay(void *data);
 
-LEVEL *create_level_01();
-LEVEL *destroy_level(LEVEL *level);
-
 void init_gameplay();
-void init_gameplay_room(char *filename);
+bool init_gameplay_room(char *filename);
 
 #endif

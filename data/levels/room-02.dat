@@ -1,49 +1,17 @@
 # Name of the room
 # Is the entire length of the line, including spaces
-TITLE Let's clean up!
+TITLE Room 2
 
 # Hero start position
-START 20 200
+START 40 40
 
-# Size of the level
+# Size of the room
 # Defaults to 16x12
 SIZE 16 12
 
 # Import a default set of tiles and blocks
-#IMPORT tiles-castle.dat
-#IMPORT blocks-colored.dat
-
-# Tiles
-
-# 1
-TILE
-  IMAGE tile-bricks.png
-END
-
-# 2
-TILE
-  IMAGE tile-gray-wall.png
-END
-
-# Blocks
-
-# 1
-TEXTURE texture-red.png
-
-# 2
-TEXTURE texture-orange.png
-
-# 3
-TEXTURE texture-yellow.png
-
-# 4
-TEXTURE texture-green.png
-
-# 5
-TEXTURE texture-blue.png
-
-# 6
-TEXTURE texture-purple.png
+IMPORT tiles-castle.dat
+IMPORT textures-colored.dat
 
 # The background is tiles that are drawn underneath everything else
 # Tiles are represented by their corresponding integer value
@@ -102,14 +70,14 @@ COLLISION
 # -1 (any negative number) will display a random block
 BLOCKS
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
-00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
+00 00 00 00 00 00 00 00 00 00 00 01 04 03 02 00
+00 00 00 00 00 00 00 00 00 00 00 02 01 04 03 00
+00 00 00 00 00 00 00 00 00 00 00 03 02 01 04 00
+00 00 00 00 00 00 00 00 00 00 00 04 03 02 01 00
+00 00 00 00 00 00 00 00 00 00 00 01 04 03 02 00
+00 00 00 00 00 00 00 00 00 00 00 02 01 04 03 00
+00 00 00 00 00 00 00 00 00 00 00 03 02 01 04 00
+00 00 00 00 00 00 00 00 00 00 00 04 03 02 01 00
+00 00 00 00 00 00 00 00 00 00 00 01 04 03 02 00
+00 00 00 00 00 00 00 00 00 00 00 02 01 04 03 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00

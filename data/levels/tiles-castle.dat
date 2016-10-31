@@ -1,0 +1,11 @@
+# Tiles
+
+# 1
+TILE
+  IMAGE tile-bricks.png
+END
+
+# 2
+TILE
+  IMAGE tile-gray-wall.png
+END

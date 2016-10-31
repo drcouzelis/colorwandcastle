@@ -90,13 +90,6 @@ ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
     return enemy;
 }
 
-IMAGE *_get_block_image(LEVEL *level, int texture)
-{
-    assert(texture >= 0 && texture < level->num_textures);
-
-    return MASKED_IMG(level->textures[texture], "mask-block.png");
-}
-
 ENEMY *_destroy_enemy(ENEMY *enemy)
 {
     if (enemy == NULL) {
@@ -106,28 +99,7 @@ ENEMY *_destroy_enemy(ENEMY *enemy)
     return free_memory("ENEMY", enemy);
 }
 
-LEVEL *destroy_level(LEVEL *level)
-{
-    if (level == NULL) {
-        return NULL;
-    }
-
-    /* Tiles */
-    for (int i = 0; i < level->num_tiles; i++) {
-        level->tiles[i] = free_memory("SPRITE", level->tiles[i]);
-    }
-    level->num_tiles = 0;
-
-    /* Blocks */
-    for (int i = 0; i < level->num_textures; i++) {
-        level->blocks[i] = free_memory("SPRITE", level->blocks[i]);
-    }
-
-    /* And the level itself */
-    return free_memory("LEVEL", level);
-}
-
-int _random_front_texture(LEVEL *level)
+int _random_front_texture()
 {
     int textures[MAX_TEXTURES];
     int num_textures = 0;
@@ -137,10 +109,10 @@ int _random_front_texture(LEVEL *level)
     }
 
     /* Create a list of blocks that are available to hit */
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
+    for (int r = 0; r < room.rows; r++) {
+        for (int c = 0; c < room.cols; c++) {
 
-            int block_texture = level->active_block_map[r][c];
+            int block_texture = room.block_map[(r * room.cols) + c];
 
             if (block_texture != NO_BLOCK) {
 
@@ -163,16 +135,16 @@ int _random_front_texture(LEVEL *level)
     }
 
     /* Randomly select a color from the list of available textures to hit */
-    if (num_textures < 1) {
+    if (num_textures == 0) {
         return NO_TEXTURE;
     } else {
         return textures[random_number(0, num_textures - 1)];
     }
 }
 
-bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y);
+bool _move_bullet(BULLET *bullet, float new_x, float new_y);
 
-void _shoot_bullet(LEVEL *level, int texture, float x, float y)
+void _shoot_bullet(int texture, float x, float y)
 {
     /* Find the next available bullet slot */
     int i = 0;
@@ -192,7 +164,7 @@ void _shoot_bullet(LEVEL *level, int texture, float x, float y)
     BULLET *bullet = &hero_bullets[i];
 
     /* Create the bullet! */
-    init_hero_bullet_sprite(&bullet->sprite, level->textures[texture], hero.type);
+    init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
     bullet->texture = texture;
     bullet->hits = 2;
     bullet->body.x = x;
@@ -215,7 +187,7 @@ void _shoot_bullet(LEVEL *level, int texture, float x, float y)
     float orig_x = bullet->body.x;
 
     for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!_move_bullet(level, bullet, bullet->body.x + 1, bullet->body.y)) {
+        if (!_move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
     }
@@ -225,7 +197,7 @@ void _shoot_bullet(LEVEL *level, int texture, float x, float y)
 
     /* NOTE: This will need to be updated when bullets can shoot in other directions */
     for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!_move_bullet(level, bullet, bullet->body.x + 1, bullet->body.y)) {
+        if (!_move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
     }
@@ -310,8 +282,6 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
     assert(is_gameplay_init);
 
-    LEVEL *level = (LEVEL *)data;
-
     /* General application control */
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
@@ -327,7 +297,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
             toggle_fullscreen();
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
             /* Toggle the hero */
-            toggle_hero(&hero, level);
+            toggle_hero(&hero, &room);
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
@@ -337,40 +307,40 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     _control_hero(event);
 }
 
-bool _is_board_collision(LEVEL *level, BODY *body)
+bool _is_board_collision(BODY *body)
 {
+    /* Level bounds! */
+    if (body->y < 0 || body->x < 0 || body->y + body->h >= (room.rows * TILE_SIZE) || body->x + body->w >= room.cols * TILE_SIZE) {
+        return true;
+    }
+    
     int r1 = (int)(body->y / TILE_SIZE);
     int c1 = (int)(body->x / TILE_SIZE);
     int r2 = (int)((body->y + body->h) / TILE_SIZE);
     int c2 = (int)((body->x + body->w) / TILE_SIZE);
 
-    /* Level bounds! */
-    if (r1 < 0 || c1 < 0 || r2 >= level->rows || c2 >= level->cols) {
-        return true;
-    }
-    
     /* Check the collision map */
 
-    if (level->collision_map[r1][c1] == '*') {
+    if (room.collision_map[(r1 * room.cols) + c1] == COLLISION) {
         return true;
     }
     
-    if (level->collision_map[r1][c2] == '*') {
+    if (room.collision_map[(r1 * room.cols) + c2] == COLLISION) {
         return true;
     }
     
-    if (level->collision_map[r2][c1] == '*') {
+    if (room.collision_map[(r2 * room.cols) + c1] == COLLISION) {
         return true;
     }
     
-    if (level->collision_map[r2][c2] == '*') {
+    if (room.collision_map[(r2 * room.cols) + c2] == COLLISION) {
         return true;
     }
     
     return false;
 }
 
-bool _get_colliding_block(LEVEL *level, BODY *body, int *row, int *col)
+bool _get_colliding_block(BODY *body, int *row, int *col)
 {
     int r1 = (int)(body->y / TILE_SIZE);
     int c1 = (int)(body->x / TILE_SIZE);
@@ -378,31 +348,31 @@ bool _get_colliding_block(LEVEL *level, BODY *body, int *row, int *col)
     int c2 = (int)((body->x + body->w) / TILE_SIZE);
 
     /* Level bounds! */
-    if (r1 < 0 || c1 < 0 || r2 >= level->rows || c2 >= level->cols) {
+    if (r1 < 0 || c1 < 0 || r2 >= room.rows || c2 >= room.cols) {
         return false;
     }
     
-    /* Check the active block map */
+    /* Check the block map for any blocks */
 
-    if (level->active_block_map[r1][c1] != NO_TEXTURE) {
+    if (room.block_map[(r1 * room.cols) + c1] != NO_BLOCK) {
         *row = r1;
         *col = c1;
         return true;
     }
     
-    if (level->active_block_map[r1][c2] != NO_TEXTURE) {
+    if (room.block_map[(r1 * room.cols) + c2] != NO_BLOCK) {
         *row = r1;
         *col = c2;
         return true;
     }
     
-    if (level->active_block_map[r2][c1] != NO_TEXTURE) {
+    if (room.block_map[(r2 * room.cols) + c1] != NO_BLOCK) {
         *row = r2;
         *col = c1;
         return true;
     }
     
-    if (level->active_block_map[r2][c2] != NO_TEXTURE) {
+    if (room.block_map[(r2 * room.cols) + c2] != NO_BLOCK) {
         *row = r2;
         *col = c2;
         return true;
@@ -411,239 +381,14 @@ bool _get_colliding_block(LEVEL *level, BODY *body, int *row, int *col)
     return false;
 }
 
-bool _is_block_collision(LEVEL *level, BODY *body)
+bool _is_block_collision(BODY *body)
 {
     int r = 0;
     int c = 0;
-    return _get_colliding_block(level, body, &r, &c);
+    return _get_colliding_block(body, &r, &c);
 }
 
-LEVEL *_create_level()
-{
-    LEVEL *level = NULL;
-
-    level = alloc_memory("LEVEL", sizeof(LEVEL));
-
-    level->cols = MAX_ROOM_COLS;
-    level->rows = MAX_ROOM_ROWS;
-
-    level->startx = TILE_SIZE;
-    level->starty = TILE_SIZE;
-
-    init_hero(&hero);
-    hero.body.x = level->startx;
-    hero.body.y = level->starty;
-
-    /* Initialize all of the hero bullets */
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        hero_bullets[i].is_active = false;
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->collision_map[r][c] = 0;
-        }
-    }
-
-    for (int i = 0; i < MAX_TILES; i++) {
-        level->tiles[i] = NULL;
-    }
-    level->num_tiles = 0;
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->background_map[r][c] = 0;
-        }
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->foreground_map[r][c] = 0;
-        }
-    }
-
-    for (int i = 0; i < MAX_TEXTURES; i++) {
-        strncpy(level->textures[i], "\0", MAX_FILENAME_SIZE);
-    }
-    level->num_textures = 0;
-
-    for (int i = 0; i < MAX_TEXTURES; i++) {
-        level->blocks[i] = NULL;
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->block_map[r][c] = 0;
-        }
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->active_block_map[r][c] = 0;
-        }
-    }
-
-    return level;
-}
-
-LEVEL *create_level_01()
-{
-    int collision_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
-        {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
-        {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '.', '.', '.', '.', '.', '*', '*', '*', '*', '.', '.', '.', '.', '.', '*'},
-        {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '*', '*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '*', '*', '*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '*', '*', '*', '*', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '*'},
-        {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
-    };
-
-    int background_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-    };
-
-    int foreground_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
-        {01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01},
-        {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, -1, -1, -1, -1, -1, 01, 01, 01, 01, -1, -1, -1, -1, -1, 01},
-        {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, 01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, 01, 01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, 01, 01, 01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, 01, 01, 01, 01, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 01},
-        {01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01}
-    };
-
-    int block_map[MAX_ROOM_ROWS][MAX_ROOM_COLS] = {
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '?', '?', '?', '?', '?', '.'},
-        {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'}
-    };
-
-    LEVEL *level = _create_level();
-
-    level->tiles[0] = alloc_memory("SPRITE", sizeof(SPRITE));
-    init_sprite(level->tiles[0], false, 0);
-    add_frame(level->tiles[0], IMG("tile-gray-wall.png"));
-
-    level->tiles[1] = alloc_memory("SPRITE", sizeof(SPRITE));
-    init_sprite(level->tiles[1], false, 0);
-    add_frame(level->tiles[1], IMG("tile-bricks.png"));
-
-    level->num_tiles = 2;
-
-    strncpy(level->textures[0], "texture-red.png", MAX_FILENAME_SIZE);
-    strncpy(level->textures[1], "texture-orange.png", MAX_FILENAME_SIZE);
-    strncpy(level->textures[2], "texture-yellow.png", MAX_FILENAME_SIZE);
-    strncpy(level->textures[3], "texture-green.png", MAX_FILENAME_SIZE);
-    strncpy(level->textures[4], "texture-blue.png", MAX_FILENAME_SIZE);
-    strncpy(level->textures[5], "texture-purple.png", MAX_FILENAME_SIZE);
-    level->num_textures = 6;
-
-    /* Create block sprites to go along with all of the textures */
-    for (int i = 0; i < level->num_textures; i++) {
-        level->blocks[i] = alloc_memory("SPRITE", sizeof(SPRITE));
-        init_sprite(level->blocks[i], false, 0);
-        add_frame(level->blocks[i], _get_block_image(level, i));
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->collision_map[r][c] = collision_map[r][c];
-        }
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->background_map[r][c] = background_map[r][c];
-        }
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->foreground_map[r][c] = foreground_map[r][c];
-        }
-    }
-
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            level->block_map[r][c] = block_map[r][c];
-        }
-    }
-
-    /**
-     * Initialize the active block map.
-     * This is where blocks are destroyed from.
-     */
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-            if (level->block_map[r][c] == '?') {
-                level->active_block_map[r][c] = random_number(0, level->num_textures - 1);
-            } else {
-                level->active_block_map[r][c] = NO_BLOCK;
-            }
-            /**
-             * TODO
-             * Add case for explicitely declaring block numbers.
-             */
-        }
-    }
-
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        level->enemies[i] = NULL;
-    }
-    level->num_enemies = 0;
-
-    init_sprite(&bat_sprite, true, 20);
-    add_frame(&bat_sprite, IMG("enemy-bat-1.png"));
-    add_frame(&bat_sprite, IMG("enemy-bat-2.png"));
-    add_frame(&bat_sprite, IMG("enemy-bat-2.png"));
-    add_frame(&bat_sprite, IMG("enemy-bat-3.png"));
-    add_frame(&bat_sprite, IMG("enemy-bat-3.png"));
-    bat_sprite.x_offset = -10;
-    bat_sprite.y_offset = -10;
-
-    init_sprite(&spider_sprite, true, 8);
-    //add_frame(&spider_sprite, IMG("enemy-spider-1.png"));
-    add_frame(&spider_sprite, IMG("enemy-spider-2.png"));
-    add_frame(&spider_sprite, IMG("enemy-spider-3.png"));
-    add_frame(&spider_sprite, IMG("enemy-spider-4.png"));
-    add_frame(&spider_sprite, IMG("enemy-spider-5.png"));
-    spider_sprite.x_offset = -10;
-    spider_sprite.y_offset = -10;
-
-    return level;
-}
-
-void _update_hero(LEVEL *level)
+void _update_hero()
 {
     float old_x = hero.body.x;
     float old_y = hero.body.y;
@@ -652,7 +397,7 @@ void _update_hero(LEVEL *level)
     hero.body.y += _convert_pps_to_fps(hero.dy);
 
     /* Check for vertical collisions */
-    if (_is_board_collision(level, &hero.body) || _is_block_collision(level, &hero.body)) {
+    if (_is_board_collision(&hero.body) || _is_block_collision(&hero.body)) {
         hero.body.y = old_y;
     }
 
@@ -660,7 +405,7 @@ void _update_hero(LEVEL *level)
     hero.body.x += _convert_pps_to_fps(hero.dx);
 
     /* Check for horizontal collisions */
-    if (_is_board_collision(level, &hero.body) || _is_block_collision(level, &hero.body)) {
+    if (_is_board_collision(&hero.body) || _is_block_collision(&hero.body)) {
         hero.body.x = old_x;
     }
 
@@ -669,7 +414,7 @@ void _update_hero(LEVEL *level)
         /* ...then shoot a bullet! */
         if (hero.has_bullet) {
             assert(hero.texture != NO_TEXTURE);
-            _shoot_bullet(level, hero.texture, hero.bullet_x, hero.bullet_y);
+            _shoot_bullet(hero.texture, hero.bullet_x, hero.bullet_y);
             hero.has_bullet = false;
         }
         hero.shoot = false;
@@ -683,12 +428,13 @@ void _update_hero(LEVEL *level)
         }
     }
 
+    /* Give the hero a bullet to shoot */
     if (!hero.has_bullet && num_active_bullets == 0) {
         /* The hero doesn't have a bullet and there are no more on screen */
         /* The hero needs a new bullet to shoot! */
-        hero.texture = _random_front_texture(level);
+        hero.texture = _random_front_texture();
         if (hero.texture != NO_TEXTURE) {
-            init_hero_bullet_sprite(&hero.bullet, level->textures[hero.texture], hero.type);
+            init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
             hero.has_bullet = true;
         }
     }
@@ -734,7 +480,7 @@ void _init_poof_effect(EFFECT *effect, float x, float y)
     effect->is_active = true;
 }
 
-bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
+bool _move_bullet(BULLET *bullet, float new_x, float new_y)
 {
     float old_x = bullet->body.x;
     float old_y = bullet->body.y;
@@ -744,17 +490,17 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
 
     int r = 0;
     int c = 0;
-    bool block_collision = _get_colliding_block(level, &bullet->body, &r, &c);
+    bool block_collision = _get_colliding_block(&bullet->body, &r, &c);
 
     if (block_collision) {
 
-        if (bullet->texture == level->active_block_map[r][c]) {
+        if (bullet->texture == room.block_map[(r * room.cols) + c]) {
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
             play_sound(SND("star_hit.wav"));
             _init_poof_effect(&effects[_find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
-            level->active_block_map[r][c] = NO_BLOCK;
+            room.block_map[(r * room.cols) + c] = NO_BLOCK;
         } else {
             bullet->hits--;
             /* Bounce */
@@ -765,7 +511,7 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
         return false;
     }
     
-    if (!block_collision && _is_board_collision(level, &bullet->body)) {
+    if (!block_collision && _is_board_collision(&bullet->body)) {
 
         /* Put the bullet back to its original position */
         bullet->body.x = old_x;
@@ -787,7 +533,7 @@ bool _move_bullet(LEVEL *level, BULLET *bullet, float new_x, float new_y)
     return true;
 }
 
-void _update_hero_bullets(LEVEL *level)
+void _update_hero_bullets()
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
 
@@ -800,7 +546,7 @@ void _update_hero_bullets(LEVEL *level)
         BULLET *bullet = &hero_bullets[i];
 
         /* Move */
-        _move_bullet(level, bullet, bullet->body.x + _convert_pps_to_fps(bullet->dx), bullet->body.y);
+        _move_bullet(bullet, bullet->body.x + _convert_pps_to_fps(bullet->dx), bullet->body.y);
 
         /* Animate */
         animate(&bullet->sprite);
@@ -816,13 +562,11 @@ bool update_gameplay(void *data)
 {
     assert(is_gameplay_init);
 
-    LEVEL *level = (LEVEL *)data;
-
     /* Hero */
-    _update_hero(level);
+    _update_hero();
 
     /* Bullets */
-    _update_hero_bullets(level);
+    _update_hero_bullets();
 
     animate(&bat_sprite);
     animate(&spider_sprite);
@@ -841,37 +585,36 @@ void draw_gameplay(void *data)
 {
     assert(is_gameplay_init);
 
-    LEVEL *level = (LEVEL *)data;
+    /* Draw the room (backgrounds, blocks...) */
+    for (int r = 0; r < room.rows; r++) {
+        for (int c = 0; c < room.cols; c++) {
 
-    /* Draw the game board */
-    for (int r = 0; r < level->rows; r++) {
-        for (int c = 0; c < level->cols; c++) {
-
-            int i = 0;
+            int n = 0;
 
             /* Background */
-            i = level->background_map[r][c];
-            if (i >= 0 && i < level->num_tiles) {
-                draw_sprite(level->tiles[i], c * TILE_SIZE, r * TILE_SIZE);
+            n = room.background_map[(r * room.cols) + c];
+            if (n >= 0 && n < room.num_tiles) {
+                draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
             }
 
             /* Foreground */
-            i = level->foreground_map[r][c];
-            if (i >= 0 && i < level->num_tiles) {
-                draw_sprite(level->tiles[i], c * TILE_SIZE, r * TILE_SIZE);
+            n = room.foreground_map[(r * room.cols) + c];
+            if (n >= 0 && n < room.num_tiles) {
+                draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
             }
 
             /* Blocks */
-            i = level->active_block_map[r][c];
-            if (i >= 0 && i < level->num_textures) {
-                draw_sprite(level->blocks[i], c * TILE_SIZE, r * TILE_SIZE);
+            n = room.block_map[(r * room.cols) + c];
+            if (n >= 0 && n < room.num_textures) {
+                draw_sprite(&room.blocks[n], c * TILE_SIZE, r * TILE_SIZE);
             }
         }
     }
 
-    draw_sprite(&bat_sprite, (TILE_SIZE * 8) - 5, (TILE_SIZE * 2) - 5);
-    draw_sprite(&spider_sprite, (TILE_SIZE * 12) - 5, (TILE_SIZE * 2) - 5);
+    //draw_sprite(&bat_sprite, (TILE_SIZE * 8) - 5, (TILE_SIZE * 2) - 5);
+    //draw_sprite(&spider_sprite, (TILE_SIZE * 12) - 5, (TILE_SIZE * 2) - 5);
     
+    /* Draw hero bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
         BULLET *bullet = &hero_bullets[i];
         if (bullet->is_active) {
@@ -895,13 +638,17 @@ void draw_gameplay(void *data)
     }
 }
 
-void init_gameplay_room(char *filename)
+bool init_gameplay_room(char *filename)
 {
     assert(is_gameplay_init);
 
-    load_room_from_filename(&room, filename);
+    bool is_room_init = load_room_from_filename(&room, filename);
 
     /* After a room is loaded, setup other things like the hero's position */
-    hero.body.x = room.startx;
-    hero.body.y = room.starty;
+    if (is_room_init) {
+        hero.body.x = room.startx;
+        hero.body.y = room.starty;
+    }
+
+    return is_room_init;
 }

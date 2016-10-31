@@ -3,4 +3,7 @@
 levelsdatadir = $(pkgdatadir)/levels
 
 dist_levelsdata_DATA = \
-  level01.dat
+  room-01.dat \
+  room-02.dat \
+  textures-colored.dat \
+  tiles-castle.dat

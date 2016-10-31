@@ -4,8 +4,12 @@
 #include <stdio.h>
 #include "sprite.h"
 
+#define NO_TILE -1
 #define NO_TEXTURE -1
 #define NO_BLOCK -1
+#define RANDOM_BLOCK -2
+#define COLLISION 0
+#define NO_COLLISION -1
 
 #define MAX_ROOM_COLS 16
 #define MAX_ROOM_ROWS 12
@@ -201,13 +205,17 @@ void init_hero(HERO *hero);
 void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type);
 
 /* Toggle the appearance of the hero */
-void toggle_hero(HERO *hero, LEVEL *level);
+void toggle_hero(HERO *hero, ROOM *room);
 
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
 
+/* Add a directory that contains data files */
+void add_level_path(const char *path);
+
 /* Load a room from the data in the given file */
-void load_room_from_filename(ROOM *room, char *filename);
+/* Returns true if the room was successfully loaded */
+bool load_room_from_filename(ROOM *room, char *filename);
 
 void init_effect(EFFECT *effect);
 

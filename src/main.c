@@ -12,8 +12,6 @@
 
 int main(int argc, char **argv)
 {
-    LEVEL *level = NULL;
-
     al_set_app_name("colorwandcastle");
     al_set_org_name("drcouzelis");
 
@@ -50,6 +48,9 @@ int main(int argc, char **argv)
     /* So we know where to look for data files */
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
+    add_level_path( PKGDATADIR "/levels/");
+    add_level_path("./");
+    add_level_path("");
   
     /* Set application properties */
     al_set_window_title(get_display(), "Colorwand Castle");
@@ -62,18 +63,25 @@ int main(int argc, char **argv)
     /* Turn off audio, I don't want to hear it during development */
     toggle_audio();
 
-    /* TODO */
-    /* START THE GAME */
-    /* New method */
+    /* INIT THE GAME */
     init_gameplay();
-    init_gameplay_room( PKGDATADIR "/levels/level01.dat"); // This can eventually be chosen from a menu
-    //run(control_gameplay, update_gameplay, draw_gameplay, NULL);
- 
-    /* START THE GAME */
-    level = create_level_01();
-    run(control_gameplay, update_gameplay, draw_gameplay, level);
-    destroy_level(level);
 
+    /* LOAD THE FIRST LEVEL */
+    bool is_room_init = false;
+
+    /* Try the filename given on the command line... */
+    if (argc > 1) {
+        is_room_init = init_gameplay_room(argv[1]);
+    }
+
+    /* ...otherwise, just load the default level! */
+    if (!is_room_init) {
+        init_gameplay_room("room-01.dat"); // This can eventually be chosen from a menu
+    }
+
+    /* RUN THE GAME */
+    run(control_gameplay, update_gameplay, draw_gameplay, NULL);
+ 
     /* DONE, clean up */
     free_resources();
     free_display();

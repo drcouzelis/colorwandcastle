@@ -3,6 +3,20 @@
 #include "gamedata.h"
 #include "main.h"
 #include "mask.h"
+#include "utilities.h"
+
+#define MAX_LEVEL_PATHS 4
+static char level_paths[MAX_LEVEL_PATHS][MAX_FILENAME_SIZE];
+static int num_level_paths = 0;
+
+//static bool is_gamedata_init = false;
+//
+//void _init_gamedata()
+//{
+//    if (is_gamedata_init) {
+//        return;
+//    }
+//}
 
 void _init_hero_sprite(HERO *hero)
 {
@@ -40,7 +54,7 @@ void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
     add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 1));
 }
 
-void toggle_hero(HERO *hero, LEVEL *level)
+void toggle_hero(HERO *hero, ROOM *room)
 {
     /* Toggle the hero type */
     if (hero->type == HERO_TYPE_MAKAYLA) {
@@ -52,7 +66,7 @@ void toggle_hero(HERO *hero, LEVEL *level)
     _init_hero_sprite(hero);
 
     if (hero->has_bullet) {
-        init_hero_bullet_sprite(&hero->bullet, level->textures[hero->texture], hero->type);
+        init_hero_bullet_sprite(&hero->bullet, room->textures[hero->texture], hero->type);
     }
 }
 
@@ -116,10 +130,10 @@ void init_room(ROOM *room)
     /* Collision map */
     /* Block map */
     for (int i = 0; i < MAX_ROOM_SIZE; i++) {
-        room->background_map[i] = 0;
-        room->foreground_map[i] = 0;
-        room->collision_map[i] = 0;
-        room->block_map[i] = 0;
+        room->background_map[i] = NO_TILE;
+        room->foreground_map[i] = NO_TILE;
+        room->collision_map[i] = NO_COLLISION;
+        room->block_map[i] = NO_BLOCK;
     }
 
     /* Texture list */
@@ -156,7 +170,6 @@ void _load_sprite_from_file(SPRITE *sprite, FILE *file)
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
             add_frame(sprite, IMG(string));
-            printf("IMAGE %s\n", string);
             continue;
         }
 
@@ -170,20 +183,20 @@ void _load_map_from_file(int *map, int cols, int rows, FILE *file)
 {
     assert(file != NULL);
 
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < cols; c++) {
-            fscanf(file, "%d", &map[(r * cols) + c]);
-        }
-    }
-}
+    int num = 0;
 
-void _print_map(int *map, int cols, int rows)
-{
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-            printf("%02d ", map[(r * cols) + c]);
+            if (fscanf(file, "%d", &num) == 1) {
+                /* WARNING: TRICKY! */
+                /* The data file counts numbers starting at 1 */
+                /* The game engile counts numbers starting at 0 */
+                /* SUBTRACT 1! */
+                map[(r * cols) + c] = num - 1;
+            } else {
+                fprintf(stderr, "Failed to find number for map.\n");
+            }
         }
-        printf("\n");
     }
 }
 
@@ -191,15 +204,11 @@ void _trim(char *string, int len)
 {
     int front, back;
 
-    printf("len %d\n", len);
-
     for (front = 0; front < len; front++) {
         if (!isspace(string[front])) {
             break;
         }
     }
-
-    printf("front %d\n", front);
 
     for (back = len - 1; len >= 0; back--) {
         if (!isspace(string[back])) {
@@ -207,32 +216,111 @@ void _trim(char *string, int len)
         }
     }
 
-    printf("back %d\n", back);
-
     int i;
 
     for (i = 0; i < back - front + 1; i++) {
         string[i] = string[i + front];
     }
 
-    printf("i %d\n", i);
-
     string[i] = '\0';
 }
 
-void load_room_from_filename(ROOM *room, char *filename)
+void _init_room_blocks(ROOM *room)
 {
-    printf("Pretending to load room from file...\n");
-    init_room(room);
+    /* Create sprites to represent each block, based on the list of textures */
+    for (int i = 0; i < room->num_textures; i++) {
+        add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
+    }
 
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
+    /* Init any random blocks (any number < 0) */
+    for (int r = 0; r < room->rows; r++) {
+        for (int c = 0; c < room->cols; c++) {
+            if (room->block_map[(r * room->cols) + c] == RANDOM_BLOCK) {
+                /* Set the block to a random texture */
+                room->block_map[(r * room->cols) + c] = random_number(0, room->num_textures - 1);
+            }
+        }
+    }
+}
+
+void _print_map(int *map, int cols, int rows, bool is_data_file_form)
+{
+    /**
+     * The numbers in the maps are stored ONE LESS in
+     * the game engine compared to the data files.
+     */
+    int offset = is_data_file_form ? 1 : 0;
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            printf("%02d ", map[(r * cols) + c] + offset);
+        }
+        printf("\n");
+    }
+}
+
+void _print_room(ROOM *room, bool is_data_file_form)
+{
+    if (room == NULL) {
         return;
     }
 
+    printf("TITLE \"%s\"\n", room->title);
+    printf("START %d %d\n", room->startx, room->starty);
+    printf("SIZE %d %d\n", room->cols, room->rows);
+    printf("TILES %d\n", room->num_tiles);
+    printf("TEXTURES %d\n", room->num_textures);
+
+    for (int i = 0; i < room->num_textures; i++) {
+        printf("TEXTURE %s\n", room->textures[i]);
+    }
+
+    if (is_data_file_form) {
+        printf("Using DATA FILE FORM, all map entries are ONE MORE than what is stored in the game engine.\n");
+    } else {
+        printf("Using GAME ENGINE FORM, all map entries are ONE LESS than what is stored in the data files.\n");
+    }
+
+    printf("BACKGROUND MAP\n");
+    _print_map(room->background_map, room->cols, room->rows, is_data_file_form);
+
+    printf("FOREGROUND MAP\n");
+    _print_map(room->foreground_map, room->cols, room->rows, is_data_file_form);
+
+    printf("COLLISION MAP\n");
+    _print_map(room->collision_map, room->cols, room->rows, is_data_file_form);
+
+    printf("BLOCK MAP\n");
+    _print_map(room->block_map, room->cols, room->rows, is_data_file_form);
+}
+
+bool load_room_from_filename(ROOM *room, char *filename)
+{
+    char fullpath[MAX_FILENAME_SIZE];
+    FILE *file = NULL;
+
+    /* Find the file to open from the list of possible paths... */
+    for (int i = 0; i < num_level_paths; i++) {
+        fullpath[0] = '\0';
+        strncat(fullpath, level_paths[i], MAX_FILENAME_SIZE);
+        strncat(fullpath, filename, MAX_FILENAME_SIZE);
+        file = fopen(fullpath, "r");
+        if (file != NULL) {
+            break;
+        }
+    }
+
+    /* Don't do anything if we can't open the file */
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
+        return false;
+    }
+
+    printf("Loading \"%s\"\n", fullpath);
+
     char string[MAX_STRING_SIZE];
 
+    /* Start reading through the file! */
     while (fscanf(file, "%s", string) != EOF) {
 
         /* Ignore comments (lines that begin with a hash) */
@@ -246,7 +334,6 @@ void load_room_from_filename(ROOM *room, char *filename)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to import.\n");
             }
-            printf("IMPORT %s\n", string);
             load_room_from_filename(room, string);
             continue;
         }
@@ -256,7 +343,6 @@ void load_room_from_filename(ROOM *room, char *filename)
             fgets(room->title, MAX_STRING_SIZE, file);
             /* Get rid of the spaces at the beginning */
             _trim(room->title, strnlen(room->title, MAX_STRING_SIZE));
-            printf("TITLE \"%s\"\n", room->title);
             continue;
         }
 
@@ -265,7 +351,6 @@ void load_room_from_filename(ROOM *room, char *filename)
             if (fscanf(file, "%d %d", &room->startx, &room->starty) != 2) {
                 fprintf(stderr, "Failed to load startx and starty.\n");
             }
-            printf("START %d %d\n", room->startx, room->starty);
             continue;
         }
 
@@ -274,14 +359,12 @@ void load_room_from_filename(ROOM *room, char *filename)
             if (fscanf(file, "%d %d", &room->cols, &room->rows) != 2) {
                 fprintf(stderr, "Failed to load cols and rows.\n");
             }
-            printf("SIZE %d %d\n", room->cols, room->rows);
             continue;
         }
 
         /* A tile (sprite) */
         if (strncmp(string, "TILE", MAX_STRING_SIZE) == 0) {
             if (room->num_tiles < MAX_TILES) {
-                printf("TILE %d\n", room->num_tiles);
                 _load_sprite_from_file(&room->tiles[room->num_tiles], file);
                 room->num_tiles++;
             } else {
@@ -292,8 +375,7 @@ void load_room_from_filename(ROOM *room, char *filename)
 
         /* A texture name (used to color blocks and bullets) */
         if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
-            if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", string) == 1) {
-                printf("TEXTURE %d %s\n", room->num_textures, string);
+            if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", room->textures[room->num_textures]) == 1) {
                 room->num_textures++;
             } else {
                 fprintf(stderr, "Failed to load texture, max number reached\n");
@@ -304,41 +386,58 @@ void load_room_from_filename(ROOM *room, char *filename)
         /* Background map */
         if (strncmp(string, "BACKGROUND", MAX_STRING_SIZE) == 0) {
             _load_map_from_file(room->background_map, room->cols, room->rows, file);
-            printf("%s\n", string);
-            _print_map(room->background_map, room->cols, room->rows);
             continue;
         }
 
         /* Foreground map */
         if (strncmp(string, "FOREGROUND", MAX_STRING_SIZE) == 0) {
             _load_map_from_file(room->foreground_map, room->cols, room->rows, file);
-            printf("%s\n", string);
-            _print_map(room->foreground_map, room->cols, room->rows);
             continue;
         }
 
         /* Collision map */
         if (strncmp(string, "COLLISION", MAX_STRING_SIZE) == 0) {
             _load_map_from_file(room->collision_map, room->cols, room->rows, file);
-            printf("%s\n", string);
-            _print_map(room->collision_map, room->cols, room->rows);
             continue;
         }
 
         /* Block map */
         if (strncmp(string, "BLOCKS", MAX_STRING_SIZE) == 0) {
             _load_map_from_file(room->block_map, room->cols, room->rows, file);
-            printf("%s\n", string);
-            _print_map(room->block_map, room->cols, room->rows);
             continue;
         }
 
-        /* WHAT THE HECK SHOULD I DO WITH THIS COMMAND??? */
-        /* Just ignore it */
+        /* WHAT THE HECK SHOULD I DO WITH THIS UNRECOGNIZED WORD IN THE DATA FILE??? */
+        /* Just ignore it ;) */
         fprintf(stderr, "Failed to recognize %s\n", string);
     }
 
     fclose(file);
+
+    /**
+     * Blocks needs to be initialized into sprites and random blocks
+     * need to be selected from the list of textures.
+     */
+    _init_room_blocks(room);
+
+    //_print_room(room, false);
+
+    return true;
+}
+
+void add_level_path(const char *path)
+{
+    if (num_level_paths >= MAX_LEVEL_PATHS) {
+        fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_LEVEL_PATHS.\n");
+        return;
+    }
+
+    /**
+     * Add the new path to the list of level paths.
+     */
+    strncpy(level_paths[num_level_paths], path, MAX_FILENAME_SIZE - 1);
+
+    num_level_paths++;
 }
 
 void init_effect(EFFECT *effect)
