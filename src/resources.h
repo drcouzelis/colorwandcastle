@@ -44,4 +44,14 @@ SOUND *get_sound(const char *name);
  */
 void insert_image_resource(const char *name, IMAGE *image);
 
+/**
+ * Open a data file, taking into account resource paths.
+ * Returns a pointer to the file on success,
+ * or NULL on failure.
+ *
+ * MAKE SURE TO CLOSE IT WHEN YOU'RE DONE!
+ */
+FILE *open_data_file(const char *name);
+void close_data_file(FILE *file);
+
 #endif

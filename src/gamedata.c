@@ -5,10 +5,6 @@
 #include "mask.h"
 #include "utilities.h"
 
-#define MAX_LEVEL_PATHS 4
-static char level_paths[MAX_LEVEL_PATHS][MAX_FILENAME_SIZE];
-static int num_level_paths = 0;
-
 //static bool is_gamedata_init = false;
 //
 //void _init_gamedata()
@@ -296,27 +292,13 @@ void _print_room(ROOM *room, bool is_data_file_form)
 
 bool load_room_from_filename(ROOM *room, char *filename)
 {
-    char fullpath[MAX_FILENAME_SIZE];
-    FILE *file = NULL;
-
-    /* Find the file to open from the list of possible paths... */
-    for (int i = 0; i < num_level_paths; i++) {
-        fullpath[0] = '\0';
-        strncat(fullpath, level_paths[i], MAX_FILENAME_SIZE);
-        strncat(fullpath, filename, MAX_FILENAME_SIZE);
-        file = fopen(fullpath, "r");
-        if (file != NULL) {
-            break;
-        }
-    }
+    FILE *file = open_data_file(filename);
 
     /* Don't do anything if we can't open the file */
     if (file == NULL) {
         fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
         return false;
     }
-
-    printf("Loading \"%s\"\n", fullpath);
 
     char string[MAX_STRING_SIZE];
 
@@ -412,7 +394,7 @@ bool load_room_from_filename(ROOM *room, char *filename)
         fprintf(stderr, "Failed to recognize %s\n", string);
     }
 
-    fclose(file);
+    close_data_file(file);
 
     /**
      * Blocks needs to be initialized into sprites and random blocks
@@ -423,21 +405,6 @@ bool load_room_from_filename(ROOM *room, char *filename)
     //_print_room(room, false);
 
     return true;
-}
-
-void add_level_path(const char *path)
-{
-    if (num_level_paths >= MAX_LEVEL_PATHS) {
-        fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_LEVEL_PATHS.\n");
-        return;
-    }
-
-    /**
-     * Add the new path to the list of level paths.
-     */
-    strncpy(level_paths[num_level_paths], path, MAX_FILENAME_SIZE - 1);
-
-    num_level_paths++;
 }
 
 void init_effect(EFFECT *effect)

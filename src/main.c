@@ -48,9 +48,9 @@ int main(int argc, char **argv)
     /* So we know where to look for data files */
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
-    add_level_path( PKGDATADIR "/levels/");
-    add_level_path("./");
-    add_level_path("");
+    add_resource_path( PKGDATADIR "/levels/");
+    add_resource_path("./");
+    add_resource_path("");
   
     /* Set application properties */
     al_set_window_title(get_display(), "Colorwand Castle");

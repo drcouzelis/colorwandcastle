@@ -210,9 +210,6 @@ void toggle_hero(HERO *hero, ROOM *room);
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
 
-/* Add a directory that contains data files */
-void add_level_path(const char *path);
-
 /* Load a room from the data in the given file */
 /* Returns true if the room was successfully loaded */
 bool load_room_from_filename(ROOM *room, char *filename);
