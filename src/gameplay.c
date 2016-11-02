@@ -648,6 +648,7 @@ bool init_gameplay_room(char *filename)
     if (is_room_init) {
         hero.body.x = room.startx;
         hero.body.y = room.starty;
+        hero.direction = room.direction;
     }
 
     return is_room_init;

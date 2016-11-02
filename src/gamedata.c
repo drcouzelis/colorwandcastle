@@ -20,6 +20,10 @@ void _init_hero_sprite(HERO *hero)
     hero->sprite.x_offset = -10;
     hero->sprite.y_offset = -10;
 
+    if (hero->direction == L) {
+        hero->sprite.mirror = true;
+    }
+
     if (hero->type == HERO_TYPE_MAKAYLA) {
         add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
         add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
@@ -53,11 +57,7 @@ void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
 void toggle_hero(HERO *hero, ROOM *room)
 {
     /* Toggle the hero type */
-    if (hero->type == HERO_TYPE_MAKAYLA) {
-        hero->type = HERO_TYPE_RAWSON;
-    } else if (hero->type == HERO_TYPE_RAWSON) {
-        hero->type = HERO_TYPE_MAKAYLA;
-    }
+    hero->type = hero->type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
 
     _init_hero_sprite(hero);
 
@@ -88,6 +88,7 @@ void init_hero(HERO *hero)
     hero->dy = 0;
 
     hero->shoot = false;
+    hero->direction = R;
 
     init_sprite(&hero->bullet, true, 4);
     hero->bullet_x = 0;
@@ -114,6 +115,8 @@ void init_room(ROOM *room)
     /* Starting position */
     room->startx = TILE_SIZE;
     room->startx = TILE_SIZE;
+
+    room->direction = R;
     
     /* Tile list */
     for (int i = 0; i < MAX_TILES; i++) {
@@ -332,6 +335,27 @@ bool load_room_from_filename(ROOM *room, char *filename)
         if (strncmp(string, "START", MAX_STRING_SIZE) == 0) {
             if (fscanf(file, "%d %d", &room->startx, &room->starty) != 2) {
                 fprintf(stderr, "Failed to load startx and starty.\n");
+            }
+            continue;
+        }
+
+        /* Room direction */
+        if (strncmp(string, "DIRECTION", MAX_STRING_SIZE) == 0) {
+            char c;
+            if (fscanf(file, "%c", &c) != 1) {
+                fprintf(stderr, "Failed to load direction.\n");
+            }
+            if (c == 'U') {
+                room->direction = U;
+            } else if (c == 'D') {
+                room->direction = D;
+            } else if (c == 'L') {
+                room->direction = L;
+            } else if (c == 'R') {
+                room->direction = R;
+            } else {
+                fprintf(stderr, "Failed to read direction, must be U, D, L, or R.\n");
+                room->direction = R;
             }
             continue;
         }

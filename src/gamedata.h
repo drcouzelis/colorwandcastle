@@ -34,6 +34,14 @@ typedef enum
     ENEMY_TYPE_SPIDER
 } ENEMY_TYPE;
 
+typedef enum
+{
+    U = 0,
+    D,
+    L,
+    R
+} DIRECTION;
+
 typedef struct
 {
     float x;
@@ -89,6 +97,9 @@ typedef struct HERO
     /* If this is true, then shoot a bullet! */
     bool shoot;
 
+    /* The direction the bullet is "facing" */
+    DIRECTION direction;
+
     /* The picture of the bullet that follows the hero around */
     bool has_bullet;
     SPRITE bullet;
@@ -128,6 +139,9 @@ typedef struct
     int startx;
     int starty;
     
+    /* The general orientation of the room */
+    DIRECTION direction;
+
     /* List of tiles used in the room */
     /* Tiles define the play area */
     SPRITE tiles[MAX_TILES];
@@ -160,42 +174,6 @@ typedef struct
     /* Enemies */
     ENEMY enemies[MAX_ENEMIES];
 } ROOM;
-
-typedef struct
-{
-    /* Size of the level */
-    int cols;
-    int rows;
-
-    /* Starting position for the hero */
-    int startx;
-    int starty;
-    
-    int collision_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
-
-    /* List of tiles used in the level */
-    SPRITE *tiles[MAX_TILES];
-    int num_tiles;
-    int background_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
-    int foreground_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
-
-    /* List of textures used to make blocks and bullets in the level */
-    char textures[MAX_TEXTURES][MAX_FILENAME_SIZE];
-    int num_textures;
-
-    /* Blocks */
-    SPRITE *blocks[MAX_TEXTURES];
-
-    /* The starting position of blocks */
-    int block_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
-
-    /* For restarting the level */
-    int active_block_map[MAX_ROOM_ROWS][MAX_ROOM_COLS];
-
-    /* Enemies */
-    ENEMY *enemies[MAX_ENEMIES];
-    int num_enemies;
-} LEVEL;
 
 /* Initialize a hero to its default state, ready to be drawn */
 void init_hero(HERO *hero);
