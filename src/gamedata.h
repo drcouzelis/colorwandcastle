@@ -173,6 +173,12 @@ typedef struct
     /* TODO */
     /* Enemies */
     ENEMY enemies[MAX_ENEMIES];
+
+    bool cleared;
+
+    SPRITE door_sprite;
+    int door_x;
+    int door_y;
 } ROOM;
 
 /* Initialize a hero to its default state, ready to be drawn */
@@ -190,7 +196,7 @@ void init_room(ROOM *room);
 
 /* Load a room from the data in the given file */
 /* Returns true if the room was successfully loaded */
-bool load_room_from_filename(ROOM *room, char *filename);
+bool load_room_from_filename(ROOM *room, const char *filename);
 
 void init_effect(EFFECT *effect);
 

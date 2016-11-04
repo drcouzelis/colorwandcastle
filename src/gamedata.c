@@ -148,6 +148,13 @@ void init_room(ROOM *room)
     for (int i = 0; i < MAX_ENEMIES; i++) {
         room->enemies[i].is_active = false;
     }
+
+    room->cleared = false;
+
+    init_sprite(&room->door_sprite, false, 0);
+    add_frame(&room->door_sprite, IMG("tile-door.png"));
+    room->door_x = 0;
+    room->door_y = 0;
 }
 
 void _load_sprite_from_file(SPRITE *sprite, FILE *file)
@@ -293,7 +300,7 @@ void _print_room(ROOM *room, bool is_data_file_form)
     _print_map(room->block_map, room->cols, room->rows, is_data_file_form);
 }
 
-bool load_room_from_filename(ROOM *room, char *filename)
+bool load_room_from_filename(ROOM *room, const char *filename)
 {
     FILE *file = open_data_file(filename);
 

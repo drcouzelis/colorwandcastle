@@ -13,6 +13,12 @@ static bool end_gameplay = false;
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;
 
+/* Level control */
+#define MAX_ROOMS 64
+static char room_filenames[MAX_ROOMS][MAX_FILENAME_SIZE];
+static int num_rooms = 0;
+static int curr_room = 0;
+
 /* The primary gameplay characters! */
 static HERO hero;
 static BULLET hero_bullets[MAX_BULLETS];
@@ -262,6 +268,13 @@ void _control_hero(ALLEGRO_EVENT *event)
     }
 }
 
+void _init_effects()
+{
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        init_effect(&effects[i]);
+    }
+}
+
 void init_gameplay()
 {
     /* Hero */
@@ -271,9 +284,13 @@ void init_gameplay()
     init_room(&room);
 
     /* Effects */
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        init_effect(&effects[i]);
+    _init_effects();
+    /* Filename list */
+    for (int i = 0; i < MAX_ROOMS; i++) {
+        room_filenames[i][0] = '\0';
     }
+    num_rooms = 0;
+    curr_room = 0;
 
     is_gameplay_init = true;
 }
@@ -480,6 +497,21 @@ void _init_poof_effect(EFFECT *effect, float x, float y)
     effect->is_active = true;
 }
 
+int _num_blocks()
+{
+    int count = 0;
+
+    for (int r = 0; r < room.rows; r++) {
+        for (int c = 0; c < room.cols; c++) {
+            if (room.block_map[(r * room.cols) + c] != NO_BLOCK) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
 bool _move_bullet(BULLET *bullet, float new_x, float new_y)
 {
     float old_x = bullet->body.x;
@@ -492,16 +524,27 @@ bool _move_bullet(BULLET *bullet, float new_x, float new_y)
     int c = 0;
     bool block_collision = _get_colliding_block(&bullet->body, &r, &c);
 
+    /* If the bullet hits a block... */
     if (block_collision) {
 
         if (bullet->texture == room.block_map[(r * room.cols) + c]) {
+
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
             play_sound(SND("star_hit.wav"));
             _init_poof_effect(&effects[_find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
+
+            if (_num_blocks() == 0) {
+                /* Level clear! Add the exit door */
+                room.cleared = true;
+                room.door_x = c * TILE_SIZE;
+                room.door_y = r * TILE_SIZE;
+            }
+
         } else {
+
             bullet->hits--;
             /* Bounce */
             bullet->dx *= -1;
@@ -511,6 +554,7 @@ bool _move_bullet(BULLET *bullet, float new_x, float new_y)
         return false;
     }
     
+    /* If the bullet hits a collision tile... */
     if (!block_collision && _is_board_collision(&bullet->body)) {
 
         /* Put the bullet back to its original position */
@@ -578,6 +622,17 @@ bool update_gameplay(void *data)
         }
     }
 
+    /* Check for level completion */
+    if (room.cleared) {
+        if (is_collision(hero.body.x, hero.body.y, hero.body.w, hero.body.h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
+            if (curr_room < num_rooms - 1) {
+                init_gameplay_room_from_num(curr_room + 1);
+            } else {
+                end_gameplay = true;
+            }
+        }
+    }
+
     return !end_gameplay;
 }
 
@@ -611,6 +666,10 @@ void draw_gameplay(void *data)
         }
     }
 
+    if (room.cleared) {
+        draw_sprite(&room.door_sprite, room.door_x, room.door_y);
+    }
+
     //draw_sprite(&bat_sprite, (TILE_SIZE * 8) - 5, (TILE_SIZE * 2) - 5);
     //draw_sprite(&spider_sprite, (TILE_SIZE * 12) - 5, (TILE_SIZE * 2) - 5);
     
@@ -638,9 +697,13 @@ void draw_gameplay(void *data)
     }
 }
 
-bool init_gameplay_room(char *filename)
+bool init_gameplay_room_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
+
+    /* Clear everything in the room */
+    init_room(&room);
+    _init_effects();
 
     bool is_room_init = load_room_from_filename(&room, filename);
 
@@ -649,6 +712,43 @@ bool init_gameplay_room(char *filename)
         hero.body.x = room.startx;
         hero.body.y = room.starty;
         hero.direction = room.direction;
+    }
+
+    return is_room_init;
+}
+
+bool init_gameplay_room_list_from_filename(const char *filename)
+{
+    FILE *file = open_data_file(filename);
+
+    /* Don't do anything if we can't open the file */
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
+        return false;
+    }
+
+    /* Reset the number of rooms */
+    num_rooms = 0;
+
+    /* Save the contents of the file to the list of room names */
+    while (fscanf(file, "%s", room_filenames[num_rooms]) != EOF) {
+        num_rooms++;
+    }
+
+    close_data_file(file);
+
+    /* Go ahead and load the first level because WHY NOT */
+    return init_gameplay_room_from_num(0);
+}
+
+bool init_gameplay_room_from_num(int room_num)
+{
+    assert(room_num < num_rooms);
+
+    bool is_room_init = init_gameplay_room_from_filename(room_filenames[room_num]);
+
+    if (is_room_init) {
+        curr_room = room_num;
     }
 
     return is_room_init;

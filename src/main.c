@@ -71,12 +71,12 @@ int main(int argc, char **argv)
 
     /* Try the filename given on the command line... */
     if (argc > 1) {
-        is_room_init = init_gameplay_room(argv[1]);
+        is_room_init = init_gameplay_room_from_filename(argv[1]);
     }
 
-    /* ...otherwise, just load the default level! */
+    /* ...otherwise, just load the default level set! */
     if (!is_room_init) {
-        init_gameplay_room("room-01.dat"); // This can eventually be chosen from a menu
+        init_gameplay_room_list_from_filename("story-list.dat"); // This can eventually be chosen from a menu
     }
 
     /* RUN THE GAME */
