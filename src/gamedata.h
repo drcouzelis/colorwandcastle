@@ -108,8 +108,6 @@ typedef struct HERO
     float bullet_x;
     float bullet_y;
     int texture;
-
-    void (*update)();
 } HERO;
 
 typedef struct ENEMY

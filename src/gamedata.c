@@ -103,8 +103,6 @@ void init_hero(HERO *hero)
     hero->bullet_y = 0;
     hero->texture = NO_TEXTURE;
     hero->has_bullet = false;
-
-    hero->update = NULL;
 }
 
 void init_room(ROOM *room)

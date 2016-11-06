@@ -13,6 +13,9 @@ static bool end_gameplay = false;
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;
 
+/* Ready to play when you start the game */
+static GAMEPLAY_STATE curr_gameplay_state = GAMEPLAY_STATE_PLAY;
+
 /* Level control */
 #define MAX_ROOMS 64
 static char room_filenames[MAX_ROOMS][MAX_FILENAME_SIZE];
@@ -24,11 +27,6 @@ static HERO hero;
 static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
-
-/* TODO */
-/* Create REAL enemies! */
-static SPRITE bat_sprite;
-static SPRITE spider_sprite;
 
 static int _get_hero_speed()
 {
@@ -55,55 +53,46 @@ void _update_effect_until_done_animating(EFFECT *effect, void *data)
     }
 }
 
-ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
-{
-    ENEMY *enemy = alloc_memory("ENEMY", sizeof(ENEMY));
-
-    enemy->type = type;
-
-    if (type == ENEMY_TYPE_BAT) {
-        init_sprite(&enemy->sprite, true, 20);
-        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-        enemy->sprite.x_offset = -10;
-        enemy->sprite.y_offset = -10;
-    } else if (type == ENEMY_TYPE_SPIDER) {
-        init_sprite(&enemy->sprite, true, 8);
-        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
-        enemy->sprite.x_offset = -10;
-        enemy->sprite.y_offset = -10;
-    }
-
-    /* Set the starting position */
-    enemy->body.x = x;
-    enemy->body.y = y;
-
-    enemy->body.w = 10;
-    enemy->body.h = 10;
-
-    enemy->dx = 0;
-    enemy->dy = 0;
-
-    enemy->update = NULL;
-
-    return enemy;
-}
-
-ENEMY *_destroy_enemy(ENEMY *enemy)
-{
-    if (enemy == NULL) {
-        return NULL;
-    }
-
-    return free_memory("ENEMY", enemy);
-}
+//ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
+//{
+//    ENEMY *enemy = alloc_memory("ENEMY", sizeof(ENEMY));
+//
+//    enemy->type = type;
+//
+//    if (type == ENEMY_TYPE_BAT) {
+//        init_sprite(&enemy->sprite, true, 20);
+//        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+//        enemy->sprite.x_offset = -10;
+//        enemy->sprite.y_offset = -10;
+//    } else if (type == ENEMY_TYPE_SPIDER) {
+//        init_sprite(&enemy->sprite, true, 8);
+//        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+//        enemy->sprite.x_offset = -10;
+//        enemy->sprite.y_offset = -10;
+//    }
+//
+//    /* Set the starting position */
+//    enemy->body.x = x;
+//    enemy->body.y = y;
+//
+//    enemy->body.w = 10;
+//    enemy->body.h = 10;
+//
+//    enemy->dx = 0;
+//    enemy->dy = 0;
+//
+//    enemy->update = NULL;
+//
+//    return enemy;
+//}
 
 int _random_front_texture()
 {
@@ -189,15 +178,6 @@ void _shoot_bullet(int texture, float x, float y)
      * should be immediately bouncing back towards the
      * player.
      */
-    /*
-    float orig_x = bullet->body.x;
-
-    for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!_move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
-            break;
-        }
-    }
-    */
 
     float orig_x = bullet->body.x;
 
@@ -209,15 +189,8 @@ void _shoot_bullet(int texture, float x, float y)
     }
 }
 
-void _update_hero_death();
-
 void _control_hero(ALLEGRO_EVENT *event)
 {
-    /* Don't do anything if the hero is dead */
-    if (hero.update == _update_hero_death) {
-        return;
-    }
-
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
 
@@ -300,6 +273,8 @@ void init_gameplay()
     num_rooms = 0;
     curr_room = 0;
 
+    curr_gameplay_state = GAMEPLAY_STATE_PLAY;
+
     is_gameplay_init = true;
 }
 
@@ -329,13 +304,17 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 
     /* Hero control */
-    _control_hero(event);
+    if (curr_gameplay_state == GAMEPLAY_STATE_PLAY) {
+        _control_hero(event);
+    }
 }
 
 bool _is_board_collision(BODY *body)
 {
     /* Level bounds! */
-    if (body->y < 0 || body->x < 0 || body->y + body->h >= (room.rows * TILE_SIZE) || body->x + body->w >= room.cols * TILE_SIZE) {
+    int room_w = room.cols * TILE_SIZE;
+    int room_h = room.rows * TILE_SIZE;
+    if (body->y < 0 || body->x < 0 || body->y + body->h >= room_h || body->x + body->w >= room_w) {
         return true;
     }
     
@@ -413,26 +392,6 @@ bool _is_block_collision(BODY *body)
     return _get_colliding_block(body, &r, &c);
 }
 
-void _update_hero()
-{
-    hero.update(&hero, NULL);
-
-    /* Graphics */
-    animate(hero.curr_sprite);
-    animate(&hero.bullet);
-}
-
-void _update_hero_death()
-{
-    /* This creates a nice "up then down" motion for the hero to fall when dying */
-    hero.dy += 0.1;
-    hero.body.y += hero.dy;
-
-    if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
-        init_gameplay_room_from_num(curr_room);
-    }
-}
-
 void _update_hero_player_control()
 {
     float old_x = hero.body.x;
@@ -493,6 +452,15 @@ void _update_hero_player_control()
         hero.bullet_x = hero.body.x + 20;
         hero.bullet_y = (((int)hero.body.y  + 5) / TILE_SIZE) * TILE_SIZE;
     }
+}
+
+void _update_hero()
+{
+    _update_hero_player_control();
+
+    /* Graphics */
+    animate(hero.curr_sprite);
+    animate(&hero.bullet);
 }
 
 int _find_available_effect_index()
@@ -626,51 +594,81 @@ void _update_hero_bullets()
     }
 }
 
+void _set_hero_death()
+{
+    hero.curr_sprite = &hero.hurt_sprite;
+
+    /* These velocity settings create a nice "up then down" movement for the dying hero */
+    hero.dx = 0;
+    hero.dy = -3;
+
+    /* A dead hero doesn't need a bullet */
+    hero.has_bullet = false;
+}
+
 bool update_gameplay(void *data)
 {
     assert(is_gameplay_init);
 
-    /* Hero */
-    _update_hero();
+    if (curr_gameplay_state == GAMEPLAY_STATE_PLAY) {
 
-    /* Bullets */
-    _update_hero_bullets();
+        /* PLAYING THE GAME */
 
-    animate(&bat_sprite);
-    animate(&spider_sprite);
+        /* Hero */
+        _update_hero();
+
+        /* Bullets */
+        _update_hero_bullets();
+
+        /* Check for hurting collisions */
+        for (int i = 0; i < MAX_BULLETS; i++) {
+            if (hero_bullets[i].is_active) {
+                BODY *b1 = &hero.body;
+                BODY *b2 = &hero_bullets[i].body;
+                if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+                    /* Kill the hero :( */
+                    _set_hero_death();
+                    /* Destroy the bullet that hit the hero */
+                    hero_bullets[i].is_active = false;
+                    /* Change the gameplay state */
+                    curr_gameplay_state = GAMEPLAY_STATE_DEATH;
+                }
+            }
+        }
+
+        /* Check for level completion */
+        if (GAMEPLAY_STATE_PLAY && room.cleared) {
+            BODY *b1 = &hero.body;
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
+                /* The hero has entered the end-level door, go to the next level */
+                if (curr_room < num_rooms - 1) {
+                    init_gameplay_room_from_num(curr_room + 1);
+                } else {
+                    end_gameplay = true;
+                }
+            }
+        }
+
+    } else if (curr_gameplay_state == GAMEPLAY_STATE_DEATH) {
+
+        /* HERO IS DEAD */
+
+        /* This creates a nice "up then down" motion for the hero to fall when dying */
+        hero.dy += 0.1;
+        hero.body.y += hero.dy;
+
+        animate(hero.curr_sprite);
+
+        if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
+            init_gameplay_room_from_num(curr_room);
+        }
+
+    }
 
     /* Effects */
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (effects[i].is_active && effects[i].update != NULL) {
             effects[i].update(&effects[i], NULL);
-        }
-    }
-
-    /* Check for hurting collisions */
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        if (hero_bullets[i].is_active) {
-            BODY *b1 = &hero.body;
-            BODY *b2 = &hero_bullets[i].body;
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
-                /* Kill the hero :( */
-                hero.update = _update_hero_death;
-                hero.curr_sprite = &hero.hurt_sprite;
-                hero.dx = 0;
-                hero.dy = -3;
-                hero.has_bullet = false;
-                hero_bullets[i].is_active = false;
-            }
-        }
-    }
-
-    /* Check for level completion */
-    if (room.cleared) {
-        if (is_collision(hero.body.x, hero.body.y, hero.body.w, hero.body.h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
-            if (curr_room < num_rooms - 1) {
-                init_gameplay_room_from_num(curr_room + 1);
-            } else {
-                end_gameplay = true;
-            }
         }
     }
 
@@ -711,9 +709,6 @@ void draw_gameplay(void *data)
         draw_sprite(&room.door_sprite, room.door_x, room.door_y);
     }
 
-    //draw_sprite(&bat_sprite, (TILE_SIZE * 8) - 5, (TILE_SIZE * 2) - 5);
-    //draw_sprite(&spider_sprite, (TILE_SIZE * 12) - 5, (TILE_SIZE * 2) - 5);
-    
     /* Draw hero bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
         BULLET *bullet = &hero_bullets[i];
@@ -754,8 +749,8 @@ bool init_gameplay_room_from_filename(const char *filename)
         hero.body.x = room.startx;
         hero.body.y = room.starty;
         hero.direction = room.direction;
-        hero.update = _update_hero_player_control;
         hero.curr_sprite = &hero.sprite;
+        curr_gameplay_state = GAMEPLAY_STATE_PLAY;
     }
 
     return is_room_init;
