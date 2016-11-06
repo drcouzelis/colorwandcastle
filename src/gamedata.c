@@ -24,12 +24,20 @@ void _init_hero_sprite(HERO *hero)
         hero->sprite.mirror = true;
     }
 
+    init_sprite(&hero->hurt_sprite, true, 6);
+    hero->hurt_sprite.x_offset = -10;
+    hero->hurt_sprite.y_offset = -10;
+
     if (hero->type == HERO_TYPE_MAKAYLA) {
         add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
         add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
+        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-01.png"));
+        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-02.png"));
     } else if (hero->type == HERO_TYPE_RAWSON) {
         add_frame(&hero->sprite, IMG("hero-rawson-01.png"));
         add_frame(&hero->sprite, IMG("hero-rawson-02.png"));
+        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-01.png"));
+        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-02.png"));
     }
 }
 

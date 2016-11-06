@@ -20,6 +20,8 @@ dist_imagesdata_DATA = \
   enemy-spider-5.png \
   hero-makayla-01.png \
   hero-makayla-02.png \
+  hero-makayla-hurt-01.png \
+  hero-makayla-hurt-02.png \
   hero-rawson-01.png \
   hero-rawson-02.png \
   icon.png \

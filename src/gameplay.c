@@ -209,8 +209,15 @@ void _shoot_bullet(int texture, float x, float y)
     }
 }
 
+void _update_hero_death();
+
 void _control_hero(ALLEGRO_EVENT *event)
 {
+    /* Don't do anything if the hero is dead */
+    if (hero.update == _update_hero_death) {
+        return;
+    }
+
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
 
@@ -285,6 +292,7 @@ void init_gameplay()
 
     /* Effects */
     _init_effects();
+
     /* Filename list */
     for (int i = 0; i < MAX_ROOMS; i++) {
         room_filenames[i][0] = '\0';
@@ -407,6 +415,26 @@ bool _is_block_collision(BODY *body)
 
 void _update_hero()
 {
+    hero.update(&hero, NULL);
+
+    /* Graphics */
+    animate(hero.curr_sprite);
+    animate(&hero.bullet);
+}
+
+void _update_hero_death()
+{
+    /* This creates a nice "up then down" motion for the hero to fall when dying */
+    hero.dy += 0.1;
+    hero.body.y += hero.dy;
+
+    if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
+        init_gameplay_room_from_num(curr_room);
+    }
+}
+
+void _update_hero_player_control()
+{
     float old_x = hero.body.x;
     float old_y = hero.body.y;
 
@@ -465,10 +493,6 @@ void _update_hero()
         hero.bullet_x = hero.body.x + 20;
         hero.bullet_y = (((int)hero.body.y  + 5) / TILE_SIZE) * TILE_SIZE;
     }
-
-    /* Graphics */
-    animate(&hero.sprite);
-    animate(&hero.bullet);
 }
 
 int _find_available_effect_index()
@@ -622,6 +646,23 @@ bool update_gameplay(void *data)
         }
     }
 
+    /* Check for hurting collisions */
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (hero_bullets[i].is_active) {
+            BODY *b1 = &hero.body;
+            BODY *b2 = &hero_bullets[i].body;
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+                /* Kill the hero :( */
+                hero.update = _update_hero_death;
+                hero.curr_sprite = &hero.hurt_sprite;
+                hero.dx = 0;
+                hero.dy = -3;
+                hero.has_bullet = false;
+                hero_bullets[i].is_active = false;
+            }
+        }
+    }
+
     /* Check for level completion */
     if (room.cleared) {
         if (is_collision(hero.body.x, hero.body.y, hero.body.w, hero.body.h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
@@ -682,7 +723,7 @@ void draw_gameplay(void *data)
     }
 
     /* Draw the hero */
-    draw_sprite(&hero.sprite, hero.body.x, hero.body.y);
+    draw_sprite(hero.curr_sprite, hero.body.x, hero.body.y);
     
     /* Draw the hero's bullet */
     if (hero.has_bullet) {
@@ -709,9 +750,12 @@ bool init_gameplay_room_from_filename(const char *filename)
 
     /* After a room is loaded, setup other things like the hero's position */
     if (is_room_init) {
+        init_hero(&hero);
         hero.body.x = room.startx;
         hero.body.y = room.starty;
         hero.direction = room.direction;
+        hero.update = _update_hero_player_control;
+        hero.curr_sprite = &hero.sprite;
     }
 
     return is_room_init;
