@@ -60,6 +60,8 @@ void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
     init_sprite(sprite, true, 4);
     add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 0));
     add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 1));
+    sprite->x_offset = -5;
+    sprite->y_offset = -5;
 }
 
 void toggle_hero(HERO *hero, ROOM *room)
@@ -103,6 +105,10 @@ void init_hero(HERO *hero)
     hero->bullet_y = 0;
     hero->texture = NO_TEXTURE;
     hero->has_bullet = false;
+
+    hero->control = NULL;
+    hero->update = NULL;
+    hero->draw = NULL;
 }
 
 void init_room(ROOM *room)

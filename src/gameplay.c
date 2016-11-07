@@ -16,6 +16,11 @@ static bool is_gameplay_init = false;
 /* Ready to play when you start the game */
 static GAMEPLAY_STATE curr_gameplay_state = GAMEPLAY_STATE_PLAY;
 
+/* Functions to control the current gameplay state */
+static void (*control)(ALLEGRO_EVENT *event) = NULL;
+static bool (*update)() = NULL;
+static void (*draw)() = NULL;
+
 /* Level control */
 #define MAX_ROOMS 64
 static char room_filenames[MAX_ROOMS][MAX_FILENAME_SIZE];
@@ -189,31 +194,33 @@ void _shoot_bullet(int texture, float x, float y)
     }
 }
 
-void _control_hero(ALLEGRO_EVENT *event)
+void _control_hero_from_keyboard(HERO *hero, void *data)
 {
+    ALLEGRO_EVENT *event = (ALLEGRO_EVENT *)data;
+
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
 
         /* Hero key pressed */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero.u = true;
-                hero.dy = -_get_hero_speed();
+                hero->u = true;
+                hero->dy = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero.d = true;
-                hero.dy = _get_hero_speed();
+                hero->d = true;
+                hero->dy = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero.l = true;
-                hero.dx = -_get_hero_speed();
+                hero->l = true;
+                hero->dx = -_get_hero_speed();
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero.r = true;
-                hero.dx = _get_hero_speed();
+                hero->r = true;
+                hero->dx = _get_hero_speed();
                 break;
             case ALLEGRO_KEY_SPACE:
-                hero.shoot = true;
+                hero->shoot = true;
                 break;
         }
     }
@@ -229,20 +236,20 @@ void _control_hero(ALLEGRO_EVENT *event)
          */
         switch (key) {
             case ALLEGRO_KEY_UP:
-                hero.u = false;
-                hero.dy = hero.d ? _get_hero_speed() : 0;
+                hero->u = false;
+                hero->dy = hero->d ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
-                hero.d = false;
-                hero.dy = hero.u ? -_get_hero_speed() : 0;
+                hero->d = false;
+                hero->dy = hero->u ? -_get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
-                hero.l = false;
-                hero.dx = hero.r ? _get_hero_speed() : 0;
+                hero->l = false;
+                hero->dx = hero->r ? _get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                hero.r = false;
-                hero.dx = hero.l ? -_get_hero_speed() : 0;
+                hero->r = false;
+                hero->dx = hero->l ? -_get_hero_speed() : 0;
                 break;
         }
     }
@@ -274,6 +281,9 @@ void init_gameplay()
     curr_room = 0;
 
     curr_gameplay_state = GAMEPLAY_STATE_PLAY;
+    control = NULL;
+    update = NULL;
+    draw = NULL;
 
     is_gameplay_init = true;
 }
@@ -305,7 +315,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 
     /* Hero control */
     if (curr_gameplay_state == GAMEPLAY_STATE_PLAY) {
-        _control_hero(event);
+        hero.control(&hero, event);
     }
 }
 
@@ -450,7 +460,7 @@ void _update_hero_player_control()
          * always lines up with a row of blocks.
          */
         hero.bullet_x = hero.body.x + 20;
-        hero.bullet_y = (((int)hero.body.y  + 5) / TILE_SIZE) * TILE_SIZE;
+        hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
     }
 }
 
@@ -637,12 +647,12 @@ bool update_gameplay(void *data)
         }
 
         /* Check for level completion */
-        if (GAMEPLAY_STATE_PLAY && room.cleared) {
+        if (curr_gameplay_state == GAMEPLAY_STATE_PLAY && room.cleared) {
             BODY *b1 = &hero.body;
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
                 /* The hero has entered the end-level door, go to the next level */
                 if (curr_room < num_rooms - 1) {
-                    init_gameplay_room_from_num(curr_room + 1);
+                    load_gameplay_room_from_num(curr_room + 1);
                 } else {
                     end_gameplay = true;
                 }
@@ -660,7 +670,7 @@ bool update_gameplay(void *data)
         animate(hero.curr_sprite);
 
         if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
-            init_gameplay_room_from_num(curr_room);
+            load_gameplay_room_from_num(curr_room);
         }
 
     }
@@ -733,7 +743,7 @@ void draw_gameplay(void *data)
     }
 }
 
-bool init_gameplay_room_from_filename(const char *filename)
+bool load_gameplay_room_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
 
@@ -751,13 +761,16 @@ bool init_gameplay_room_from_filename(const char *filename)
         hero.direction = room.direction;
         hero.curr_sprite = &hero.sprite;
         curr_gameplay_state = GAMEPLAY_STATE_PLAY;
+        hero.control = _control_hero_from_keyboard;
     }
 
     return is_room_init;
 }
 
-bool init_gameplay_room_list_from_filename(const char *filename)
+bool load_gameplay_room_list_from_filename(const char *filename)
 {
+    assert(is_gameplay_init);
+
     FILE *file = open_data_file(filename);
 
     /* Don't do anything if we can't open the file */
@@ -777,18 +790,40 @@ bool init_gameplay_room_list_from_filename(const char *filename)
     close_data_file(file);
 
     /* Go ahead and load the first level because WHY NOT */
-    return init_gameplay_room_from_num(0);
+    return load_gameplay_room_from_num(0);
 }
 
-bool init_gameplay_room_from_num(int room_num)
+bool load_gameplay_room_from_num(int room_num)
 {
+    assert(is_gameplay_init);
     assert(room_num < num_rooms);
 
-    bool is_room_init = init_gameplay_room_from_filename(room_filenames[room_num]);
+    bool is_room_init = load_gameplay_room_from_filename(room_filenames[room_num]);
 
     if (is_room_init) {
         curr_room = room_num;
     }
 
     return is_room_init;
+}
+
+void reset_gameplay()
+{
+    assert(is_gameplay_init);
+
+    printf("Pretending to reset gameplay.\n");
+}
+
+void to_gameplay_state_playing()
+{
+    assert(is_gameplay_init);
+
+    printf("Pretending to set gameplay state to playing.\n");
+}
+
+void to_gameplay_state_dying()
+{
+    assert(is_gameplay_init);
+
+    printf("Pretending to set gameplay state to dying.\n");
 }

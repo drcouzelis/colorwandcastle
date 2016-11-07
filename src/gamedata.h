@@ -73,8 +73,8 @@ typedef struct
     int hits;
 
     BODY body;
-    int dx; /* In pixels per second */
-    int dy; /* In pixels per second */
+    float dx; /* In pixels per second */
+    float dy; /* In pixels per second */
 } BULLET;
 
 typedef struct HERO
@@ -108,6 +108,10 @@ typedef struct HERO
     float bullet_x;
     float bullet_y;
     int texture;
+
+    void (*control)(struct HERO *hero, void *data);
+    void (*update)(struct HERO *hero, void *data);
+    void (*draw)(struct HERO *hero, void *data);
 } HERO;
 
 typedef struct ENEMY
@@ -119,9 +123,8 @@ typedef struct ENEMY
     SPRITE sprite;
 
     BODY body;
-
-    int dx;
-    int dy;
+    float dx;
+    float dy;
 
     void (*update)(struct ENEMY *enemy, void *data);
 } ENEMY;
@@ -176,6 +179,7 @@ typedef struct
 
     bool cleared;
 
+    /* The door representing the exit, appears when all blocks are gone */
     SPRITE door_sprite;
     int door_x;
     int door_y;
@@ -186,18 +190,20 @@ void init_hero(HERO *hero);
 
 /* Setup the appearance (sprite) of a bullet for the hero */
 /* This takes into account the current bullet texture and hero type */
+/* TODO: Move to gameplay */
 void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type);
 
 /* Toggle the appearance of the hero */
+/* TODO: Move to gameplay */
 void toggle_hero(HERO *hero, ROOM *room);
 
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
 
+void init_effect(EFFECT *effect);
+
 /* Load a room from the data in the given file */
 /* Returns true if the room was successfully loaded */
 bool load_room_from_filename(ROOM *room, const char *filename);
-
-void init_effect(EFFECT *effect);
 
 #endif
