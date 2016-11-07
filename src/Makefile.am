@@ -6,6 +6,8 @@ bin_PROGRAMS = colorwandcastle
 # A list of all of the source code files.
 # The "SOURCES" suffix marks it as source code.
 colorwandcastle_SOURCES = \
+  datafile.c \
+  datafile.h \
   display.c \
   display.h \
   gamedata.c \

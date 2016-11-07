@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "datafile.h"
 #include "display.h"
 #include "gameplay.h"
 #include "main.h"
@@ -814,7 +815,7 @@ bool load_gameplay_room_from_filename(const char *filename)
     init_room(&room);
     _init_effects();
 
-    bool is_room_init = load_room_from_filename(&room, filename);
+    bool is_room_init = load_room_from_datafile_with_filename(filename, &room);
 
     /* After a room is loaded, setup other things like the hero's position */
     if (is_room_init) {

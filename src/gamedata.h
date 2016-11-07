@@ -193,8 +193,4 @@ void init_room(ROOM *room);
 
 void init_effect(EFFECT *effect);
 
-/* Load a room from the data in the given file */
-/* Returns true if the room was successfully loaded */
-bool load_room_from_filename(ROOM *room, const char *filename);
-
 #endif
