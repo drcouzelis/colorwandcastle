@@ -188,15 +188,6 @@ typedef struct
 /* Initialize a hero to its default state, ready to be drawn */
 void init_hero(HERO *hero);
 
-/* Setup the appearance (sprite) of a bullet for the hero */
-/* This takes into account the current bullet texture and hero type */
-/* TODO: Move to gameplay */
-void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type);
-
-/* Toggle the appearance of the hero */
-/* TODO: Move to gameplay */
-void toggle_hero(HERO *hero, ROOM *room);
-
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
 

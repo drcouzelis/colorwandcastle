@@ -5,82 +5,9 @@
 #include "mask.h"
 #include "utilities.h"
 
-//static bool is_gamedata_init = false;
-//
-//void _init_gamedata()
-//{
-//    if (is_gamedata_init) {
-//        return;
-//    }
-//}
-
-void _init_hero_sprite(HERO *hero)
-{
-    init_sprite(&hero->sprite, true, 10);
-    hero->sprite.x_offset = -10;
-    hero->sprite.y_offset = -10;
-
-    if (hero->direction == L) {
-        hero->sprite.mirror = true;
-    }
-
-    init_sprite(&hero->hurt_sprite, true, 6);
-    hero->hurt_sprite.x_offset = -10;
-    hero->hurt_sprite.y_offset = -10;
-
-    if (hero->type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero->sprite, IMG("hero-makayla-01.png"));
-        add_frame(&hero->sprite, IMG("hero-makayla-02.png"));
-        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-01.png"));
-        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-02.png"));
-    } else if (hero->type == HERO_TYPE_RAWSON) {
-        add_frame(&hero->sprite, IMG("hero-rawson-01.png"));
-        add_frame(&hero->sprite, IMG("hero-rawson-02.png"));
-        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-01.png"));
-        add_frame(&hero->hurt_sprite, IMG("hero-makayla-hurt-02.png"));
-    }
-}
-
-IMAGE *_get_hero_bullet_image(char *texture_name, int hero_type, int frame)
-{
-    /**
-     * Return an image of the hero's bullet based on
-     * which hero is currently being used.
-     */
-    static char *bullet_mask_names[2][2] = {
-        {"mask-star-1.png", "mask-star-2.png"},
-        {"mask-plasma-1.png", "mask-plasma-2.png"}
-    };
-
-    return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
-}
-
-void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
-{
-    init_sprite(sprite, true, 4);
-    add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 0));
-    add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 1));
-    sprite->x_offset = -5;
-    sprite->y_offset = -5;
-}
-
-void toggle_hero(HERO *hero, ROOM *room)
-{
-    /* Toggle the hero type */
-    hero->type = hero->type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
-
-    _init_hero_sprite(hero);
-
-    if (hero->has_bullet) {
-        init_hero_bullet_sprite(&hero->bullet, room->textures[hero->texture], hero->type);
-    }
-}
-
 void init_hero(HERO *hero)
 {
     hero->type = HERO_TYPE_MAKAYLA;
-
-    _init_hero_sprite(hero);
 
     /* Set the starting position */
     hero->body.x = TILE_SIZE;

@@ -27,4 +27,11 @@ void draw_gameplay(void *data);
 void to_gameplay_state_playing();
 void to_gameplay_state_dying();
 
+///* Setup the appearance (sprite) of a bullet for the hero */
+///* This takes into account the current bullet texture and hero type */
+//void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type);
+//
+///* Toggle the appearance of the hero */
+//void toggle_hero(HERO *hero, ROOM *room);
+
 #endif

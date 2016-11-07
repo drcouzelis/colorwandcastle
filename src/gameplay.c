@@ -142,6 +142,68 @@ int _random_front_texture()
     }
 }
 
+IMAGE *_get_hero_bullet_image(char *texture_name, int hero_type, int frame)
+{
+    /**
+     * Return an image of the hero's bullet based on
+     * which hero is currently being used.
+     */
+    static char *bullet_mask_names[2][2] = {
+        {"mask-star-1.png", "mask-star-2.png"},
+        {"mask-plasma-1.png", "mask-plasma-2.png"}
+    };
+
+    return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
+}
+
+void _init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
+{
+    init_sprite(sprite, true, 4);
+    add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 0));
+    add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 1));
+    sprite->x_offset = -5;
+    sprite->y_offset = -5;
+}
+
+void _init_hero_sprite()
+{
+    init_sprite(&hero.sprite, true, 10);
+    hero.sprite.x_offset = -10;
+    hero.sprite.y_offset = -10;
+
+    if (hero.direction == L) {
+        hero.sprite.mirror = true;
+    }
+
+    init_sprite(&hero.hurt_sprite, true, 6);
+    hero.hurt_sprite.x_offset = -10;
+    hero.hurt_sprite.y_offset = -10;
+
+    if (hero.type == HERO_TYPE_MAKAYLA) {
+        add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
+        add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
+        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-01.png"));
+        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-02.png"));
+    } else if (hero.type == HERO_TYPE_RAWSON) {
+        add_frame(&hero.sprite, IMG("hero-rawson-01.png"));
+        add_frame(&hero.sprite, IMG("hero-rawson-02.png"));
+        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-01.png"));
+        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-02.png"));
+    }
+}
+
+void _toggle_hero()
+{
+    /* Toggle the hero type */
+    hero.type = hero.type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
+
+    _init_hero_sprite();
+
+    if (hero.has_bullet) {
+        _init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+    }
+}
+
 bool _move_bullet(BULLET *bullet, float new_x, float new_y);
 
 void _shoot_bullet(int texture, float x, float y)
@@ -164,7 +226,7 @@ void _shoot_bullet(int texture, float x, float y)
     BULLET *bullet = &hero_bullets[i];
 
     /* Create the bullet! */
-    init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
+    _init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
     bullet->texture = texture;
     bullet->hits = 2;
     bullet->body.x = x;
@@ -266,6 +328,7 @@ void init_gameplay()
 {
     /* Hero */
     init_hero(&hero);
+    _init_hero_sprite();
 
     /* Room */
     init_room(&room);
@@ -307,7 +370,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
             toggle_fullscreen();
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
             /* Toggle the hero */
-            toggle_hero(&hero, &room);
+            _toggle_hero(&hero, &room);
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
@@ -448,7 +511,7 @@ void _update_hero_player_control()
         /* The hero needs a new bullet to shoot! */
         hero.texture = _random_front_texture();
         if (hero.texture != NO_TEXTURE) {
-            init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+            _init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
             hero.has_bullet = true;
         }
     }
@@ -756,6 +819,7 @@ bool load_gameplay_room_from_filename(const char *filename)
     /* After a room is loaded, setup other things like the hero's position */
     if (is_room_init) {
         init_hero(&hero);
+        _init_hero_sprite();
         hero.body.x = room.startx;
         hero.body.y = room.starty;
         hero.direction = room.direction;
