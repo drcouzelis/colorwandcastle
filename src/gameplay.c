@@ -34,6 +34,13 @@ static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
 
+static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
+
+void set_gameplay_difficulty(GAMEPLAY_DIFFICULTY difficulty)
+{
+    gameplay_difficulty = difficulty;
+}
+
 static int _get_hero_speed()
 {
     /* The hero can move four tiles in one second */
@@ -734,7 +741,18 @@ bool update_gameplay(void *data)
         animate(hero.curr_sprite);
 
         if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
-            load_gameplay_room_from_num(curr_room);
+            if (gameplay_difficulty == GAMEPLAY_DIFFICULTY_EASY) {
+                init_hero(&hero);
+                _init_hero_sprite();
+                hero.body.x = room.startx;
+                hero.body.y = room.starty;
+                hero.direction = room.direction;
+                hero.curr_sprite = &hero.sprite;
+                curr_gameplay_state = GAMEPLAY_STATE_PLAY;
+                hero.control = _control_hero_from_keyboard;
+            } else {
+                load_gameplay_room_from_num(curr_room);
+            }
         }
 
     }
