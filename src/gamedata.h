@@ -77,8 +77,8 @@ typedef struct
     int hits;
 
     BODY body;
-    float dx; /* In pixels per second */
-    float dy; /* In pixels per second */
+    int dx; /* In pixels per second */
+    int dy; /* In pixels per second */
 } BULLET;
 
 typedef struct HERO
@@ -90,8 +90,8 @@ typedef struct HERO
     SPRITE hurt_sprite;
 
     BODY body;
-    float dx; /* In pixels per second */
-    float dy; /* In pixels per second */
+    int dx; /* In pixels per second */
+    int dy; /* In pixels per second */
 
     /* Movement toggles */
     /* True means the hero is moving in that direction */
@@ -127,8 +127,8 @@ typedef struct ENEMY
     SPRITE sprite;
 
     BODY body;
-    float dx;
-    float dy;
+    int dx;
+    int dy;
 
     void (*update)(struct ENEMY *enemy, void *data);
 } ENEMY;

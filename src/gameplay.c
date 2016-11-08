@@ -681,7 +681,7 @@ static void set_hero_death()
 
     /* These velocity settings create a nice "up then down" movement for the dying hero */
     hero.dx = 0;
-    hero.dy = -3;
+    hero.dy = -300;
 
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
@@ -735,8 +735,8 @@ bool update_gameplay(void *data)
         /* HERO IS DEAD */
 
         /* This creates a nice "up then down" motion for the hero to fall when dying */
-        hero.dy += 0.1;
-        hero.body.y += hero.dy;
+        hero.dy += 10;
+        hero.body.y += convert_pps_to_fps(hero.dy);
 
         animate(hero.curr_sprite);
 
