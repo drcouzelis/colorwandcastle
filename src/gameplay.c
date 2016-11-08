@@ -41,23 +41,23 @@ void set_gameplay_difficulty(GAMEPLAY_DIFFICULTY difficulty)
     gameplay_difficulty = difficulty;
 }
 
-static int _get_hero_speed()
+static int get_hero_speed()
 {
     /* The hero can move four tiles in one second */
     return TILE_SIZE * 4;
 }
 
-static int _get_bullet_speed()
+static int get_bullet_speed()
 {
     return TILE_SIZE * 10;
 }
 
-static float _convert_pps_to_fps(int pps)
+static float convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
 }
 
-void _update_effect_until_done_animating(EFFECT *effect, void *data)
+static void update_effect_until_done_animating(EFFECT *effect, void *data)
 {
     animate(&effect->sprite);
 
@@ -107,7 +107,7 @@ void _update_effect_until_done_animating(EFFECT *effect, void *data)
 //    return enemy;
 //}
 
-int _random_front_texture()
+static int random_front_texture()
 {
     int textures[MAX_TEXTURES];
     int num_textures = 0;
@@ -150,7 +150,7 @@ int _random_front_texture()
     }
 }
 
-IMAGE *_get_hero_bullet_image(char *texture_name, int hero_type, int frame)
+static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame)
 {
     /**
      * Return an image of the hero's bullet based on
@@ -164,16 +164,16 @@ IMAGE *_get_hero_bullet_image(char *texture_name, int hero_type, int frame)
     return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
 }
 
-void _init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
+static void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
 {
     init_sprite(sprite, true, 4);
-    add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 0));
-    add_frame(sprite, _get_hero_bullet_image(texture_name, hero_type, 1));
+    add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 0));
+    add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 1));
     sprite->x_offset = -5;
     sprite->y_offset = -5;
 }
 
-void _init_hero_sprite()
+static void init_hero_sprite()
 {
     init_sprite(&hero.sprite, true, 10);
     hero.sprite.x_offset = -10;
@@ -200,21 +200,21 @@ void _init_hero_sprite()
     }
 }
 
-void _toggle_hero()
+static void toggle_hero()
 {
     /* Toggle the hero type */
     hero.type = hero.type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
 
-    _init_hero_sprite();
+    init_hero_sprite();
 
     if (hero.has_bullet) {
-        _init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+        init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
     }
 }
 
-bool _move_bullet(BULLET *bullet, float new_x, float new_y);
+static bool move_bullet(BULLET *bullet, float new_x, float new_y);
 
-void _shoot_bullet(int texture, float x, float y)
+static void shoot_bullet(int texture, float x, float y)
 {
     /* Find the next available bullet slot */
     int i = 0;
@@ -234,7 +234,7 @@ void _shoot_bullet(int texture, float x, float y)
     BULLET *bullet = &hero_bullets[i];
 
     /* Create the bullet! */
-    _init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
+    init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
     bullet->texture = texture;
     bullet->hits = 2;
     bullet->body.x = x;
@@ -243,7 +243,7 @@ void _shoot_bullet(int texture, float x, float y)
     bullet->body.h = 10;
 
     /* Make the bullet fly to the right */
-    bullet->dx = _get_bullet_speed();
+    bullet->dx = get_bullet_speed();
     bullet->dy = 0;
 
     bullet->is_active = true;
@@ -258,13 +258,13 @@ void _shoot_bullet(int texture, float x, float y)
 
     /* NOTE: This will need to be updated when bullets can shoot in other directions */
     for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!_move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
+        if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
     }
 }
 
-void _control_hero_from_keyboard(HERO *hero, void *data)
+static void control_hero_from_keyboard(HERO *hero, void *data)
 {
     ALLEGRO_EVENT *event = (ALLEGRO_EVENT *)data;
 
@@ -275,19 +275,19 @@ void _control_hero_from_keyboard(HERO *hero, void *data)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = true;
-                hero->dy = -_get_hero_speed();
+                hero->dy = -get_hero_speed();
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = true;
-                hero->dy = _get_hero_speed();
+                hero->dy = get_hero_speed();
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = true;
-                hero->dx = -_get_hero_speed();
+                hero->dx = -get_hero_speed();
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = true;
-                hero->dx = _get_hero_speed();
+                hero->dx = get_hero_speed();
                 break;
             case ALLEGRO_KEY_SPACE:
                 hero->shoot = true;
@@ -307,25 +307,25 @@ void _control_hero_from_keyboard(HERO *hero, void *data)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = false;
-                hero->dy = hero->d ? _get_hero_speed() : 0;
+                hero->dy = hero->d ? get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = false;
-                hero->dy = hero->u ? -_get_hero_speed() : 0;
+                hero->dy = hero->u ? -get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = false;
-                hero->dx = hero->r ? _get_hero_speed() : 0;
+                hero->dx = hero->r ? get_hero_speed() : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = false;
-                hero->dx = hero->l ? -_get_hero_speed() : 0;
+                hero->dx = hero->l ? -get_hero_speed() : 0;
                 break;
         }
     }
 }
 
-void _init_effects()
+static void init_effects()
 {
     for (int i = 0; i < MAX_EFFECTS; i++) {
         init_effect(&effects[i]);
@@ -336,13 +336,13 @@ void init_gameplay()
 {
     /* Hero */
     init_hero(&hero);
-    _init_hero_sprite();
+    init_hero_sprite();
 
     /* Room */
     init_room(&room);
 
     /* Effects */
-    _init_effects();
+    init_effects();
 
     /* Filename list */
     for (int i = 0; i < MAX_ROOMS; i++) {
@@ -378,7 +378,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
             toggle_fullscreen();
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
             /* Toggle the hero */
-            _toggle_hero(&hero, &room);
+            toggle_hero(&hero, &room);
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
@@ -390,7 +390,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 }
 
-bool _is_board_collision(BODY *body)
+static bool is_board_collision(BODY *body)
 {
     /* Level bounds! */
     int room_w = room.cols * TILE_SIZE;
@@ -425,7 +425,7 @@ bool _is_board_collision(BODY *body)
     return false;
 }
 
-bool _get_colliding_block(BODY *body, int *row, int *col)
+static bool get_colliding_block(BODY *body, int *row, int *col)
 {
     int r1 = (int)(body->y / TILE_SIZE);
     int c1 = (int)(body->x / TILE_SIZE);
@@ -466,31 +466,31 @@ bool _get_colliding_block(BODY *body, int *row, int *col)
     return false;
 }
 
-bool _is_block_collision(BODY *body)
+static bool is_block_collision(BODY *body)
 {
     int r = 0;
     int c = 0;
-    return _get_colliding_block(body, &r, &c);
+    return get_colliding_block(body, &r, &c);
 }
 
-void _update_hero_player_control()
+static void update_hero_player_control()
 {
     float old_x = hero.body.x;
     float old_y = hero.body.y;
 
     /* Vertical movement */
-    hero.body.y += _convert_pps_to_fps(hero.dy);
+    hero.body.y += convert_pps_to_fps(hero.dy);
 
     /* Check for vertical collisions */
-    if (_is_board_collision(&hero.body) || _is_block_collision(&hero.body)) {
+    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
         hero.body.y = old_y;
     }
 
     /* Horizontal movement */
-    hero.body.x += _convert_pps_to_fps(hero.dx);
+    hero.body.x += convert_pps_to_fps(hero.dx);
 
     /* Check for horizontal collisions */
-    if (_is_board_collision(&hero.body) || _is_block_collision(&hero.body)) {
+    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
         hero.body.x = old_x;
     }
 
@@ -499,7 +499,7 @@ void _update_hero_player_control()
         /* ...then shoot a bullet! */
         if (hero.has_bullet) {
             assert(hero.texture != NO_TEXTURE);
-            _shoot_bullet(hero.texture, hero.bullet_x, hero.bullet_y);
+            shoot_bullet(hero.texture, hero.bullet_x, hero.bullet_y);
             hero.has_bullet = false;
         }
         hero.shoot = false;
@@ -517,9 +517,9 @@ void _update_hero_player_control()
     if (!hero.has_bullet && num_active_bullets == 0) {
         /* The hero doesn't have a bullet and there are no more on screen */
         /* The hero needs a new bullet to shoot! */
-        hero.texture = _random_front_texture();
+        hero.texture = random_front_texture();
         if (hero.texture != NO_TEXTURE) {
-            _init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+            init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
             hero.has_bullet = true;
         }
     }
@@ -535,16 +535,16 @@ void _update_hero_player_control()
     }
 }
 
-void _update_hero()
+static void update_hero()
 {
-    _update_hero_player_control();
+    update_hero_player_control();
 
     /* Graphics */
     animate(hero.curr_sprite);
     animate(&hero.bullet);
 }
 
-int _find_available_effect_index()
+static int find_available_effect_index()
 {
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (!effects[i].is_active) {
@@ -555,7 +555,7 @@ int _find_available_effect_index()
     return -1;
 }
 
-void _init_poof_effect(EFFECT *effect, float x, float y)
+static void init_poof_effect(EFFECT *effect, float x, float y)
 {
     init_sprite(&effect->sprite, false, 15);
     add_frame(&effect->sprite, IMG("effect-poof-1.png"));
@@ -566,11 +566,11 @@ void _init_poof_effect(EFFECT *effect, float x, float y)
     effect->sprite.y_offset = -10;
     effect->x = x;
     effect->y = y;
-    effect->update = _update_effect_until_done_animating;
+    effect->update = update_effect_until_done_animating;
     effect->is_active = true;
 }
 
-int _num_blocks()
+static int num_blocks()
 {
     int count = 0;
 
@@ -585,7 +585,7 @@ int _num_blocks()
     return count;
 }
 
-bool _move_bullet(BULLET *bullet, float new_x, float new_y)
+static bool move_bullet(BULLET *bullet, float new_x, float new_y)
 {
     float old_x = bullet->body.x;
     float old_y = bullet->body.y;
@@ -595,7 +595,7 @@ bool _move_bullet(BULLET *bullet, float new_x, float new_y)
 
     int r = 0;
     int c = 0;
-    bool block_collision = _get_colliding_block(&bullet->body, &r, &c);
+    bool block_collision = get_colliding_block(&bullet->body, &r, &c);
 
     /* If the bullet hits a block... */
     if (block_collision) {
@@ -606,10 +606,10 @@ bool _move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Remove the bullet and the block */
             bullet->hits = 0;
             play_sound(SND("star_hit.wav"));
-            _init_poof_effect(&effects[_find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
+            init_poof_effect(&effects[find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
-            if (_num_blocks() == 0) {
+            if (num_blocks() == 0) {
                 /* Level clear! Add the exit door */
                 room.cleared = true;
                 room.door_x = c * TILE_SIZE;
@@ -628,7 +628,7 @@ bool _move_bullet(BULLET *bullet, float new_x, float new_y)
     }
     
     /* If the bullet hits a collision tile... */
-    if (!block_collision && _is_board_collision(&bullet->body)) {
+    if (!block_collision && is_board_collision(&bullet->body)) {
 
         /* Put the bullet back to its original position */
         bullet->body.x = old_x;
@@ -650,7 +650,7 @@ bool _move_bullet(BULLET *bullet, float new_x, float new_y)
     return true;
 }
 
-void _update_hero_bullets()
+static void update_hero_bullets()
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
 
@@ -663,7 +663,7 @@ void _update_hero_bullets()
         BULLET *bullet = &hero_bullets[i];
 
         /* Move */
-        _move_bullet(bullet, bullet->body.x + _convert_pps_to_fps(bullet->dx), bullet->body.y);
+        move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->dx), bullet->body.y);
 
         /* Animate */
         animate(&bullet->sprite);
@@ -675,7 +675,7 @@ void _update_hero_bullets()
     }
 }
 
-void _set_hero_death()
+static void set_hero_death()
 {
     hero.curr_sprite = &hero.hurt_sprite;
 
@@ -696,10 +696,10 @@ bool update_gameplay(void *data)
         /* PLAYING THE GAME */
 
         /* Hero */
-        _update_hero();
+        update_hero();
 
         /* Bullets */
-        _update_hero_bullets();
+        update_hero_bullets();
 
         /* Check for hurting collisions */
         for (int i = 0; i < MAX_BULLETS; i++) {
@@ -708,7 +708,7 @@ bool update_gameplay(void *data)
                 BODY *b2 = &hero_bullets[i].body;
                 if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
                     /* Kill the hero :( */
-                    _set_hero_death();
+                    set_hero_death();
                     /* Destroy the bullet that hit the hero */
                     hero_bullets[i].is_active = false;
                     /* Change the gameplay state */
@@ -743,13 +743,13 @@ bool update_gameplay(void *data)
         if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
             if (gameplay_difficulty == GAMEPLAY_DIFFICULTY_EASY) {
                 init_hero(&hero);
-                _init_hero_sprite();
+                init_hero_sprite();
                 hero.body.x = room.startx;
                 hero.body.y = room.starty;
                 hero.direction = room.direction;
                 hero.curr_sprite = &hero.sprite;
                 curr_gameplay_state = GAMEPLAY_STATE_PLAY;
-                hero.control = _control_hero_from_keyboard;
+                hero.control = control_hero_from_keyboard;
             } else {
                 load_gameplay_room_from_num(curr_room);
             }
@@ -831,20 +831,20 @@ bool load_gameplay_room_from_filename(const char *filename)
 
     /* Clear everything in the room */
     init_room(&room);
-    _init_effects();
+    init_effects();
 
     bool is_room_init = load_room_from_datafile_with_filename(filename, &room);
 
     /* After a room is loaded, setup other things like the hero's position */
     if (is_room_init) {
         init_hero(&hero);
-        _init_hero_sprite();
+        init_hero_sprite();
         hero.body.x = room.startx;
         hero.body.y = room.starty;
         hero.direction = room.direction;
         hero.curr_sprite = &hero.sprite;
         curr_gameplay_state = GAMEPLAY_STATE_PLAY;
-        hero.control = _control_hero_from_keyboard;
+        hero.control = control_hero_from_keyboard;
     }
 
     return is_room_init;

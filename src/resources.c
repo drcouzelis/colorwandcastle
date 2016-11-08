@@ -64,7 +64,7 @@ void add_resource_path(const char *path)
 /**
  * Load a bitmap and set magic pink to transparent.
  */
-IMAGE *_load_bitmap_with_magic_pink(const char *filename)
+static IMAGE *load_bitmap_with_magic_pink(const char *filename)
 {
     IMAGE *bitmap = al_load_bitmap(filename);
 
@@ -78,7 +78,7 @@ IMAGE *_load_bitmap_with_magic_pink(const char *filename)
 /**
  * Create a RESOURCE structure.
  */
-RESOURCE *_create_resource(const char *name, RESOURCE_TYPE type, void *data)
+static RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
 {
     RESOURCE *resource = alloc_memory("RESOURCE", sizeof(RESOURCE));
 
@@ -91,7 +91,7 @@ RESOURCE *_create_resource(const char *name, RESOURCE_TYPE type, void *data)
     return resource;
 }
 
-bool _is_space_for_new_resource()
+static bool is_space_for_new_resource()
 {
     /* See if we have space to load another resource... */
     if (num_resources == MAX_RESOURCES) {
@@ -101,9 +101,9 @@ bool _is_space_for_new_resource()
     return true;
 }
 
-void _add_resource_to_list(RESOURCE *resource)
+static void add_resource_to_list(RESOURCE *resource)
 {
-    if (_is_space_for_new_resource()) {
+    if (is_space_for_new_resource()) {
         resources[num_resources] = resource;
         num_resources++;
     }
@@ -132,7 +132,7 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
     /**
      * Uh oh. The resource WASN'T found.
      */
-    if (!_is_space_for_new_resource()) {
+    if (!is_space_for_new_resource()) {
         return NULL;
     }
 
@@ -150,14 +150,14 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
 
         /* Load the resource, based on the filetype */
         if (type == RESOURCE_TYPE_IMAGE) {
-            data = _load_bitmap_with_magic_pink(fullpath);
+            data = load_bitmap_with_magic_pink(fullpath);
         } else if (type == RESOURCE_TYPE_SOUND) {
             data = al_load_sample(fullpath);
         }
 
         /* The resource has been created! Return it */
         if (data != NULL) {
-            _add_resource_to_list(_create_resource(name, type, data));
+            add_resource_to_list(create_resource(name, type, data));
             return data;
         }
     }
@@ -185,5 +185,5 @@ void insert_image_resource(const char *name, IMAGE *image)
         return;
     }
 
-    _add_resource_to_list(_create_resource(name, RESOURCE_TYPE_IMAGE, image));
+    add_resource_to_list(create_resource(name, RESOURCE_TYPE_IMAGE, image));
 }

@@ -95,7 +95,7 @@ void delete_frames(SPRITE *sprite)
     sprite->len = 0;
 }
 
-void _draw_image(ALLEGRO_BITMAP *img, float x, float y, bool rotate, bool mirror, bool flip)
+static void draw_image(ALLEGRO_BITMAP *img, float x, float y, bool rotate, bool mirror, bool flip)
 {
     assert(img != NULL);
   
@@ -136,7 +136,7 @@ void draw_sprite(SPRITE *sprite, float x, float y)
     x += sprite->x_offset;
     y += sprite->y_offset;
     
-    _draw_image(get_frame(sprite), x, y, sprite->rotate, sprite->mirror, sprite->flip);
+    draw_image(get_frame(sprite), x, y, sprite->rotate, sprite->mirror, sprite->flip);
 }
 
 /* Animate the sprite */
