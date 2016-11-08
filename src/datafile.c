@@ -5,6 +5,54 @@
 #include "resources.h"
 #include "utilities.h"
 
+#define MAX_DATAFILE_PATHS 4
+#define MAX_DATAFILE_FILENAME_SIZE 256
+
+static char datafile_paths[MAX_DATAFILE_PATHS][MAX_DATAFILE_FILENAME_SIZE];
+static int num_datafile_paths = 0;
+
+void add_datafile_path(const char *path)
+{
+    if (num_datafile_paths >= MAX_DATAFILE_PATHS) {
+        fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_DATAFILE_PATHS.\n");
+        return;
+    }
+
+    /**
+     * Add the new path to the list of resource paths.
+     */
+    strncpy(datafile_paths[num_datafile_paths], path, MAX_DATAFILE_FILENAME_SIZE - 1);
+
+    num_datafile_paths++;
+}
+
+FILE *open_data_file(const char *name)
+{
+    char fullpath[MAX_DATAFILE_FILENAME_SIZE];
+    FILE *file = NULL;
+
+    /* Find the file to open from the list of possible paths... */
+    for (int i = 0; i < num_datafile_paths; i++) {
+
+        fullpath[0] = '\0';
+        strncat(fullpath, datafile_paths[i], MAX_DATAFILE_FILENAME_SIZE);
+        strncat(fullpath, name, MAX_DATAFILE_FILENAME_SIZE);
+
+        file = fopen(fullpath, "r");
+
+        if (file != NULL) {
+            break;
+        }
+    }
+
+    return file;
+}
+
+void close_data_file(FILE *file)
+{
+    fclose(file);
+}
+
 static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
 {
     assert(file != NULL);

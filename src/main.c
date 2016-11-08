@@ -1,6 +1,7 @@
 #include <allegro5/allegro.h>
 #include <stdio.h>
 #include "config.h"
+#include "datafile.h"
 #include "display.h"
 #include "gameplay.h"
 #include "main.h"
@@ -48,9 +49,9 @@ int main(int argc, char **argv)
     /* So we know where to look for data files */
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
-    add_resource_path( PKGDATADIR "/levels/");
-    add_resource_path("./");
-    add_resource_path("");
+    add_datafile_path( PKGDATADIR "/levels/");
+    add_datafile_path("./");
+    add_datafile_path("");
   
     /* Set application properties */
     al_set_window_title(get_display(), "Colorwand Castle");

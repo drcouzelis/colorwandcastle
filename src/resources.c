@@ -4,7 +4,7 @@
 #include "resources.h"
 
 #define MAX_RESOURCES 256
-#define MAX_RESOURCE_PATHS 8
+#define MAX_RESOURCE_PATHS 4
 #define MAX_FILENAME_LEN 256
 #define GAME_VOLUME 192
 
@@ -186,31 +186,4 @@ void insert_image_resource(const char *name, IMAGE *image)
     }
 
     _add_resource_to_list(_create_resource(name, RESOURCE_TYPE_IMAGE, image));
-}
-
-FILE *open_data_file(const char *name)
-{
-    char fullpath[MAX_FILENAME_LEN];
-    FILE *file = NULL;
-
-    /* Find the file to open from the list of possible paths... */
-    for (int i = 0; i < num_resource_paths; i++) {
-
-        fullpath[0] = '\0';
-        strncat(fullpath, resource_paths[i], MAX_FILENAME_LEN);
-        strncat(fullpath, name, MAX_FILENAME_LEN);
-
-        file = fopen(fullpath, "r");
-
-        if (file != NULL) {
-            break;
-        }
-    }
-
-    return file;
-}
-
-void close_data_file(FILE *file)
-{
-    fclose(file);
 }
