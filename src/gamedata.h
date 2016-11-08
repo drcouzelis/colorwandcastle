@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include "sprite.h"
 
+#define TILE_SIZE 20
+#define COLS 16
+#define ROWS 12
+
 #define NO_TILE -1
 #define NO_TEXTURE -1
 #define NO_BLOCK -1
