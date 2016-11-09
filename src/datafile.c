@@ -329,3 +329,26 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     return true;
 }
+
+bool load_room_list_from_datafile_with_filename(const char *filename, ROOM_LIST *room_list)
+{
+    FILE *file = open_data_file(filename);
+
+    /* Don't do anything if we can't open the file */
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
+        return false;
+    }
+
+    /* Reset the number of rooms */
+    room_list->size = 0;
+
+    /* Save the contents of the file to the list of room names */
+    while (fscanf(file, "%s", room_list->filenames[room_list->size]) != EOF) {
+        room_list->size++;
+    }
+
+    close_data_file(file);
+
+    return true;
+}

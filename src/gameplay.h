@@ -4,22 +4,8 @@
 #include <allegro5/allegro.h>
 #include "gamedata.h"
 
-typedef enum
-{
-    GAMEPLAY_STATE_PLAY = 0,
-    GAMEPLAY_STATE_DEATH
-} GAMEPLAY_STATE;
-
 /* Must be done before using any other gameplay functions */
-void init_gameplay();
-
-typedef enum
-{
-    GAMEPLAY_DIFFICULTY_EASY = 0,
-    GAMEPLAY_DIFFICULTY_NORMAL
-} GAMEPLAY_DIFFICULTY;
-
-void set_gameplay_difficulty(GAMEPLAY_DIFFICULTY difficulty);
+void init_gameplay_session();
 
 bool load_gameplay_room_from_filename(const char *filename);
 bool load_gameplay_room_list_from_filename(const char *filename);

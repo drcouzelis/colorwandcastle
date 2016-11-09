@@ -9,10 +9,10 @@
 #include "sprite.h"
 #include "utilities.h"
 
-static bool end_gameplay = false;
-
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;
+
+static bool end_gameplay = false;
 
 /* Ready to play when you start the game */
 static GAMEPLAY_STATE curr_gameplay_state = GAMEPLAY_STATE_PLAY;
@@ -23,9 +23,7 @@ static bool (*update)() = NULL;
 static void (*draw)() = NULL;
 
 /* Level control */
-#define MAX_ROOMS 64
-static char room_filenames[MAX_ROOMS][MAX_FILENAME_SIZE];
-static int num_rooms = 0;
+static ROOM_LIST room_list;
 static int curr_room = 0;
 
 /* The primary gameplay characters! */
@@ -35,11 +33,6 @@ static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
-
-void set_gameplay_difficulty(GAMEPLAY_DIFFICULTY difficulty)
-{
-    gameplay_difficulty = difficulty;
-}
 
 static int get_hero_speed()
 {
@@ -332,7 +325,7 @@ static void init_effects()
     }
 }
 
-void init_gameplay()
+void init_gameplay_session()
 {
     /* Hero */
     init_hero(&hero);
@@ -345,10 +338,7 @@ void init_gameplay()
     init_effects();
 
     /* Filename list */
-    for (int i = 0; i < MAX_ROOMS; i++) {
-        room_filenames[i][0] = '\0';
-    }
-    num_rooms = 0;
+    init_room_list(&room_list);
     curr_room = 0;
 
     curr_gameplay_state = GAMEPLAY_STATE_PLAY;
@@ -722,7 +712,7 @@ bool update_gameplay(void *data)
             BODY *b1 = &hero.body;
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
                 /* The hero has entered the end-level door, go to the next level */
-                if (curr_room < num_rooms - 1) {
+                if (curr_room < room_list.size - 1) {
                     load_gameplay_room_from_num(curr_room + 1);
                 } else {
                     end_gameplay = true;
@@ -854,23 +844,9 @@ bool load_gameplay_room_list_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
 
-    FILE *file = open_data_file(filename);
-
-    /* Don't do anything if we can't open the file */
-    if (file == NULL) {
-        fprintf(stderr, "Failed to open filename \"%s\".\n", filename);
+    if (!load_room_list_from_datafile_with_filename(filename, &room_list)) {
         return false;
     }
-
-    /* Reset the number of rooms */
-    num_rooms = 0;
-
-    /* Save the contents of the file to the list of room names */
-    while (fscanf(file, "%s", room_filenames[num_rooms]) != EOF) {
-        num_rooms++;
-    }
-
-    close_data_file(file);
 
     /* Go ahead and load the first level because WHY NOT */
     return load_gameplay_room_from_num(0);
@@ -879,9 +855,9 @@ bool load_gameplay_room_list_from_filename(const char *filename)
 bool load_gameplay_room_from_num(int room_num)
 {
     assert(is_gameplay_init);
-    assert(room_num < num_rooms);
+    assert(room_num < room_list.size);
 
-    bool is_room_init = load_gameplay_room_from_filename(room_filenames[room_num]);
+    bool is_room_init = load_gameplay_room_from_filename(room_list.filenames[room_num]);
 
     if (is_room_init) {
         curr_room = room_num;

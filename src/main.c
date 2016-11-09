@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     toggle_audio();
 
     /* INIT THE GAME */
-    init_gameplay();
+    init_gameplay_session();
 
     /* LOAD THE FIRST LEVEL */
     bool is_room_init = false;

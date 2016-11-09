@@ -23,6 +23,7 @@
 #define MAX_EFFECTS 8
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
+#define MAX_ROOMS 63
 #define MAX_FILENAME_SIZE 128
 #define MAX_STRING_SIZE 128
 
@@ -37,6 +38,18 @@ typedef enum
     ENEMY_TYPE_BAT = 0,
     ENEMY_TYPE_SPIDER
 } ENEMY_TYPE;
+
+typedef enum
+{
+    GAMEPLAY_DIFFICULTY_EASY = 0,
+    GAMEPLAY_DIFFICULTY_NORMAL
+} GAMEPLAY_DIFFICULTY;
+
+typedef enum
+{
+    GAMEPLAY_STATE_PLAY = 0,
+    GAMEPLAY_STATE_DEATH
+} GAMEPLAY_STATE;
 
 typedef enum
 {
@@ -189,12 +202,46 @@ typedef struct
     int door_y;
 } ROOM;
 
+typedef struct {
+    char filenames[MAX_ROOMS][MAX_FILENAME_SIZE];
+    int size;
+} ROOM_LIST;
+
+typedef struct
+{
+    bool is_ended;
+
+    /* State of the gameplay */
+    GAMEPLAY_STATE state;
+
+    /* Functions to control the current gameplay state */
+    void (*control)(ALLEGRO_EVENT *event);
+    bool (*update)();
+    void (*draw)();
+
+    /* Level control */
+    ROOM_LIST room_list;
+    int curr_room;
+
+    /* The primary gameplay characters! */
+    HERO hero;
+    BULLET hero_bullets[MAX_BULLETS];
+    ROOM room;
+    EFFECT effects[MAX_EFFECTS];
+
+    GAMEPLAY_DIFFICULTY difficulty;
+} GAMEPLAY;
+
 /* Initialize a hero to its default state, ready to be drawn */
 void init_hero(HERO *hero);
 
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
 
+void init_room_list(ROOM_LIST *room_list);
+
 void init_effect(EFFECT *effect);
+
+void init_gameplay(GAMEPLAY *gameplay);
 
 #endif

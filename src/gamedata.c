@@ -93,6 +93,17 @@ void init_room(ROOM *room)
     room->door_y = 0;
 }
 
+void init_room_list(ROOM_LIST *list)
+{
+    assert(list != NULL);
+
+    for (int i = 0; i < MAX_ROOMS; i++) {
+        list->filenames[i][0] = '\0';
+    }
+
+    list->size = 0;
+}
+
 void init_effect(EFFECT *effect)
 {
     effect->is_active = false;
@@ -100,4 +111,11 @@ void init_effect(EFFECT *effect)
     init_sprite(&effect->sprite, false, 0);
     effect->x = 0;
     effect->y = 0;
+}
+
+void init_gameplay(GAMEPLAY *gameplay)
+{
+    assert(gameplay != NULL);
+
+    // TODO
 }
