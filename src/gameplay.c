@@ -34,17 +34,6 @@ static EFFECT effects[MAX_EFFECTS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
-static int get_hero_speed()
-{
-    /* The hero can move four tiles in one second */
-    return TILE_SIZE * 4;
-}
-
-static int get_bullet_speed()
-{
-    return TILE_SIZE * 10;
-}
-
 static float convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
@@ -58,47 +47,6 @@ static void update_effect_until_done_animating(EFFECT *effect, void *data)
         effect->is_active = false;
     }
 }
-
-//ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
-//{
-//    ENEMY *enemy = alloc_memory("ENEMY", sizeof(ENEMY));
-//
-//    enemy->type = type;
-//
-//    if (type == ENEMY_TYPE_BAT) {
-//        init_sprite(&enemy->sprite, true, 20);
-//        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-//        enemy->sprite.x_offset = -10;
-//        enemy->sprite.y_offset = -10;
-//    } else if (type == ENEMY_TYPE_SPIDER) {
-//        init_sprite(&enemy->sprite, true, 8);
-//        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
-//        enemy->sprite.x_offset = -10;
-//        enemy->sprite.y_offset = -10;
-//    }
-//
-//    /* Set the starting position */
-//    enemy->body.x = x;
-//    enemy->body.y = y;
-//
-//    enemy->body.w = 10;
-//    enemy->body.h = 10;
-//
-//    enemy->dx = 0;
-//    enemy->dy = 0;
-//
-//    enemy->update = NULL;
-//
-//    return enemy;
-//}
 
 static int random_front_texture()
 {
@@ -205,61 +153,12 @@ static void toggle_hero()
     }
 }
 
-static bool move_bullet(BULLET *bullet, float new_x, float new_y);
-
-static void shoot_bullet(int texture, float x, float y)
-{
-    /* Find the next available bullet slot */
-    int i = 0;
-    while (i < MAX_BULLETS) {
-        if (!hero_bullets[i].is_active) {
-            break;
-        }
-        i++;
-    }
-
-    if (i == MAX_BULLETS) {
-        /* No more bullet slots available, don't create a bullet */
-        return;
-    }
-
-    /* Found an available bullet slot to use to setup this new bullet */
-    BULLET *bullet = &hero_bullets[i];
-
-    /* Create the bullet! */
-    init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
-    bullet->texture = texture;
-    bullet->hits = 2;
-    bullet->body.x = x;
-    bullet->body.y = y;
-    bullet->body.w = 10;
-    bullet->body.h = 10;
-
-    /* Make the bullet fly to the right */
-    bullet->dx = get_bullet_speed();
-    bullet->dy = 0;
-
-    bullet->is_active = true;
-
-    /**
-     * Do some fancy footwork to find out if this bullet
-     * should be immediately bouncing back towards the
-     * player.
-     */
-
-    float orig_x = bullet->body.x;
-
-    /* NOTE: This will need to be updated when bullets can shoot in other directions */
-    for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
-            break;
-        }
-    }
-}
-
 static void control_hero_from_keyboard(HERO *hero, void *data)
 {
     ALLEGRO_EVENT *event = (ALLEGRO_EVENT *)data;
+
+    /* The hero can move four tiles in one second */
+    int speed = TILE_SIZE * 4;
 
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
@@ -268,19 +167,19 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = true;
-                hero->dy = -get_hero_speed();
+                hero->dy = -speed;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = true;
-                hero->dy = get_hero_speed();
+                hero->dy = speed;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = true;
-                hero->dx = -get_hero_speed();
+                hero->dx = -speed;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = true;
-                hero->dx = get_hero_speed();
+                hero->dx = speed;
                 break;
             case ALLEGRO_KEY_SPACE:
                 hero->shoot = true;
@@ -300,19 +199,19 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = false;
-                hero->dy = hero->d ? get_hero_speed() : 0;
+                hero->dy = hero->d ? speed : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = false;
-                hero->dy = hero->u ? -get_hero_speed() : 0;
+                hero->dy = hero->u ? -speed : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = false;
-                hero->dx = hero->r ? get_hero_speed() : 0;
+                hero->dx = hero->r ? speed : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = false;
-                hero->dx = hero->l ? -get_hero_speed() : 0;
+                hero->dx = hero->l ? -speed : 0;
                 break;
         }
     }
@@ -463,88 +362,6 @@ static bool is_block_collision(BODY *body)
     return get_colliding_block(body, &r, &c);
 }
 
-static void update_hero_player_control()
-{
-    float old_x = hero.body.x;
-    float old_y = hero.body.y;
-
-    /* Vertical movement */
-    hero.body.y += convert_pps_to_fps(hero.dy);
-
-    /* Check for vertical collisions */
-    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
-        hero.body.y = old_y;
-    }
-
-    /* Horizontal movement */
-    hero.body.x += convert_pps_to_fps(hero.dx);
-
-    /* Check for horizontal collisions */
-    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
-        hero.body.x = old_x;
-    }
-
-    /* If the hero was told to shoot... */
-    if (hero.shoot) {
-        /* ...then shoot a bullet! */
-        if (hero.has_bullet) {
-            assert(hero.texture != NO_TEXTURE);
-            shoot_bullet(hero.texture, hero.bullet_x, hero.bullet_y);
-            hero.has_bullet = false;
-        }
-        hero.shoot = false;
-    }
-
-    /* Count the number of active bullets */
-    int num_active_bullets = 0;
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        if (hero_bullets[i].is_active) {
-            num_active_bullets++;
-        }
-    }
-
-    /* Give the hero a bullet to shoot */
-    if (!hero.has_bullet && num_active_bullets == 0) {
-        /* The hero doesn't have a bullet and there are no more on screen */
-        /* The hero needs a new bullet to shoot! */
-        hero.texture = random_front_texture();
-        if (hero.texture != NO_TEXTURE) {
-            init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
-            hero.has_bullet = true;
-        }
-    }
-
-    /* Tell the hero's bullet to follow the hero */
-    if (hero.has_bullet) {
-        /**
-         * These calculations produce a neat effect where the bullet
-         * always lines up with a row of blocks.
-         */
-        hero.bullet_x = hero.body.x + 20;
-        hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
-    }
-}
-
-static void update_hero()
-{
-    update_hero_player_control();
-
-    /* Graphics */
-    animate(hero.curr_sprite);
-    animate(&hero.bullet);
-}
-
-static int find_available_effect_index()
-{
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        if (!effects[i].is_active) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 static void init_poof_effect(EFFECT *effect, float x, float y)
 {
     init_sprite(&effect->sprite, false, 15);
@@ -558,6 +375,17 @@ static void init_poof_effect(EFFECT *effect, float x, float y)
     effect->y = y;
     effect->update = update_effect_until_done_animating;
     effect->is_active = true;
+}
+
+static int find_available_effect_index()
+{
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        if (!effects[i].is_active) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 static int num_blocks()
@@ -638,6 +466,128 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
     }
 
     return true;
+}
+
+
+static void shoot_bullet(int texture, float x, float y)
+{
+    /* Find the next available bullet slot */
+    int i = 0;
+    while (i < MAX_BULLETS) {
+        if (!hero_bullets[i].is_active) {
+            break;
+        }
+        i++;
+    }
+
+    if (i == MAX_BULLETS) {
+        /* No more bullet slots available, don't create a bullet */
+        return;
+    }
+
+    /* Found an available bullet slot to use to setup this new bullet */
+    BULLET *bullet = &hero_bullets[i];
+
+    /* Create the bullet! */
+    init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
+    bullet->texture = texture;
+    bullet->hits = 2;
+    bullet->body.x = x;
+    bullet->body.y = y;
+    bullet->body.w = 10;
+    bullet->body.h = 10;
+
+    /* Make the bullet fly to the right */
+    bullet->dx = TILE_SIZE * 10;
+    bullet->dy = 0;
+
+    bullet->is_active = true;
+
+    /**
+     * Do some fancy footwork to find out if this bullet
+     * should be immediately bouncing back towards the
+     * player.
+     */
+
+    float orig_x = bullet->body.x;
+
+    /* NOTE: This will need to be updated when bullets can shoot in other directions */
+    for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
+        if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
+            break;
+        }
+    }
+}
+
+static void update_hero_player_control()
+{
+    float old_x = hero.body.x;
+    float old_y = hero.body.y;
+
+    /* Vertical movement */
+    hero.body.y += convert_pps_to_fps(hero.dy);
+
+    /* Check for vertical collisions */
+    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
+        hero.body.y = old_y;
+    }
+
+    /* Horizontal movement */
+    hero.body.x += convert_pps_to_fps(hero.dx);
+
+    /* Check for horizontal collisions */
+    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
+        hero.body.x = old_x;
+    }
+
+    /* If the hero was told to shoot... */
+    if (hero.shoot) {
+        /* ...then shoot a bullet! */
+        if (hero.has_bullet) {
+            assert(hero.texture != NO_TEXTURE);
+            shoot_bullet(hero.texture, hero.bullet_x, hero.bullet_y);
+            hero.has_bullet = false;
+        }
+        hero.shoot = false;
+    }
+
+    /* Count the number of active bullets */
+    int num_active_bullets = 0;
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (hero_bullets[i].is_active) {
+            num_active_bullets++;
+        }
+    }
+
+    /* Give the hero a bullet to shoot */
+    if (!hero.has_bullet && num_active_bullets == 0) {
+        /* The hero doesn't have a bullet and there are no more on screen */
+        /* The hero needs a new bullet to shoot! */
+        hero.texture = random_front_texture();
+        if (hero.texture != NO_TEXTURE) {
+            init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+            hero.has_bullet = true;
+        }
+    }
+
+    /* Tell the hero's bullet to follow the hero */
+    if (hero.has_bullet) {
+        /**
+         * These calculations produce a neat effect where the bullet
+         * always lines up with a row of blocks.
+         */
+        hero.bullet_x = hero.body.x + 20;
+        hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
+    }
+}
+
+static void update_hero()
+{
+    update_hero_player_control();
+
+    /* Graphics */
+    animate(hero.curr_sprite);
+    animate(&hero.bullet);
 }
 
 static void update_hero_bullets()
@@ -886,3 +836,44 @@ void to_gameplay_state_dying()
 
     printf("Pretending to set gameplay state to dying.\n");
 }
+
+//ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
+//{
+//    ENEMY *enemy = alloc_memory("ENEMY", sizeof(ENEMY));
+//
+//    enemy->type = type;
+//
+//    if (type == ENEMY_TYPE_BAT) {
+//        init_sprite(&enemy->sprite, true, 20);
+//        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+//        enemy->sprite.x_offset = -10;
+//        enemy->sprite.y_offset = -10;
+//    } else if (type == ENEMY_TYPE_SPIDER) {
+//        init_sprite(&enemy->sprite, true, 8);
+//        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
+//        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+//        enemy->sprite.x_offset = -10;
+//        enemy->sprite.y_offset = -10;
+//    }
+//
+//    /* Set the starting position */
+//    enemy->body.x = x;
+//    enemy->body.y = y;
+//
+//    enemy->body.w = 10;
+//    enemy->body.h = 10;
+//
+//    enemy->dx = 0;
+//    enemy->dy = 0;
+//
+//    enemy->update = NULL;
+//
+//    return enemy;
+//}
