@@ -12,6 +12,14 @@
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;
 
+/**
+ * GLOBAL GAMEPLAY DATA
+ *
+ * There's only one instance of these needed, so just make them global.
+ *
+ * STARTS HERE...
+ */
+
 static bool end_gameplay = false;
 
 /* Ready to play when you start the game */
@@ -34,6 +42,15 @@ static EFFECT effects[MAX_EFFECTS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
+/**
+ * ...ENDS HERE.
+ */
+
+/**
+ * All velocity values (dx, dy...) are stored as "int" values,
+ * as "Pixels Per Second". Use this to convert it to "Frames
+ * Per Second" before adding it to the sprite's location.
+ */
 static float convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
@@ -224,11 +241,19 @@ static void init_effects()
     }
 }
 
-void init_gameplay_session()
+static void init_hero_bullets()
+{
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        hero_bullets[i].is_active = false;
+    }
+}
+
+void init_gameplay()
 {
     /* Hero */
     init_hero(&hero);
     init_hero_sprite();
+    init_hero_bullets();
 
     /* Room */
     init_room(&room);
@@ -274,7 +299,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 
     /* Hero control */
-    if (curr_gameplay_state == GAMEPLAY_STATE_PLAY) {
+    if (hero.control != NULL) {
         hero.control(&hero, event);
     }
 }
@@ -625,6 +650,70 @@ static void set_hero_death()
 
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
+
+    hero.control = NULL;
+}
+
+static bool update_gameplay_playing()
+{
+    printf("Pretending to update gameplay playing...\n");
+
+    return true;
+}
+
+static bool update_gameplay_dying()
+{
+    /* HERO IS DEAD */
+
+    /* This creates a nice "up then down" motion for the hero to fall when dying */
+    hero.dy += 10;
+    hero.body.y += convert_pps_to_fps(hero.dy);
+
+    animate(hero.curr_sprite);
+
+    if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
+        if (gameplay_difficulty == GAMEPLAY_DIFFICULTY_EASY) {
+            init_hero(&hero);
+            init_hero_sprite();
+            hero.body.x = room.startx;
+            hero.body.y = room.starty;
+            hero.direction = room.direction;
+            hero.curr_sprite = &hero.sprite;
+            curr_gameplay_state = GAMEPLAY_STATE_PLAY;
+            hero.control = control_hero_from_keyboard;
+            update = update_gameplay_playing;
+        } else {
+            load_gameplay_room_from_num(curr_room);
+        }
+    }
+
+    return true;
+}
+
+//static void to_gameplay_state_starting()
+//{
+//    assert(is_gameplay_init);
+//
+//    printf("Pretending to set gameplay state to playing.\n");
+//}
+
+//static void to_gameplay_state_playing()
+//{
+//    assert(is_gameplay_init);
+//
+//    printf("Pretending to set gameplay state to playing.\n");
+//}
+
+static void to_gameplay_state_dying()
+{
+    assert(is_gameplay_init);
+
+    /* Kill the hero :( */
+    set_hero_death();
+
+    /* Change the gameplay state */
+    curr_gameplay_state = GAMEPLAY_STATE_DEATH;
+    update = update_gameplay_dying;
 }
 
 bool update_gameplay(void *data)
@@ -647,12 +736,9 @@ bool update_gameplay(void *data)
                 BODY *b1 = &hero.body;
                 BODY *b2 = &hero_bullets[i].body;
                 if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
-                    /* Kill the hero :( */
-                    set_hero_death();
                     /* Destroy the bullet that hit the hero */
                     hero_bullets[i].is_active = false;
-                    /* Change the gameplay state */
-                    curr_gameplay_state = GAMEPLAY_STATE_DEATH;
+                    to_gameplay_state_dying();
                 }
             }
         }
@@ -672,28 +758,7 @@ bool update_gameplay(void *data)
 
     } else if (curr_gameplay_state == GAMEPLAY_STATE_DEATH) {
 
-        /* HERO IS DEAD */
-
-        /* This creates a nice "up then down" motion for the hero to fall when dying */
-        hero.dy += 10;
-        hero.body.y += convert_pps_to_fps(hero.dy);
-
-        animate(hero.curr_sprite);
-
-        if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
-            if (gameplay_difficulty == GAMEPLAY_DIFFICULTY_EASY) {
-                init_hero(&hero);
-                init_hero_sprite();
-                hero.body.x = room.startx;
-                hero.body.y = room.starty;
-                hero.direction = room.direction;
-                hero.curr_sprite = &hero.sprite;
-                curr_gameplay_state = GAMEPLAY_STATE_PLAY;
-                hero.control = control_hero_from_keyboard;
-            } else {
-                load_gameplay_room_from_num(curr_room);
-            }
-        }
+        update_gameplay_dying();
 
     }
 
@@ -821,20 +886,6 @@ void reset_gameplay()
     assert(is_gameplay_init);
 
     printf("Pretending to reset gameplay.\n");
-}
-
-void to_gameplay_state_playing()
-{
-    assert(is_gameplay_init);
-
-    printf("Pretending to set gameplay state to playing.\n");
-}
-
-void to_gameplay_state_dying()
-{
-    assert(is_gameplay_init);
-
-    printf("Pretending to set gameplay state to dying.\n");
 }
 
 //ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)

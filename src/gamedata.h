@@ -207,31 +207,6 @@ typedef struct {
     int size;
 } ROOM_LIST;
 
-typedef struct
-{
-    bool is_ended;
-
-    /* State of the gameplay */
-    GAMEPLAY_STATE state;
-
-    /* Functions to control the current gameplay state */
-    void (*control)(ALLEGRO_EVENT *event);
-    bool (*update)();
-    void (*draw)();
-
-    /* Level control */
-    ROOM_LIST room_list;
-    int curr_room;
-
-    /* The primary gameplay characters! */
-    HERO hero;
-    BULLET hero_bullets[MAX_BULLETS];
-    ROOM room;
-    EFFECT effects[MAX_EFFECTS];
-
-    GAMEPLAY_DIFFICULTY difficulty;
-} GAMEPLAY;
-
 /* Initialize a hero to its default state, ready to be drawn */
 void init_hero(HERO *hero);
 
@@ -241,7 +216,5 @@ void init_room(ROOM *room);
 void init_room_list(ROOM_LIST *room_list);
 
 void init_effect(EFFECT *effect);
-
-void init_gameplay(GAMEPLAY *gameplay);
 
 #endif

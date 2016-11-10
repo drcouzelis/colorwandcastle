@@ -112,10 +112,3 @@ void init_effect(EFFECT *effect)
     effect->x = 0;
     effect->y = 0;
 }
-
-void init_gameplay(GAMEPLAY *gameplay)
-{
-    assert(gameplay != NULL);
-
-    // TODO
-}

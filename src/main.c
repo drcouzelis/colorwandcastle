@@ -46,9 +46,11 @@ int main(int argc, char **argv)
     /* So animations know how fast to go */
     set_animation_fps(GAME_TICKER);
 
-    /* So we know where to look for data files */
+    /* So we know where to look for image / sound files... */
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
+
+    /* So we know where to look for data / level files... */
     add_datafile_path( PKGDATADIR "/levels/");
     add_datafile_path("./");
     add_datafile_path("");
@@ -65,7 +67,7 @@ int main(int argc, char **argv)
     toggle_audio();
 
     /* INIT THE GAME */
-    init_gameplay_session();
+    init_gameplay();
 
     /* LOAD THE FIRST LEVEL */
     bool is_room_init = false;
