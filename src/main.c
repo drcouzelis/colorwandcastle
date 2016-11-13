@@ -79,7 +79,8 @@ int main(int argc, char **argv)
 
     /* ...otherwise, just load the default level set! */
     if (!is_room_init) {
-        load_gameplay_room_list_from_filename("story-list.dat"); // This can eventually be chosen from a menu
+        /* This can eventually be chosen from a menu */
+        load_gameplay_room_list_from_filename("story-list.dat");
     }
 
     /* RUN THE GAME */

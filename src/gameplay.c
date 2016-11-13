@@ -9,6 +9,13 @@
 #include "sprite.h"
 #include "utilities.h"
 
+static void to_gameplay_state_starting();
+static void to_gameplay_state_playing();
+static void to_gameplay_state_dying();
+static bool update_gameplay_starting();
+static bool update_gameplay_playing();
+static bool update_gameplay_dying();
+
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;
 
@@ -21,9 +28,6 @@ static bool is_gameplay_init = false;
  */
 
 static bool end_gameplay = false;
-
-/* Ready to play when you start the game */
-static GAMEPLAY_STATE curr_gameplay_state = GAMEPLAY_STATE_PLAY;
 
 /* Functions to control the current gameplay state */
 static void (*control)(ALLEGRO_EVENT *event) = NULL;
@@ -122,7 +126,7 @@ static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame
     return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
 }
 
-static void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
+static void load_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
 {
     init_sprite(sprite, true, 4);
     add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 0));
@@ -131,7 +135,7 @@ static void init_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero
     sprite->y_offset = -5;
 }
 
-static void init_hero_sprite()
+static void load_hero_sprite()
 {
     init_sprite(&hero.sprite, true, 10);
     hero.sprite.x_offset = -10;
@@ -163,10 +167,10 @@ static void toggle_hero()
     /* Toggle the hero type */
     hero.type = hero.type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
 
-    init_hero_sprite();
+    load_hero_sprite();
 
     if (hero.has_bullet) {
-        init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+        load_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
     }
 }
 
@@ -252,7 +256,8 @@ void init_gameplay()
 {
     /* Hero */
     init_hero(&hero);
-    init_hero_sprite();
+
+    /* Hero bullets */
     init_hero_bullets();
 
     /* Room */
@@ -265,12 +270,31 @@ void init_gameplay()
     init_room_list(&room_list);
     curr_room = 0;
 
-    curr_gameplay_state = GAMEPLAY_STATE_PLAY;
     control = NULL;
     update = NULL;
     draw = NULL;
 
+    to_gameplay_state_starting();
+
     is_gameplay_init = true;
+}
+
+static void to_gameplay_state_starting()
+{
+    update = update_gameplay_starting;
+}
+
+bool load_gameplay_room_from_num(int room_num);
+
+static bool update_gameplay_starting()
+{
+    load_hero_sprite();
+
+    load_gameplay_room_from_num(curr_room);
+
+    to_gameplay_state_playing();
+
+    return true;
 }
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
@@ -387,7 +411,7 @@ static bool is_block_collision(BODY *body)
     return get_colliding_block(body, &r, &c);
 }
 
-static void init_poof_effect(EFFECT *effect, float x, float y)
+static void load_poof_effect(EFFECT *effect, float x, float y)
 {
     init_sprite(&effect->sprite, false, 15);
     add_frame(&effect->sprite, IMG("effect-poof-1.png"));
@@ -449,7 +473,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Remove the bullet and the block */
             bullet->hits = 0;
             play_sound(SND("star_hit.wav"));
-            init_poof_effect(&effects[find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
+            load_poof_effect(&effects[find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
             if (num_blocks() == 0) {
@@ -514,7 +538,7 @@ static void shoot_bullet(int texture, float x, float y)
     BULLET *bullet = &hero_bullets[i];
 
     /* Create the bullet! */
-    init_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
+    load_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
     bullet->texture = texture;
     bullet->hits = 2;
     bullet->body.x = x;
@@ -590,7 +614,7 @@ static void update_hero_player_control()
         /* The hero needs a new bullet to shoot! */
         hero.texture = random_front_texture();
         if (hero.texture != NO_TEXTURE) {
-            init_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+            load_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
             hero.has_bullet = true;
         }
     }
@@ -654,13 +678,6 @@ static void set_hero_death()
     hero.control = NULL;
 }
 
-static bool update_gameplay_playing()
-{
-    printf("Pretending to update gameplay playing...\n");
-
-    return true;
-}
-
 static bool update_gameplay_dying()
 {
     /* HERO IS DEAD */
@@ -671,17 +688,10 @@ static bool update_gameplay_dying()
 
     animate(hero.curr_sprite);
 
+    /* Check if the hero has finished FLYING off the bottom of the screen, dead */
     if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
         if (gameplay_difficulty == GAMEPLAY_DIFFICULTY_EASY) {
-            init_hero(&hero);
-            init_hero_sprite();
-            hero.body.x = room.startx;
-            hero.body.y = room.starty;
-            hero.direction = room.direction;
-            hero.curr_sprite = &hero.sprite;
-            curr_gameplay_state = GAMEPLAY_STATE_PLAY;
-            hero.control = control_hero_from_keyboard;
-            update = update_gameplay_playing;
+            to_gameplay_state_playing();
         } else {
             load_gameplay_room_from_num(curr_room);
         }
@@ -690,77 +700,73 @@ static bool update_gameplay_dying()
     return true;
 }
 
-//static void to_gameplay_state_starting()
-//{
-//    assert(is_gameplay_init);
-//
-//    printf("Pretending to set gameplay state to playing.\n");
-//}
+static void to_gameplay_state_playing()
+{
+    init_hero(&hero);
+    load_hero_sprite();
+    hero.body.x = room.startx;
+    hero.body.y = room.starty;
+    hero.direction = room.direction;
+    hero.curr_sprite = &hero.sprite;
+    hero.control = control_hero_from_keyboard;
 
-//static void to_gameplay_state_playing()
-//{
-//    assert(is_gameplay_init);
-//
-//    printf("Pretending to set gameplay state to playing.\n");
-//}
+    update = update_gameplay_playing;
+}
 
 static void to_gameplay_state_dying()
 {
-    assert(is_gameplay_init);
-
     /* Kill the hero :( */
     set_hero_death();
 
     /* Change the gameplay state */
-    curr_gameplay_state = GAMEPLAY_STATE_DEATH;
     update = update_gameplay_dying;
+}
+
+static bool update_gameplay_playing()
+{
+    /* Hero */
+    update_hero();
+
+    /* Bullets */
+    update_hero_bullets();
+
+    /* Check for hurting collisions */
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (hero_bullets[i].is_active) {
+            BODY *b1 = &hero.body;
+            BODY *b2 = &hero_bullets[i].body;
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+                /* Destroy the bullet that hit the hero */
+                hero_bullets[i].is_active = false;
+                to_gameplay_state_dying();
+                /* If you're dead, you can't complete the level, so quit here! */
+                return true;
+            }
+        }
+    }
+
+    /* Check for level completion */
+    if (room.cleared) {
+        BODY *b1 = &hero.body;
+        if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
+            /* The hero has entered the end-level door, go to the next level */
+            if (curr_room < room_list.size - 1) {
+                load_gameplay_room_from_num(curr_room + 1);
+                to_gameplay_state_playing();
+            } else {
+                end_gameplay = true;
+            }
+        }
+    }
+
+    return true;
 }
 
 bool update_gameplay(void *data)
 {
     assert(is_gameplay_init);
 
-    if (curr_gameplay_state == GAMEPLAY_STATE_PLAY) {
-
-        /* PLAYING THE GAME */
-
-        /* Hero */
-        update_hero();
-
-        /* Bullets */
-        update_hero_bullets();
-
-        /* Check for hurting collisions */
-        for (int i = 0; i < MAX_BULLETS; i++) {
-            if (hero_bullets[i].is_active) {
-                BODY *b1 = &hero.body;
-                BODY *b2 = &hero_bullets[i].body;
-                if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
-                    /* Destroy the bullet that hit the hero */
-                    hero_bullets[i].is_active = false;
-                    to_gameplay_state_dying();
-                }
-            }
-        }
-
-        /* Check for level completion */
-        if (curr_gameplay_state == GAMEPLAY_STATE_PLAY && room.cleared) {
-            BODY *b1 = &hero.body;
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
-                /* The hero has entered the end-level door, go to the next level */
-                if (curr_room < room_list.size - 1) {
-                    load_gameplay_room_from_num(curr_room + 1);
-                } else {
-                    end_gameplay = true;
-                }
-            }
-        }
-
-    } else if (curr_gameplay_state == GAMEPLAY_STATE_DEATH) {
-
-        update_gameplay_dying();
-
-    }
+    update();
 
     /* Effects */
     for (int i = 0; i < MAX_EFFECTS; i++) {
@@ -838,21 +844,7 @@ bool load_gameplay_room_from_filename(const char *filename)
     init_room(&room);
     init_effects();
 
-    bool is_room_init = load_room_from_datafile_with_filename(filename, &room);
-
-    /* After a room is loaded, setup other things like the hero's position */
-    if (is_room_init) {
-        init_hero(&hero);
-        init_hero_sprite();
-        hero.body.x = room.startx;
-        hero.body.y = room.starty;
-        hero.direction = room.direction;
-        hero.curr_sprite = &hero.sprite;
-        curr_gameplay_state = GAMEPLAY_STATE_PLAY;
-        hero.control = control_hero_from_keyboard;
-    }
-
-    return is_room_init;
+    return load_room_from_datafile_with_filename(filename, &room);
 }
 
 bool load_gameplay_room_list_from_filename(const char *filename)
@@ -864,7 +856,7 @@ bool load_gameplay_room_list_from_filename(const char *filename)
     }
 
     /* Go ahead and load the first level because WHY NOT */
-    return load_gameplay_room_from_num(0);
+    return true;
 }
 
 bool load_gameplay_room_from_num(int room_num)
@@ -872,13 +864,13 @@ bool load_gameplay_room_from_num(int room_num)
     assert(is_gameplay_init);
     assert(room_num < room_list.size);
 
-    bool is_room_init = load_gameplay_room_from_filename(room_list.filenames[room_num]);
+    bool success = load_gameplay_room_from_filename(room_list.filenames[room_num]);
 
-    if (is_room_init) {
+    if (success) {
         curr_room = room_num;
     }
 
-    return is_room_init;
+    return success;
 }
 
 void reset_gameplay()
