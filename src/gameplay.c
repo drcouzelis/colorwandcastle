@@ -11,8 +11,16 @@
 
 static void to_gameplay_state_starting(); /* TO BE DELETED */
 //static void to_gameplay_state_starting_new_game();
+//. clear room
+//. load level
+//. reset hero pos
 //static void to_gameplay_state_starting_new_room();
+//. clear room
+//. load level
+//. reset hero pos
 //static void to_gameplay_state_starting_after_dying();
+//. reset level (maybe)
+//. reset hero pos
 static void to_gameplay_state_playing();
 static void to_gameplay_state_dying();
 static bool update_gameplay_starting();
