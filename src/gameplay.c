@@ -9,7 +9,10 @@
 #include "sprite.h"
 #include "utilities.h"
 
-static void to_gameplay_state_starting();
+static void to_gameplay_state_starting(); /* TO BE DELETED */
+//static void to_gameplay_state_starting_new_game();
+//static void to_gameplay_state_starting_new_room();
+//static void to_gameplay_state_starting_after_dying();
 static void to_gameplay_state_playing();
 static void to_gameplay_state_dying();
 static bool update_gameplay_starting();
