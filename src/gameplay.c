@@ -9,23 +9,16 @@
 #include "sprite.h"
 #include "utilities.h"
 
-static void to_gameplay_state_starting(); /* TO BE DELETED */
-//static void to_gameplay_state_starting_new_game();
-//. clear room
-//. load level
-//. reset hero pos
-//static void to_gameplay_state_starting_new_room();
-//. clear room
-//. load level
-//. reset hero pos
-//static void to_gameplay_state_starting_after_dying();
-//. reset level (maybe)
-//. reset hero pos
+static void to_gameplay_state_starting_new_game();
+static void to_gameplay_state_starting_after_dying();
+static void to_gameplay_state_starting_next_room();
 static void to_gameplay_state_playing();
 static void to_gameplay_state_dying();
-static bool update_gameplay_starting();
+static bool update_gameplay_starting_new_game();
 static bool update_gameplay_playing();
 static bool update_gameplay_dying();
+static void draw_gameplay_playing();
+static void control_gameplay_playing();
 
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;
@@ -285,24 +278,79 @@ void init_gameplay()
     update = NULL;
     draw = NULL;
 
-    to_gameplay_state_starting();
+    to_gameplay_state_starting_new_game();
 
     is_gameplay_init = true;
 }
 
-static void to_gameplay_state_starting()
+static void reset_hero(float x, float y, DIRECTION direction)
 {
-    update = update_gameplay_starting;
+    /* Set the current sprite */
+    hero.curr_sprite = &hero.sprite;
+
+    /* Set a new given position */
+    hero.body.x = x;
+    hero.body.y = y;
+    hero.direction = direction;
+
+    /* Stop the hero from moving for the moment */
+    hero.dx = 0;
+    hero.dy = 0;
+
+    /* Allow the hero to be controlled by the player */
+    hero.control = control_hero_from_keyboard;
+}
+
+static void to_gameplay_state_starting_new_game()
+{
+    update = update_gameplay_starting_new_game;
+    control = NULL;
+    draw = NULL;
+}
+
+static void to_gameplay_state_starting_after_dying()
+{
+    if (gameplay_difficulty != GAMEPLAY_DIFFICULTY_EASY) {
+        /* Load the current room */
+        load_gameplay_room_from_num(curr_room);
+    }
+
+    /* Reset the hero */
+    reset_hero(room.startx, room.starty, room.direction);
+
+    /* Ready to start playing! */
+    to_gameplay_state_playing();
+}
+
+static void to_gameplay_state_starting_next_room()
+{
+    /* Clear the old room */
+    init_room(&room);
+
+    /* Load the next room */
+    load_gameplay_room_from_num(curr_room + 1);
+
+    /* Reset the hero */
+    reset_hero(room.startx, room.starty, room.direction);
+
+    /* Ready to start playing! */
+    to_gameplay_state_playing();
+
 }
 
 bool load_gameplay_room_from_num(int room_num);
 
-static bool update_gameplay_starting()
+static bool update_gameplay_starting_new_game()
 {
-    load_hero_sprite();
-
+    /* Load the current room */
     load_gameplay_room_from_num(curr_room);
 
+    /* Load the hero sprites */
+    /* Reset the hero */
+    load_hero_sprite();
+    reset_hero(room.startx, room.starty, room.direction);
+
+    /* Ready to start playing! */
     to_gameplay_state_playing();
 
     return true;
@@ -312,6 +360,13 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
     assert(is_gameplay_init);
 
+    if (control != NULL) {
+        control(event);
+    }
+}
+
+static void control_gameplay_playing(ALLEGRO_EVENT *event)
+{
     /* General application control */
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
@@ -701,11 +756,7 @@ static bool update_gameplay_dying()
 
     /* Check if the hero has finished FLYING off the bottom of the screen, dead */
     if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
-        if (gameplay_difficulty == GAMEPLAY_DIFFICULTY_EASY) {
-            to_gameplay_state_playing();
-        } else {
-            load_gameplay_room_from_num(curr_room);
-        }
+        to_gameplay_state_starting_after_dying();
     }
 
     return true;
@@ -713,15 +764,9 @@ static bool update_gameplay_dying()
 
 static void to_gameplay_state_playing()
 {
-    init_hero(&hero);
-    load_hero_sprite();
-    hero.body.x = room.startx;
-    hero.body.y = room.starty;
-    hero.direction = room.direction;
-    hero.curr_sprite = &hero.sprite;
-    hero.control = control_hero_from_keyboard;
-
+    control = control_gameplay_playing;
     update = update_gameplay_playing;
+    draw = draw_gameplay_playing;
 }
 
 static void to_gameplay_state_dying()
@@ -762,8 +807,7 @@ static bool update_gameplay_playing()
         if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
             /* The hero has entered the end-level door, go to the next level */
             if (curr_room < room_list.size - 1) {
-                load_gameplay_room_from_num(curr_room + 1);
-                to_gameplay_state_playing();
+                to_gameplay_state_starting_next_room();
             } else {
                 end_gameplay = true;
             }
@@ -793,6 +837,13 @@ void draw_gameplay(void *data)
 {
     assert(is_gameplay_init);
 
+    if (draw != NULL) {
+        draw();
+    }
+}
+
+static void draw_gameplay_playing()
+{
     /* Draw the room (backgrounds, blocks...) */
     for (int r = 0; r < room.rows; r++) {
         for (int c = 0; c < room.cols; c++) {
@@ -851,10 +902,6 @@ bool load_gameplay_room_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
 
-    /* Clear everything in the room */
-    init_room(&room);
-    init_effects();
-
     return load_room_from_datafile_with_filename(filename, &room);
 }
 
@@ -866,7 +913,6 @@ bool load_gameplay_room_list_from_filename(const char *filename)
         return false;
     }
 
-    /* Go ahead and load the first level because WHY NOT */
     return true;
 }
 
@@ -882,13 +928,6 @@ bool load_gameplay_room_from_num(int room_num)
     }
 
     return success;
-}
-
-void reset_gameplay()
-{
-    assert(is_gameplay_init);
-
-    printf("Pretending to reset gameplay.\n");
 }
 
 //ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
