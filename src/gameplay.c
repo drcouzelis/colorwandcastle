@@ -141,28 +141,29 @@ static void load_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero
 
 static void load_hero_sprite()
 {
-    init_sprite(&hero.sprite, true, 10);
-    hero.sprite.x_offset = -10;
-    hero.sprite.y_offset = -10;
+    init_sprite(&hero.sprite_flying, true, 10);
+    hero.sprite_flying.x_offset = -10;
+    hero.sprite_flying.y_offset = -10;
+
+    init_sprite(&hero.sprite_hurting, true, 6);
+    hero.sprite_hurting.x_offset = -10;
+    hero.sprite_hurting.y_offset = -10;
 
     if (hero.direction == L) {
-        hero.sprite.mirror = true;
+        hero.sprite_flying.mirror = true;
+        hero.sprite_hurting.mirror = true;
     }
 
-    init_sprite(&hero.hurt_sprite, true, 6);
-    hero.hurt_sprite.x_offset = -10;
-    hero.hurt_sprite.y_offset = -10;
-
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero.sprite, IMG("hero-makayla-01.png"));
-        add_frame(&hero.sprite, IMG("hero-makayla-02.png"));
-        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-01.png"));
-        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-02.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-makayla-01.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-makayla-02.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-01.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-02.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        add_frame(&hero.sprite, IMG("hero-rawson-01.png"));
-        add_frame(&hero.sprite, IMG("hero-rawson-02.png"));
-        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-01.png"));
-        add_frame(&hero.hurt_sprite, IMG("hero-makayla-hurt-02.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-rawson-01.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-rawson-02.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-01.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-02.png"));
     }
 }
 
@@ -286,7 +287,7 @@ void init_gameplay()
 static void reset_hero(float x, float y, DIRECTION direction)
 {
     /* Set the current sprite */
-    hero.curr_sprite = &hero.sprite;
+    hero.sprite = &hero.sprite_flying;
 
     /* Set a new given position */
     hero.body.x = x;
@@ -701,7 +702,7 @@ static void update_hero()
     update_hero_player_control();
 
     /* Graphics */
-    animate(hero.curr_sprite);
+    animate(hero.sprite);
     animate(&hero.bullet);
 }
 
@@ -732,7 +733,7 @@ static void update_hero_bullets()
 
 static void set_hero_death()
 {
-    hero.curr_sprite = &hero.hurt_sprite;
+    hero.sprite = &hero.sprite_hurting;
 
     /* These velocity settings create a nice "up then down" movement for the dying hero */
     hero.dx = 0;
@@ -752,7 +753,7 @@ static bool update_gameplay_dying()
     hero.dy += 10;
     hero.body.y += convert_pps_to_fps(hero.dy);
 
-    animate(hero.curr_sprite);
+    animate(hero.sprite);
 
     /* Check if the hero has finished FLYING off the bottom of the screen, dead */
     if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
@@ -883,7 +884,7 @@ static void draw_gameplay_playing()
     }
 
     /* Draw the hero */
-    draw_sprite(hero.curr_sprite, hero.body.x, hero.body.y);
+    draw_sprite(hero.sprite, hero.body.x, hero.body.y);
     
     /* Draw the hero's bullet */
     if (hero.has_bullet) {

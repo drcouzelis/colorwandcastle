@@ -6,6 +6,10 @@ void init_hero(HERO *hero)
 {
     hero->type = HERO_TYPE_MAKAYLA;
 
+    init_sprite(&hero->sprite_flying, false, 0);
+    init_sprite(&hero->sprite_hurting, false, 0);
+    hero->sprite = NULL;
+
     /* Set the starting position */
     hero->body.x = TILE_SIZE;
     hero->body.y = TILE_SIZE;

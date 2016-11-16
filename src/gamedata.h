@@ -98,9 +98,9 @@ typedef struct HERO
 {
     HERO_TYPE type;
 
-    SPRITE *curr_sprite;
-    SPRITE sprite;
-    SPRITE hurt_sprite;
+    SPRITE sprite_flying;
+    SPRITE sprite_hurting;
+    SPRITE *sprite; /* The current active sprite */
 
     BODY body;
     int dx; /* In pixels per second */

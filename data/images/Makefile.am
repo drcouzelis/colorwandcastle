@@ -24,6 +24,8 @@ dist_imagesdata_DATA = \
   hero-makayla-hurt-02.png \
   hero-rawson-01.png \
   hero-rawson-02.png \
+  hero-rawson-hurt-01.png \
+  hero-rawson-hurt-02.png \
   icon.png \
   mask-block.png \
   mask-plasma-1.png \
