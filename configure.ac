@@ -15,7 +15,6 @@ AC_CONFIG_HEADERS([config.h])
 
 # Check for the compiler.
 AC_PROG_CXX
-AM_PROG_CC_C_O
 
 # Check for libraries.
 AC_CHECK_LIB([allegro], [al_install_system], [],
