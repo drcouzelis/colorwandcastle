@@ -2,6 +2,8 @@
 
 **A simple, colorful action game.**
 
+![Screenshot](/dev/screenshots/screenshot-2016-04-30.png?raw=true)
+
 - [x] Shoot the blocks to clear the room.
 - [x] Don't get hit by your own shots!
 - [ ] Dodge enemies.
