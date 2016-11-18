@@ -10,6 +10,8 @@
 
 **This game is a work in progress.**
 
-Written using the C programming language and the [Allegro game library](http://liballeg.org/).
+## Development
 
-David Couzelis (drcouzelis@gmail.com), copyright 2016
+- By David Couzelis (drcouzelis@gmail.com)
+- C programming language
+- [Allegro game library](http://liballeg.org/).
