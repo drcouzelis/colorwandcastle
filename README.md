@@ -1,7 +1,6 @@
 # Colorwand Castle
 
-By David Couzelis
-drcouzelis@gmail.com
+By David Couzelis <drcouzelis@gmail.com>
 Copyright 2016
 
 A cute action puzzle game.

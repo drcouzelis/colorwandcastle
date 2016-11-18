@@ -5,7 +5,10 @@
 AC_INIT([colorwandcastle], [0.1], [drcouzelis@gmail.com])
 
 # Initialize automake with all warnings.
-AM_INIT_AUTOMAKE([-Wall -Werror])
+# "foreign" will ignore any missing files (README, AUTHORS...).
+#
+# https://www.gnu.org/software/automake/manual/html_node/Strictness.html
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 # Mark the source code directory.
 AC_CONFIG_SRCDIR([src/main.c])
