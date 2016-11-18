@@ -2,8 +2,11 @@
 
 **A simple, colorful action game.**
 
-- Shoot the blocks to clear the room.
-- Don't get hit by your own shots!
+[x] Shoot the blocks to clear the room.
+[x] Don't get hit by your own shots!
+[ ] Dodge enemies.
+[ ] Collect powerups.
+[ ] Dozens of levels.
 
 **This game is a work in progress.**
 
