@@ -1,7 +1,12 @@
 # Colorwand Castle
 
-**A cute action puzzle game.**
+**A simple, colorful action game.**
 
-David Couzelis drcouzelis@gmail.com
+- Shoot the blocks to clear the room.
+- Don't get hit by your own shots!
 
-Copyright 2016
+**This game is a work in progress.**
+
+Written using the C programming language and the [Allegro game library](http://liballeg.org/).
+
+David Couzelis (drcouzelis@gmail.com), copyright 2016
