@@ -8,7 +8,7 @@ AC_INIT([colorwandcastle], [0.1], [drcouzelis@gmail.com])
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
 # Mark the source code directory.
-AC_CONFIG_SRCDIR([src/main.h])
+AC_CONFIG_SRCDIR([src/main.c])
 
 # Rebuild these header files.
 AC_CONFIG_HEADERS([config.h])
