@@ -16,4 +16,6 @@
 
 - By David Couzelis (drcouzelis@gmail.com)
 - C programming language
-- [Allegro game library](http://liballeg.org/). ![Alex](https://wiki.allegro.cc/pub/2/2a/Alex.gif)
+- [Allegro game library](http://liballeg.org/).
+
+![Alex](https://wiki.allegro.cc/pub/2/2a/Alex.gif)

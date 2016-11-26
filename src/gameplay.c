@@ -167,6 +167,39 @@ static void load_hero_sprite()
     }
 }
 
+static EFFECT *find_available_effect()
+{
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        if (!effects[i].is_active) {
+            return &effects[i];
+        }
+    }
+
+    return NULL;
+}
+
+static void load_poof_effect(float x, float y)
+{
+    EFFECT *effect = find_available_effect();
+
+    if (effect == NULL) {
+        fprintf(stderr, "Failed to find available effect.\n");
+        return;
+    }
+
+    init_sprite(&effect->sprite, false, 15);
+    add_frame(&effect->sprite, IMG("effect-poof-1.png"));
+    add_frame(&effect->sprite, IMG("effect-poof-2.png"));
+    add_frame(&effect->sprite, IMG("effect-poof-3.png"));
+    add_frame(&effect->sprite, IMG("effect-poof-4.png"));
+    effect->sprite.x_offset = -10;
+    effect->sprite.y_offset = -10;
+    effect->x = x;
+    effect->y = y;
+    effect->update = update_effect_until_done_animating;
+    effect->is_active = true;
+}
+
 static void toggle_hero()
 {
     /* Toggle the hero type */
@@ -177,6 +210,8 @@ static void toggle_hero()
     if (hero.has_bullet) {
         load_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
     }
+
+    load_poof_effect(hero.body.x - 5, hero.body.y - 5);
 }
 
 static void control_hero_from_keyboard(HERO *hero, void *data)
@@ -294,6 +329,13 @@ static void reset_hero(float x, float y, DIRECTION direction)
     hero.body.y = y;
     hero.direction = direction;
 
+    /* Clear keyboard input */
+    hero.u = false;
+    hero.d = false;
+    hero.l = false;
+    hero.r = false;
+    hero.shoot = false;
+
     /* Stop the hero from moving for the moment */
     hero.dx = 0;
     hero.dy = 0;
@@ -338,8 +380,6 @@ static void to_gameplay_state_starting_next_room()
     to_gameplay_state_playing();
 
 }
-
-bool load_gameplay_room_from_num(int room_num);
 
 static bool update_gameplay_starting_new_game()
 {
@@ -478,32 +518,6 @@ static bool is_block_collision(BODY *body)
     return get_colliding_block(body, &r, &c);
 }
 
-static void load_poof_effect(EFFECT *effect, float x, float y)
-{
-    init_sprite(&effect->sprite, false, 15);
-    add_frame(&effect->sprite, IMG("effect-poof-1.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-2.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-3.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-4.png"));
-    effect->sprite.x_offset = -10;
-    effect->sprite.y_offset = -10;
-    effect->x = x;
-    effect->y = y;
-    effect->update = update_effect_until_done_animating;
-    effect->is_active = true;
-}
-
-static int find_available_effect_index()
-{
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        if (!effects[i].is_active) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 static int num_blocks()
 {
     int count = 0;
@@ -540,7 +554,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Remove the bullet and the block */
             bullet->hits = 0;
             play_sound(SND("star_hit.wav"));
-            load_poof_effect(&effects[find_available_effect_index()], c * TILE_SIZE, r * TILE_SIZE);
+            load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
             if (num_blocks() == 0) {
@@ -548,6 +562,14 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
                 room.cleared = true;
                 room.door_x = c * TILE_SIZE;
                 room.door_y = r * TILE_SIZE;
+                /* Get rid of those nasty enemies */
+                for (int i = 0; i < MAX_ENEMIES; i++) {
+                    ENEMY *enemy = &room.enemies[i];
+                    if (enemy->is_active) {
+                        enemy->is_active = false;
+                        load_poof_effect(enemy->body.x - 5, enemy->body.y - 5);
+                    }
+                }
             }
 
         } else {
@@ -779,6 +801,32 @@ static void to_gameplay_state_dying()
     update = update_gameplay_dying;
 }
 
+static void update_enemy_movement(ENEMY *enemy, void *data)
+{
+    float old_x = enemy->body.x;
+    float old_y = enemy->body.y;
+
+    /* Vertical movement */
+    enemy->body.y += convert_pps_to_fps(enemy->dy);
+
+    /* Check for vertical collisions */
+    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+        enemy->body.y = old_y;
+        enemy->dy *= -1;
+    }
+
+    /* Horizontal movement */
+    enemy->body.x += convert_pps_to_fps(enemy->dx);
+
+    /* Check for horizontal collisions */
+    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+        enemy->body.x = old_x;
+        enemy->dx *= -1;
+    }
+
+    animate(&enemy->sprite);
+}
+
 static bool update_gameplay_playing()
 {
     /* Hero */
@@ -787,7 +835,17 @@ static bool update_gameplay_playing()
     /* Bullets */
     update_hero_bullets();
 
-    /* Check for hurting collisions */
+    /* Enemies */
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        ENEMY *enemy = &room.enemies[i];
+        if (enemy->is_active && enemy->update != NULL) {
+            enemy->update(enemy, NULL);
+        }
+    }
+
+    /* Check for hurting collisions... */
+
+    /* ...from bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (hero_bullets[i].is_active) {
             BODY *b1 = &hero.body;
@@ -797,6 +855,19 @@ static bool update_gameplay_playing()
                 hero_bullets[i].is_active = false;
                 to_gameplay_state_dying();
                 /* If you're dead, you can't complete the level, so quit here! */
+                return true;
+            }
+        }
+    }
+
+    /* ...from enemies */
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        ENEMY *enemy = &room.enemies[i];
+        if (enemy->is_active) {
+            BODY *b1 = &hero.body;
+            BODY *b2 = &enemy->body;
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+                to_gameplay_state_dying();
                 return true;
             }
         }
@@ -883,6 +954,14 @@ static void draw_gameplay_playing()
         }
     }
 
+    /* Draw enemies */
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        ENEMY *enemy = &room.enemies[i];
+        if (enemy->is_active) {
+            draw_sprite(&enemy->sprite, enemy->body.x, enemy->body.y);
+        }
+    }
+
     /* Draw the hero */
     draw_sprite(hero.sprite, hero.body.x, hero.body.y);
     
@@ -899,11 +978,29 @@ static void draw_gameplay_playing()
     }
 }
 
+static void load_enemy_update_functions()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        ENEMY *enemy = &room.enemies[i];
+        if (enemy->is_active) {
+            //if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
+                enemy->update = update_enemy_movement;
+            //}
+        }
+    }
+}
+
 bool load_gameplay_room_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
 
-    return load_room_from_datafile_with_filename(filename, &room);
+    bool success = load_room_from_datafile_with_filename(filename, &room);
+
+    if (success) {
+        load_enemy_update_functions();
+    }
+
+    return success;
 }
 
 bool load_gameplay_room_list_from_filename(const char *filename)
@@ -931,43 +1028,17 @@ bool load_gameplay_room_from_num(int room_num)
     return success;
 }
 
-//ENEMY *_create_enemy(ENEMY_TYPE type, float x, float y)
-//{
-//    ENEMY *enemy = alloc_memory("ENEMY", sizeof(ENEMY));
-//
-//    enemy->type = type;
-//
-//    if (type == ENEMY_TYPE_BAT) {
-//        init_sprite(&enemy->sprite, true, 20);
-//        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-//        enemy->sprite.x_offset = -10;
-//        enemy->sprite.y_offset = -10;
-//    } else if (type == ENEMY_TYPE_SPIDER) {
-//        init_sprite(&enemy->sprite, true, 8);
-//        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
-//        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
-//        enemy->sprite.x_offset = -10;
-//        enemy->sprite.y_offset = -10;
-//    }
-//
-//    /* Set the starting position */
-//    enemy->body.x = x;
-//    enemy->body.y = y;
-//
-//    enemy->body.w = 10;
-//    enemy->body.h = 10;
-//
-//    enemy->dx = 0;
-//    enemy->dy = 0;
-//
-//    enemy->update = NULL;
-//
-//    return enemy;
-//}
+bool add_gameplay_room_filename_to_room_list(const char *filename)
+{
+    assert(is_gameplay_init);
+
+    if (room_list.size == MAX_ROOMS) {
+        fprintf(stderr, "Failed to find space to add room filename to room list.\n");
+        return false;
+    }
+
+    strncpy(room_list.filenames[room_list.size], filename, MAX_FILENAME_SIZE);
+    room_list.size++;
+
+    return true;
+}

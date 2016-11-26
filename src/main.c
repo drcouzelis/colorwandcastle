@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 
     /* Try the filename given on the command line... */
     if (argc > 1) {
-        is_room_init = load_gameplay_room_from_filename(argv[1]);
+        is_room_init = add_gameplay_room_filename_to_room_list(argv[1]);
     }
 
     /* ...otherwise, just load the default level set! */

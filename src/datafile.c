@@ -102,6 +102,53 @@ static void load_map_from_datafile(int *map, int cols, int rows, FILE *file)
     }
 }
 
+static void load_enemy(ENEMY *enemy, const char *type, int row, int col, int speed, int dist)
+{
+    enemy->body.x = col * TILE_SIZE;
+    enemy->body.y = row * TILE_SIZE;
+
+    if (strncmp(type, "LEFTRIGHT", MAX_STRING_SIZE) == 0) {
+        enemy->type = ENEMY_TYPE_LEFTRIGHT;
+        init_sprite(&enemy->sprite, true, 20);
+        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+        enemy->body.x += 5; /* Fix the initial position */
+        enemy->body.y += 5;
+        enemy->body.w = 10;
+        enemy->body.h = 10;
+        enemy->dx = -speed;
+    } else if (strncmp(type, "UPDOWN", MAX_STRING_SIZE) == 0) {
+        enemy->type = ENEMY_TYPE_UPDOWN;
+        init_sprite(&enemy->sprite, true, 8);
+        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+        enemy->body.x += 5; /* Fix the initial position */
+        enemy->body.y += 5;
+        enemy->body.w = 10;
+        enemy->body.h = 10;
+        enemy->dy = -speed;
+    } else if (strncmp(type, "DIAGONAL", MAX_STRING_SIZE) == 0) {
+        printf("Pretending to load enemy type DIAGONAL.\n");
+    } else {
+        fprintf(stderr, "Failed to understand enemy type \"%s\".\n", type);
+    }
+
+    //enemy->speed = speed;
+    enemy->dist = dist;
+
+    enemy->is_active = true;
+}
+
 static void trim_string(char *string, int len)
 {
     int front, back;
@@ -189,6 +236,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     }
 
     char string[MAX_STRING_SIZE];
+    int next_enemy = 0;
 
     /* Start reading through the file! */
     while (fscanf(file, "%s", string) != EOF) {
@@ -295,6 +343,26 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
         /* Block map */
         if (strncmp(string, "BLOCKS", MAX_STRING_SIZE) == 0) {
             load_map_from_datafile(room->block_map, room->cols, room->rows, file);
+            continue;
+        }
+
+        /* Enemy */
+        if (strncmp(string, "ENEMY", MAX_STRING_SIZE) == 0) {
+
+            char type[MAX_STRING_SIZE];
+            int row;
+            int col;
+            int speed;
+            int dist;
+
+            if (fscanf(file, "%s %d %d %d %d", type, &row, &col, &speed, &dist) != 5) {
+                fprintf(stderr, "Failed to load enemy.\n");
+            }
+            printf("%s %d %d %d %d\n", type, row, col, speed, dist);
+
+            load_enemy(&room->enemies[next_enemy], type, row, col, speed, dist);
+            next_enemy++;
+
             continue;
         }
 

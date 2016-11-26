@@ -20,7 +20,7 @@
 #define MAX_ROOM_SIZE (MAX_ROOM_COLS * MAX_ROOM_ROWS)
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 16
-#define MAX_EFFECTS 8
+#define MAX_EFFECTS 16
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
 #define MAX_ROOMS 63
@@ -35,8 +35,9 @@ typedef enum
 
 typedef enum
 {
-    ENEMY_TYPE_BAT = 0,
-    ENEMY_TYPE_SPIDER
+    ENEMY_TYPE_LEFTRIGHT = 0,
+    ENEMY_TYPE_UPDOWN,
+    ENEMY_TYPE_DIAGONAL
 } ENEMY_TYPE;
 
 typedef enum
@@ -135,6 +136,7 @@ typedef struct ENEMY
 {
     bool is_active;
 
+    /* Not sure if I'm actually going to use this variable... */
     ENEMY_TYPE type;
 
     SPRITE sprite;
@@ -142,6 +144,12 @@ typedef struct ENEMY
     BODY body;
     int dx;
     int dy;
+
+    int speed; /* In PPS */
+    int dist; /* In pixels, how far to travel before turning around, -1 to bounce */
+
+    /* The direction the enemy is moving */
+    DIRECTION direction;
 
     void (*update)(struct ENEMY *enemy, void *data);
 } ENEMY;
@@ -190,7 +198,6 @@ typedef struct
     /* Each entry is an index number for the list of blocks */
     int block_map[MAX_ROOM_SIZE];
 
-    /* TODO */
     /* Enemies */
     ENEMY enemies[MAX_ENEMIES];
 
