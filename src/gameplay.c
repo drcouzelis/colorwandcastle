@@ -990,7 +990,7 @@ static void load_enemy_update_functions()
     }
 }
 
-bool load_gameplay_room_from_filename(const char *filename)
+static bool load_gameplay_room_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
 
