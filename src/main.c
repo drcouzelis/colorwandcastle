@@ -13,23 +13,24 @@
 
 int main(int argc, char **argv)
 {
+    /* Set application properties */
     al_set_app_name("colorwandcastle");
     al_set_org_name("drcouzelis");
 
     /* Initialize Allegro */
     assert(al_init());
 
-    /* Allow the use of PNG images */
+    /* Allows the use of PNG images */
     assert(al_init_image_addon());
    
     /* Add keyboard support */
     if (!al_install_keyboard()) {
-        printf("Warning: Failed to init keyboard.\n");
+        printf("Failed to init keyboard.\n");
     }
 
     /* Add mouse support */
     if (!al_install_mouse()) {
-        printf("Warning: Failed to init mouse.\n");
+        printf("Failed to init mouse.\n");
     }
 
     /**
@@ -38,15 +39,16 @@ int main(int argc, char **argv)
      * many sound effects at a time.
      */
     if (!al_install_audio() || !al_init_acodec_addon() || !al_reserve_samples(4)) {
-        printf("Warning: Failed to init audio.\n");
+        printf("Failed to init audio.\n");
     }
 
+    /* Create a display that will be used to draw the game on */
     init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, false);
 
     /* So animations know how fast to go */
     set_animation_fps(GAME_TICKER);
 
-    /* So we know where to look for image / sound files... */
+    /* So we know where to look for image and sound files... */
     add_resource_path( PKGDATADIR "/images/");
     add_resource_path( PKGDATADIR "/sounds/");
 
@@ -55,7 +57,7 @@ int main(int argc, char **argv)
     add_datafile_path("./");
     add_datafile_path("");
   
-    /* Set application properties */
+    /* Set window properties */
     al_set_window_title(get_display(), "Colorwand Castle");
     al_set_display_icon(get_display(), IMG("icon.png"));
 
@@ -65,22 +67,22 @@ int main(int argc, char **argv)
     /* TEMP */
     /* Turn off audio, I don't want to hear it during development */
     toggle_audio();
+    printf("TEMP: Audio has been toggled off. Press \"S\" to toggle audio in game.\n");
 
     /* INIT THE GAME */
     init_gameplay();
 
     /* LOAD THE FIRST LEVEL */
-    bool is_room_init = false;
 
-    /* Try the filename given on the command line... */
+    /* If command line arguments have been given... */
     if (argc > 1) {
-        is_room_init = add_gameplay_room_filename_to_room_list(argv[1]);
-    }
-
-    /* ...otherwise, just load the default level set! */
-    if (!is_room_init) {
-        /* This can eventually be chosen from a menu */
-        load_gameplay_room_list_from_filename("story-list.dat");
+        /* ...then add them all as level filenames */
+        for (int i = 1; i < argc; i++) {
+            add_gameplay_room_filename_to_room_list(argv[i]);
+        }
+    } else {
+        /* No command line arguments given, just load the default level set! */
+        load_gameplay_room_list_from_filename("story-list.dat"); /* This can eventually be chosen from a menu */
     }
 
     /* RUN THE GAME */

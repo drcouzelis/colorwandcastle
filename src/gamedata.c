@@ -39,6 +39,23 @@ void init_hero(HERO *hero)
     hero->draw = NULL;
 }
 
+static void init_enemy(ENEMY *enemy)
+{
+    enemy->is_active = false;
+    enemy->type = ENEMY_TYPE_LEFTRIGHT;
+    init_sprite(&enemy->sprite, false, 0);
+    enemy->body.x = 0;
+    enemy->body.y = 0;
+    enemy->body.w = 0;
+    enemy->body.h = 0;
+    enemy->dx = 0;
+    enemy->dy = 0;
+    enemy->speed = 0;
+    enemy->dist = 0;
+    enemy->direction = U;
+    enemy->update = NULL;
+}
+
 void init_room(ROOM *room)
 {
     if (room == NULL) {
@@ -83,10 +100,9 @@ void init_room(ROOM *room)
     }
     room->num_textures = 0;
 
-    /* TODO */
     /* Enemy list */
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        room->enemies[i].is_active = false;
+        init_enemy(&room->enemies[i]);
     }
 
     room->cleared = false;

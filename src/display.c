@@ -6,6 +6,9 @@ static int display_width = 0;
 static int display_height = 0;
 static bool display_fullscreen = false;
 
+/**
+ * Returns the maximum resolution available on the screen.
+ */
 static void get_max_desktop_resolution(int *w, int *h)
 {
     ALLEGRO_DISPLAY_MODE mode;
@@ -23,6 +26,9 @@ static void get_max_desktop_resolution(int *w, int *h)
     }
 }
 
+/**
+ * Returns the current desktop resolution.
+ */
 static void get_current_desktop_resolution(int *w, int *h)
 {
     ALLEGRO_MONITOR_INFO info;
@@ -40,6 +46,10 @@ static void get_current_desktop_resolution(int *w, int *h)
     }
 }
 
+/**
+ * Returns the maximum size the window can be scaled (integer)
+ * without being bigger than the screen.
+ */
 static int get_max_display_scale(int window_w, int window_h, bool fullscreen)
 {
     int scale = 1;
@@ -77,6 +87,12 @@ static int get_max_display_scale(int window_w, int window_h, bool fullscreen)
     return scale;
 }
 
+/**
+ * Scale (integer) the display.
+ *
+ * This allows the internal game logic to use the game's native window size,
+ * while the visual size of the window is much bigger.
+ */
 static void set_display_transform(int scale, float offset_x, float offset_y, bool fullscreen)
 {
     ALLEGRO_TRANSFORM trans;
