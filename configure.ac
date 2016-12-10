@@ -12,8 +12,6 @@ AC_SEARCH_LIBS([al_init_acodec_addon], [allegro_acodec], [], [AC_MSG_ERROR([alle
 AC_SEARCH_LIBS([al_install_audio], [allegro_audio], [], [AC_MSG_ERROR([allegro not found.])])
 AC_SEARCH_LIBS([al_init_image_addon], [allegro_image], [], [AC_MSG_ERROR([allegro not found.])])
 
-AC_CONFIG_HEADERS([config.h])
-
 AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
