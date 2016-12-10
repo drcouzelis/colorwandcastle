@@ -358,7 +358,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             if (fscanf(file, "%s %d %d %d %d", type, &row, &col, &speed, &dist) != 5) {
                 fprintf(stderr, "Failed to load enemy.\n");
             }
-            printf("%s %d %d %d %d\n", type, row, col, speed, dist);
+            //printf("%s %d %d %d %d\n", type, row, col, speed, dist);
 
             load_enemy(&room->enemies[next_enemy], type, row, col, speed, dist);
             next_enemy++;
