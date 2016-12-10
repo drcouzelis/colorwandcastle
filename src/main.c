@@ -82,7 +82,7 @@ int main(int argc, char **argv)
         }
     } else {
         /* No command line arguments given, just load the default level set! */
-        load_gameplay_room_list_from_filename("story-list.dat"); /* This can eventually be chosen from a menu */
+        load_gameplay_room_list_from_filename("list-story.dat"); /* This can eventually be chosen from a menu */
     }
 
     /* RUN THE GAME */

@@ -1,4 +1,93 @@
-# Declare subdirectories.
-#
-# https://www.gnu.org/software/automake/manual/html_node/Subdirectories.html
-SUBDIRS = data src system
+# Sources
+bin_PROGRAMS = colorwandcastle
+colorwandcastle_SOURCES = \
+  src/datafile.c \
+  src/datafile.h \
+  src/display.c \
+  src/display.h \
+  src/gamedata.c \
+  src/gamedata.h \
+  src/gameplay.c \
+  src/gameplay.h \
+  src/main.c \
+  src/main.h \
+  src/mask.c \
+  src/mask.h \
+  src/memory.c \
+  src/memory.h \
+  src/menu.c \
+  src/menu.h \
+  src/resources.c \
+  src/resources.h \
+  src/run.c \
+  src/run.h \
+  src/sound.c \
+  src/sound.h \
+  src/sprite.c \
+  src/sprite.h \
+  src/utilities.c \
+  src/utilities.h
+
+colorwandcastle_CPPFLAGS = -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'
+
+# Data - Images
+imagesdatadir = $(pkgdatadir)/images
+dist_imagesdata_DATA = \
+  data/images/effect-poof-1.png \
+  data/images/effect-poof-2.png \
+  data/images/effect-poof-3.png \
+  data/images/effect-poof-4.png \
+  data/images/enemy-bat-1.png \
+  data/images/enemy-bat-2.png \
+  data/images/enemy-bat-3.png \
+  data/images/enemy-spider-1.png \
+  data/images/enemy-spider-2.png \
+  data/images/enemy-spider-3.png \
+  data/images/enemy-spider-4.png \
+  data/images/enemy-spider-5.png \
+  data/images/hero-makayla-01.png \
+  data/images/hero-makayla-02.png \
+  data/images/hero-makayla-hurt-01.png \
+  data/images/hero-makayla-hurt-02.png \
+  data/images/hero-rawson-01.png \
+  data/images/hero-rawson-02.png \
+  data/images/hero-rawson-hurt-01.png \
+  data/images/hero-rawson-hurt-02.png \
+  data/images/icon.png \
+  data/images/mask-block.png \
+  data/images/mask-plasma-1.png \
+  data/images/mask-plasma-2.png \
+  data/images/mask-star-1.png \
+  data/images/mask-star-2.png \
+  data/images/texture-blue.png \
+  data/images/texture-green.png \
+  data/images/texture-orange.png \
+  data/images/texture-purple.png \
+  data/images/texture-red.png \
+  data/images/texture-yellow.png \
+  data/images/tile-bricks.png \
+  data/images/tile-door.png \
+  data/images/tile-gray-wall.png
+
+# Data - Levels
+levelsdatadir = $(pkgdatadir)/levels
+dist_levelsdata_DATA = \
+  data/levels/list-story.dat \
+  data/levels/room-01.dat \
+  data/levels/room-02.dat \
+  data/levels/room-03-hard.dat \
+  data/levels/room-story-01.dat \
+  data/levels/room-story-02.dat \
+  data/levels/textures-colored.dat \
+  data/levels/tiles-castle.dat
+
+# Data - Sounds
+soundsdatadir = $(pkgdatadir)/sounds
+dist_soundsdata_DATA = \
+  data/sounds/star_disolve.wav \
+  data/sounds/star_hit.wav
+
+# Distribution files
+EXTRA_DIST = \
+  system/colorwandcastle.desktop \
+  system/colorwandcastle.png
