@@ -344,97 +344,6 @@ static void reset_hero(float x, float y, DIRECTION direction)
     hero.control = control_hero_from_keyboard;
 }
 
-static void to_gameplay_state_starting_new_game()
-{
-    update = update_gameplay_starting_new_game;
-    control = NULL;
-    draw = NULL;
-}
-
-static void to_gameplay_state_starting_after_dying()
-{
-    if (gameplay_difficulty != GAMEPLAY_DIFFICULTY_EASY) {
-        /* Load the current room */
-        load_gameplay_room_from_num(curr_room);
-    }
-
-    /* Reset the hero */
-    reset_hero(room.startx, room.starty, room.direction);
-
-    /* Ready to start playing! */
-    to_gameplay_state_playing();
-}
-
-static void to_gameplay_state_starting_next_room()
-{
-    /* Clear the old room */
-    init_room(&room);
-
-    /* Load the next room */
-    load_gameplay_room_from_num(curr_room + 1);
-
-    /* Reset the hero */
-    reset_hero(room.startx, room.starty, room.direction);
-
-    /* Ready to start playing! */
-    to_gameplay_state_playing();
-
-}
-
-static bool update_gameplay_starting_new_game()
-{
-    /* Load the current room */
-    load_gameplay_room_from_num(curr_room);
-
-    /* Load the hero sprites */
-    /* Reset the hero */
-    load_hero_sprite();
-    reset_hero(room.startx, room.starty, room.direction);
-
-    /* Ready to start playing! */
-    to_gameplay_state_playing();
-
-    return true;
-}
-
-void control_gameplay(void *data, ALLEGRO_EVENT *event)
-{
-    assert(is_gameplay_init);
-
-    if (control != NULL) {
-        control(event);
-    }
-}
-
-static void control_gameplay_playing(ALLEGRO_EVENT *event)
-{
-    /* General application control */
-    if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
-        int key = event->keyboard.keycode;
-
-        if (key == ALLEGRO_KEY_ESCAPE || key == ALLEGRO_KEY_Q || key == ALLEGRO_KEY_QUOTE) {
-            /* ESC : Stop gameplay */
-            end_gameplay = true;
-        } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_O) {
-            /* S : Toggle audio */
-            toggle_audio();
-        } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_Y) {
-            /* F : Toggle fullscreen */
-            toggle_fullscreen();
-        } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
-            /* Toggle the hero */
-            toggle_hero(&hero, &room);
-        }
-    } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-        end_gameplay = true;
-    }
-
-    /* Hero control */
-    if (hero.control != NULL) {
-        hero.control(&hero, event);
-    }
-}
-
 static bool is_board_collision(BODY *body)
 {
     /* Level bounds! */
@@ -516,6 +425,196 @@ static bool is_block_collision(BODY *body)
     int r = 0;
     int c = 0;
     return get_colliding_block(body, &r, &c);
+}
+
+static void update_enemy_movement(ENEMY *enemy, void *data)
+{
+    float old_x = enemy->body.x;
+    float old_y = enemy->body.y;
+
+    /* Vertical movement */
+    enemy->body.y += convert_pps_to_fps(enemy->dy);
+
+    /* Check for vertical collisions */
+    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+        enemy->body.y = old_y;
+        enemy->dy *= -1;
+    }
+
+    /* Horizontal movement */
+    enemy->body.x += convert_pps_to_fps(enemy->dx);
+
+    /* Check for horizontal collisions */
+    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+        enemy->body.x = old_x;
+        enemy->dx *= -1;
+    }
+
+    animate(&enemy->sprite);
+}
+
+static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definition)
+{
+    if (!definition->is_active) {
+        /* There's no enemy to load, just clear it out and return */
+        init_enemy(enemy);
+        return;
+    }
+
+    enemy->body.x = definition->col * TILE_SIZE;
+    enemy->body.y = definition->row * TILE_SIZE;
+
+    enemy->type = definition->type;
+
+    if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
+        init_sprite(&enemy->sprite, true, 20);
+        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+        enemy->body.x += 5; /* Fix the initial position */
+        enemy->body.y += 5;
+        enemy->body.w = 10;
+        enemy->body.h = 10;
+        enemy->dx = -definition->speed;
+    } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
+        init_sprite(&enemy->sprite, true, 8);
+        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+        enemy->body.x += 5; /* Fix the initial position */
+        enemy->body.y += 5;
+        enemy->body.w = 10;
+        enemy->body.h = 10;
+        enemy->dy = -definition->speed;
+    } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
+        printf("Pretending to load enemy type DIAGONAL.\n");
+    }
+
+    //if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
+        enemy->update = update_enemy_movement;
+    //}
+
+    enemy->dist = definition->dist;
+
+    enemy->is_active = true;
+}
+
+static void load_enemies_from_definitions()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        load_enemy_from_definition(&room.enemies[i], &room.enemy_definitions[i]);
+    }
+}
+
+static void load_blocks_from_orig()
+{
+    for (int r = 0; r < room.rows; r++) {
+        for (int c = 0; c < room.cols; c++) {
+            room.block_map[(r * room.cols) + c] = room.block_map_orig[(r * room.cols) + c];
+        }
+    }
+}
+
+static void to_gameplay_state_starting_new_game()
+{
+    update = update_gameplay_starting_new_game;
+    control = NULL;
+    draw = NULL;
+}
+
+static void to_gameplay_state_starting_after_dying()
+{
+    if (gameplay_difficulty != GAMEPLAY_DIFFICULTY_EASY) {
+        /* Load the original state of the blocks */
+        load_blocks_from_orig();
+    }
+
+    /* Reset the hero */
+    reset_hero(room.startx, room.starty, room.direction);
+
+    /* Load enemies */
+    load_enemies_from_definitions();
+
+    /* Ready to start playing! */
+    to_gameplay_state_playing();
+}
+
+static void to_gameplay_state_starting_next_room()
+{
+    /* Clear the old room */
+    init_room(&room);
+
+    /* Load the next room */
+    load_gameplay_room_from_num(curr_room + 1);
+
+    /* Reset the hero */
+    reset_hero(room.startx, room.starty, room.direction);
+
+    /* Ready to start playing! */
+    to_gameplay_state_playing();
+
+}
+
+static bool update_gameplay_starting_new_game()
+{
+    /* Load the current room */
+    load_gameplay_room_from_num(curr_room);
+
+    /* Load the hero sprites */
+    /* Reset the hero */
+    load_hero_sprite();
+    reset_hero(room.startx, room.starty, room.direction);
+
+    /* Ready to start playing! */
+    to_gameplay_state_playing();
+
+    return true;
+}
+
+void control_gameplay(void *data, ALLEGRO_EVENT *event)
+{
+    assert(is_gameplay_init);
+
+    if (control != NULL) {
+        control(event);
+    }
+}
+
+static void control_gameplay_playing(ALLEGRO_EVENT *event)
+{
+    /* General application control */
+    if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
+        int key = event->keyboard.keycode;
+
+        if (key == ALLEGRO_KEY_ESCAPE || key == ALLEGRO_KEY_Q || key == ALLEGRO_KEY_QUOTE) {
+            /* ESC : Stop gameplay */
+            end_gameplay = true;
+        } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_O) {
+            /* S : Toggle audio */
+            toggle_audio();
+        } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_Y) {
+            /* F : Toggle fullscreen */
+            toggle_fullscreen();
+        } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
+            /* Toggle the hero */
+            toggle_hero(&hero, &room);
+        }
+    } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+        end_gameplay = true;
+    }
+
+    /* Hero control */
+    if (hero.control != NULL) {
+        hero.control(&hero, event);
+    }
 }
 
 static int num_blocks()
@@ -801,32 +900,6 @@ static void to_gameplay_state_dying()
     update = update_gameplay_dying;
 }
 
-static void update_enemy_movement(ENEMY *enemy, void *data)
-{
-    float old_x = enemy->body.x;
-    float old_y = enemy->body.y;
-
-    /* Vertical movement */
-    enemy->body.y += convert_pps_to_fps(enemy->dy);
-
-    /* Check for vertical collisions */
-    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
-        enemy->body.y = old_y;
-        enemy->dy *= -1;
-    }
-
-    /* Horizontal movement */
-    enemy->body.x += convert_pps_to_fps(enemy->dx);
-
-    /* Check for horizontal collisions */
-    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
-        enemy->body.x = old_x;
-        enemy->dx *= -1;
-    }
-
-    animate(&enemy->sprite);
-}
-
 static bool update_gameplay_playing()
 {
     /* Hero */
@@ -978,18 +1051,6 @@ static void draw_gameplay_playing()
     }
 }
 
-static void load_enemy_update_functions()
-{
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        ENEMY *enemy = &room.enemies[i];
-        if (enemy->is_active) {
-            //if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
-                enemy->update = update_enemy_movement;
-            //}
-        }
-    }
-}
-
 static bool load_gameplay_room_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
@@ -997,7 +1058,8 @@ static bool load_gameplay_room_from_filename(const char *filename)
     bool success = load_room_from_datafile_with_filename(filename, &room);
 
     if (success) {
-        load_enemy_update_functions();
+        load_blocks_from_orig();
+        load_enemies_from_definitions();
     }
 
     return success;

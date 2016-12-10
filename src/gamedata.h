@@ -156,6 +156,16 @@ typedef struct ENEMY
 
 typedef struct
 {
+    bool is_active;
+    ENEMY_TYPE type;
+    int row;
+    int col;
+    int speed;
+    int dist;
+} ENEMY_DEFINITION;
+
+typedef struct
+{
     /* Name of the room */
     char title[MAX_STRING_SIZE];
 
@@ -198,8 +208,14 @@ typedef struct
     /* Each entry is an index number for the list of blocks */
     int block_map[MAX_ROOM_SIZE];
 
+    /* Same as above, but this stores the original state of the room blocks */
+    int block_map_orig[MAX_ROOM_SIZE];
+
     /* Enemies */
     ENEMY enemies[MAX_ENEMIES];
+
+    /* This info is used to create the enemies when the level starts */
+    ENEMY_DEFINITION enemy_definitions[MAX_ENEMIES];
 
     bool cleared;
 
@@ -216,6 +232,9 @@ typedef struct {
 
 /* Initialize a hero to its default state, ready to be drawn */
 void init_hero(HERO *hero);
+
+/* Initialize an enemy to its default state */
+void init_enemy(ENEMY *enemy);
 
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);

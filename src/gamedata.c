@@ -39,7 +39,7 @@ void init_hero(HERO *hero)
     hero->draw = NULL;
 }
 
-static void init_enemy(ENEMY *enemy)
+void init_enemy(ENEMY *enemy)
 {
     enemy->is_active = false;
     enemy->type = ENEMY_TYPE_LEFTRIGHT;
@@ -54,6 +54,16 @@ static void init_enemy(ENEMY *enemy)
     enemy->dist = 0;
     enemy->direction = U;
     enemy->update = NULL;
+}
+
+static void init_enemy_definition(ENEMY_DEFINITION *enemy_def)
+{
+    enemy_def->is_active = false;
+    enemy_def->type = ENEMY_TYPE_LEFTRIGHT;
+    enemy_def->row = 0;
+    enemy_def->col = 0;
+    enemy_def->speed = 0;
+    enemy_def->dist = 0;
 }
 
 void init_room(ROOM *room)
@@ -90,6 +100,7 @@ void init_room(ROOM *room)
         room->foreground_map[i] = NO_TILE;
         room->collision_map[i] = NO_COLLISION;
         room->block_map[i] = NO_BLOCK;
+        room->block_map_orig[i] = NO_BLOCK;
     }
 
     /* Texture list */
@@ -103,6 +114,7 @@ void init_room(ROOM *room)
     /* Enemy list */
     for (int i = 0; i < MAX_ENEMIES; i++) {
         init_enemy(&room->enemies[i]);
+        init_enemy_definition(&room->enemy_definitions[i]);
     }
 
     room->cleared = false;
