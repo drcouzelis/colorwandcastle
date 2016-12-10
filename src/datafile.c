@@ -190,7 +190,7 @@ static void print_map(int *map, int cols, int rows, bool is_data_file_form)
     }
 }
 
-static void print_room(ROOM *room, bool is_data_file_form)
+void print_room(ROOM *room, bool is_data_file_form)
 {
     if (room == NULL) {
         return;
@@ -393,7 +393,8 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
         }
     }
 
-    print_room(room, false);
+    /* Uncomment if you want to see what was loaded in this room */
+    //print_room(room, false);
 
     return true;
 }

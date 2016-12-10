@@ -1,6 +1,5 @@
 #include <allegro5/allegro.h>
 #include <stdio.h>
-#include "config.h"
 #include "datafile.h"
 #include "display.h"
 #include "gameplay.h"
@@ -84,6 +83,16 @@ int main(int argc, char **argv)
         /* No command line arguments given, just load the default level set! */
         load_gameplay_room_list_from_filename("list-story.dat"); /* This can eventually be chosen from a menu */
     }
+
+    /* Print some basic controls to stdout */
+    printf("\n");
+    printf("CONTROLS:\n");
+    printf("  Arrow keys : Fly\n");
+    printf("  Spacebar : Shoot\n");
+    printf("  C : Toggle character\n");
+    printf("  F : Toggle fullscreen\n");
+    printf("  S : Toggle sound\n");
+    printf("  Esc : Quit\n");
 
     /* RUN THE GAME */
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);

@@ -21,4 +21,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room);
 
 bool load_room_list_from_datafile_with_filename(const char *filename, ROOM_LIST *room_list);
 
+/* Print a room data structure to stdout */
+void print_room(ROOM *room, bool is_data_file_form);
+
 #endif
