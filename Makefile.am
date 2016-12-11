@@ -1,5 +1,6 @@
 # Sources
 bin_PROGRAMS = colorwandcastle
+colorwandcastle_CPPFLAGS = -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'
 colorwandcastle_SOURCES = \
   src/datafile.c \
   src/datafile.h \
@@ -27,8 +28,6 @@ colorwandcastle_SOURCES = \
   src/sprite.h \
   src/utilities.c \
   src/utilities.h
-
-colorwandcastle_CPPFLAGS = -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'
 
 # Data - Images
 imagesdatadir = $(pkgdatadir)/images
