@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+source "$(dirname ${0})"/settings
+
+"${bin_dir}"/build && \
+"${build_dir}"/bin/${project} "$@"

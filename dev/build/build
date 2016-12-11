@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+source "$(dirname ${0})"/settings
+
+if [ ! -d "${build_dir}"/working ]; then
+    "${bin_dir}"/refresh
+fi
+
+make -C "${build_dir}"/working install

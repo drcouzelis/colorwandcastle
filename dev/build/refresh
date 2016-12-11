@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+source "$(dirname ${0})"/settings
+
+"${bin_dir}"/wipe && \
+mkdir -p "${build_dir}"/working && \
+cd "${build_dir}"/working && \
+autoreconf --install "${source_dir}" && \
+"${source_dir}"/configure --enable-silent-rules --prefix="${build_dir}"

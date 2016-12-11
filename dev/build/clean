@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+source "$(dirname ${0})"/settings
+
+if [ -d "${build_dir}"/working ]; then
+  make -C "${build_dir}"/working clean
+fi
