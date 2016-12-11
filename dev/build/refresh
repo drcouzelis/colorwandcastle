@@ -3,7 +3,6 @@
 source "$(dirname ${0})"/settings
 
 "${bin_dir}"/wipe && \
-mkdir -p "${build_dir}"/working && \
-cd "${build_dir}"/working && \
+mkdir -p "${working_dir}"/build && cd "${working_dir}"/build && \
 autoreconf --install "${source_dir}" && \
-"${source_dir}"/configure --enable-silent-rules --prefix="${build_dir}"
+"${source_dir}"/configure --enable-silent-rules --prefix="${working_dir}"

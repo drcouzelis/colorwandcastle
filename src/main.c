@@ -63,10 +63,21 @@ int main(int argc, char **argv)
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
 
+    /* Print some basic controls to stdout */
+    printf("\n");
+    printf("CONTROLS:\n");
+    printf("  Arrow keys : Fly\n");
+    printf("  Spacebar : Shoot\n");
+    printf("  C : Toggle character\n");
+    printf("  F : Toggle fullscreen\n");
+    printf("  S : Toggle sound\n");
+    printf("  Esc : Quit\n");
+    printf("\n");
+
     /* TEMP */
     /* Turn off audio, I don't want to hear it during development */
     toggle_audio();
-    printf("TEMP: Audio has been toggled off. Press \"S\" to toggle audio in game.\n");
+    printf("TEMP: Audio is off.\n");
 
     /* INIT THE GAME */
     init_gameplay();
@@ -83,16 +94,6 @@ int main(int argc, char **argv)
         /* No command line arguments given, just load the default level set! */
         load_gameplay_room_list_from_filename("list-story.dat"); /* This can eventually be chosen from a menu */
     }
-
-    /* Print some basic controls to stdout */
-    printf("\n");
-    printf("CONTROLS:\n");
-    printf("  Arrow keys : Fly\n");
-    printf("  Spacebar : Shoot\n");
-    printf("  C : Toggle character\n");
-    printf("  F : Toggle fullscreen\n");
-    printf("  S : Toggle sound\n");
-    printf("  Esc : Quit\n");
 
     /* RUN THE GAME */
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);

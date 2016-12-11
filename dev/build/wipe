@@ -2,16 +2,16 @@
 
 source "$(dirname ${0})"/settings
 
-\rm -rf "${build_dir}"
+\rm -vrf "${working_dir}"
 
-\rm -rf "${source_dir}"/autom4te.cache
-\rm -f "${source_dir}"/Makefile.in
-\rm -f "${source_dir}"/aclocal.m4
-\rm -f "${source_dir}"/compile
-\rm -f "${source_dir}"/config.h
-\rm -f "${source_dir}"/config.h.in
-\rm -f "${source_dir}"/config.h.in~
-\rm -f "${source_dir}"/configure
-\rm -f "${source_dir}"/depcomp
-\rm -f "${source_dir}"/install-sh
-\rm -f "${source_dir}"/missing
+\rm -vrf "${source_dir}"/autom4te.cache
+\rm -vf "${source_dir}"/Makefile.in
+\rm -vf "${source_dir}"/aclocal.m4
+\rm -vf "${source_dir}"/compile
+\rm -vf "${source_dir}"/config.h
+\rm -vf "${source_dir}"/config.h.in
+\rm -vf "${source_dir}"/config.h.in~
+\rm -vf "${source_dir}"/configure
+\rm -vf "${source_dir}"/depcomp
+\rm -vf "${source_dir}"/install-sh
+\rm -vf "${source_dir}"/missing

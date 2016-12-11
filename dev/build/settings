@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 project="colorwandcastle"
 source_dir="${HOME}/Projects/colorwandcastle"
-build_dir="${HOME}/tmp/colorwandcastle-build"
+working_dir="${HOME}/tmp/colorwandcastle-build"
 bin_dir="$(dirname ${0})"
