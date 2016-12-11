@@ -1,5 +1,11 @@
 #!/usr/bin/bash
-project="colorwandcastle"
-source_dir="${HOME}/Projects/colorwandcastle"
-working_dir="${HOME}/tmp/colorwandcastle-build"
-bin_dir="$(dirname ${0})"
+
+# The name of the project executable
+BUILD_project="colorwandcastle"
+
+# Path to the project (where the "configure.ac" file is located)
+BUILD_project_path="${HOME}"/Projects/"${BUILD_project}"
+
+# Path to where the project work area, where it will be built and installed
+# (This directory will be created if it doesn't exist)
+BUILD_workarea_path=/tmp/"${BUILD_project}"-"${USER}"

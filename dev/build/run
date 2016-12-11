@@ -1,6 +1,11 @@
 #!/usr/bin/bash
 
+[ "${EUID}" -eq 0 ] && echo "ERROR: Do not run as root." && exit 1
+
 source "$(dirname ${0})"/settings
 
-"${bin_dir}"/build && \
-"${working_dir}"/bin/${project} "$@"
+# Run
+
+# Build and run
+"$(dirname ${0})"/build || exit 1
+"${BUILD_workarea_path}"/bin/${BUILD_project} "$@"
