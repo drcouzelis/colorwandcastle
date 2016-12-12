@@ -570,8 +570,8 @@ static bool update_gameplay_starting_new_game()
 
     /* Load the hero sprites */
     /* Reset the hero */
-    load_hero_sprite();
     reset_hero(room.startx, room.starty, room.direction);
+    load_hero_sprite();
 
     /* Ready to start playing! */
     to_gameplay_state_playing();
@@ -734,9 +734,18 @@ static void shoot_bullet(int texture, float x, float y)
     bullet->body.w = 10;
     bullet->body.h = 10;
 
-    /* Make the bullet fly to the right */
-    bullet->dx = TILE_SIZE * 10;
-    bullet->dy = 0;
+    /* Make the bullet fly */
+
+    float speed = TILE_SIZE * 10;
+
+    if (room.direction == L) {
+        printf("Setting speed for left!\n");
+        bullet->dx = -speed;
+        bullet->dy = 0;
+    } else { /* Right */
+        bullet->dx = speed;
+        bullet->dy = 0;
+    }
 
     bullet->is_active = true;
 
@@ -749,10 +758,26 @@ static void shoot_bullet(int texture, float x, float y)
     float orig_x = bullet->body.x;
 
     /* NOTE: This will need to be updated when bullets can shoot in other directions */
+    /* YOU LEFT OFF HERE!!! */
     for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
         if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
             break;
         }
+    }
+}
+
+static void update_hero_bullet_position()
+{
+    /**
+     * These calculations produce a neat effect where the bullet
+     * always lines up with a row of blocks.
+     */
+    if (hero.direction == L) {
+        hero.bullet_x = hero.body.x - 20;
+        hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
+    } else { /* Right */
+        hero.bullet_x = hero.body.x + 20;
+        hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
     }
 }
 
@@ -798,9 +823,11 @@ static void update_hero_player_control()
 
     /* Give the hero a bullet to shoot */
     if (!hero.has_bullet && num_active_bullets == 0) {
+
         /* The hero doesn't have a bullet and there are no more on screen */
         /* The hero needs a new bullet to shoot! */
         hero.texture = random_front_texture();
+
         if (hero.texture != NO_TEXTURE) {
             load_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
             hero.has_bullet = true;
@@ -809,12 +836,7 @@ static void update_hero_player_control()
 
     /* Tell the hero's bullet to follow the hero */
     if (hero.has_bullet) {
-        /**
-         * These calculations produce a neat effect where the bullet
-         * always lines up with a row of blocks.
-         */
-        hero.bullet_x = hero.body.x + 20;
-        hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
+        update_hero_bullet_position();
     }
 }
 

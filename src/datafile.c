@@ -255,17 +255,16 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Room direction */
         if (strncmp(string, "DIRECTION", MAX_STRING_SIZE) == 0) {
-            char c;
-            if (fscanf(file, "%c", &c) != 1) {
+            if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load direction.\n");
             }
-            if (c == 'U') {
+            if (strncmp(string, "U", MAX_STRING_SIZE) == 0) {
                 room->direction = U;
-            } else if (c == 'D') {
+            } else if (strncmp(string, "D", MAX_STRING_SIZE) == 0) {
                 room->direction = D;
-            } else if (c == 'L') {
+            } else if (strncmp(string, "L", MAX_STRING_SIZE) == 0) {
                 room->direction = L;
-            } else if (c == 'R') {
+            } else if (strncmp(string, "R", MAX_STRING_SIZE) == 0) {
                 room->direction = R;
             } else {
                 fprintf(stderr, "Failed to read direction, must be U, D, L, or R.\n");
