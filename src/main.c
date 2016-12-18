@@ -4,7 +4,6 @@
 #include "display.h"
 #include "gameplay.h"
 #include "main.h"
-#include "memory.h"
 #include "run.h"
 #include "sound.h"
 #include "sprite.h"
@@ -102,9 +101,6 @@ int main(int argc, char **argv)
     free_resources();
     free_display();
 
-    /* See if we have any naughty memory leaks */
-    check_memory();
-    
     return EXIT_SUCCESS;
 }
 

@@ -44,6 +44,9 @@ void free_resources()
     }
   
     num_resources = 0;
+
+    /* See if we have any naughty memory leaks */
+    check_memory();
 }
 
 void add_resource_path(const char *path)
