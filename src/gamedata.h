@@ -117,9 +117,6 @@ typedef struct HERO
     /* If this is true, then shoot a bullet! */
     bool shoot;
 
-    /* The direction the bullet is "facing" */
-    DIRECTION direction;
-
     /* The picture of the bullet that follows the hero around */
     bool has_bullet;
     SPRITE bullet;
@@ -147,9 +144,6 @@ typedef struct ENEMY
 
     int speed; /* In PPS */
     int dist; /* In pixels, how far to travel before turning around, -1 to bounce */
-
-    /* The direction the enemy is moving */
-    DIRECTION direction;
 
     void (*update)(struct ENEMY *enemy, void *data);
 } ENEMY;

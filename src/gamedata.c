@@ -26,7 +26,6 @@ void init_hero(HERO *hero)
     hero->dy = 0;
 
     hero->shoot = false;
-    hero->direction = R;
 
     init_sprite(&hero->bullet, true, 4);
     hero->bullet_x = 0;
@@ -52,7 +51,6 @@ void init_enemy(ENEMY *enemy)
     enemy->dy = 0;
     enemy->speed = 0;
     enemy->dist = 0;
-    enemy->direction = U;
     enemy->update = NULL;
 }
 
