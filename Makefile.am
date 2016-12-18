@@ -76,6 +76,9 @@ dist_levelsdata_DATA = \
   data/levels/room-02.dat \
   data/levels/room-03-hard.dat \
   data/levels/room-story-01.dat \
+  data/levels/room-story-01-down.dat \
+  data/levels/room-story-01-left.dat \
+  data/levels/room-story-01-up.dat \
   data/levels/room-story-02.dat \
   data/levels/textures-colored.dat \
   data/levels/tiles-castle.dat

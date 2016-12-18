@@ -148,7 +148,7 @@ static void load_hero_sprite()
     hero.sprite_hurting.x_offset = -10;
     hero.sprite_hurting.y_offset = -10;
 
-    if (hero.direction == L) {
+    if (room.direction == L) {
         hero.sprite_flying.mirror = true;
         hero.sprite_hurting.mirror = true;
     }
@@ -318,7 +318,7 @@ void init_gameplay()
     is_gameplay_init = true;
 }
 
-static void reset_hero(float x, float y, DIRECTION direction)
+static void reset_hero(float x, float y)
 {
     /* Set the current sprite */
     hero.sprite = &hero.sprite_flying;
@@ -326,7 +326,6 @@ static void reset_hero(float x, float y, DIRECTION direction)
     /* Set a new given position */
     hero.body.x = x;
     hero.body.y = y;
-    hero.direction = direction;
 
     /* Clear keyboard input */
     hero.u = false;
@@ -537,7 +536,7 @@ static void to_gameplay_state_starting_after_dying()
     }
 
     /* Reset the hero */
-    reset_hero(room.startx, room.starty, room.direction);
+    reset_hero(room.startx, room.starty);
 
     /* Load enemies */
     load_enemies_from_definitions();
@@ -555,7 +554,7 @@ static void to_gameplay_state_starting_next_room()
     load_gameplay_room_from_num(curr_room + 1);
 
     /* Reset the hero */
-    reset_hero(room.startx, room.starty, room.direction);
+    reset_hero(room.startx, room.starty);
 
     /* Ready to start playing! */
     to_gameplay_state_playing();
@@ -569,7 +568,7 @@ static bool update_gameplay_starting_new_game()
 
     /* Load the hero sprites */
     /* Reset the hero */
-    reset_hero(room.startx, room.starty, room.direction);
+    reset_hero(room.startx, room.starty);
     load_hero_sprite();
 
     /* Ready to start playing! */
@@ -675,6 +674,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             bullet->hits--;
             /* Bounce */
             bullet->dx *= -1;
+            bullet->dy *= -1;
             play_sound(SND("star_disolve.wav"));
         }
 
@@ -695,6 +695,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         } else {
             /* Bounce */
             bullet->dx *= -1;
+            bullet->dy *= -1;
             play_sound(SND("star_disolve.wav"));
         }
 
@@ -737,8 +738,13 @@ static void shoot_bullet(int texture, float x, float y)
 
     float speed = TILE_SIZE * 10;
 
-    if (room.direction == L) {
-        printf("Setting speed for left!\n");
+    if (room.direction == U) {
+        bullet->dx = 0;
+        bullet->dy = -speed;
+    } else if (room.direction == D) {
+        bullet->dx = 0;
+        bullet->dy = speed;
+    } else if (room.direction == L) {
         bullet->dx = -speed;
         bullet->dy = 0;
     } else { /* Right */
@@ -755,12 +761,32 @@ static void shoot_bullet(int texture, float x, float y)
      */
 
     float orig_x = bullet->body.x;
+    float orig_y = bullet->body.y;
 
-    /* NOTE: This will need to be updated when bullets can shoot in other directions */
-    /* YOU LEFT OFF HERE!!! */
-    for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
-        if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
-            break;
+    /* (See comment a few lines above) */
+    if (room.direction == U) {
+        for (bullet->body.y = hero.body.y; bullet->body.y > orig_y; bullet->body.y--) {
+            if (!move_bullet(bullet, bullet->body.x, bullet->body.y - 1)) {
+                break;
+            }
+        }
+    } else if (room.direction == D) {
+        for (bullet->body.y = hero.body.y; bullet->body.y < orig_y; bullet->body.y++) {
+            if (!move_bullet(bullet, bullet->body.x, bullet->body.y + 1)) {
+                break;
+            }
+        }
+    } else if (room.direction == L) {
+        for (bullet->body.x = hero.body.x; bullet->body.x > orig_x; bullet->body.x--) {
+            if (!move_bullet(bullet, bullet->body.x - 1, bullet->body.y)) {
+                break;
+            }
+        }
+    } else { /* R */
+        for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
+            if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
+                break;
+            }
         }
     }
 }
@@ -771,10 +797,16 @@ static void update_hero_bullet_position()
      * These calculations produce a neat effect where the bullet
      * always lines up with a row of blocks.
      */
-    if (hero.direction == L) {
+    if (room.direction == U) {
+        hero.bullet_x = ((((int)hero.body.x  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.x_offset;
+        hero.bullet_y = hero.body.y - 20;
+    } else if (room.direction == D) {
+        hero.bullet_x = ((((int)hero.body.x  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.x_offset;
+        hero.bullet_y = hero.body.y + 20;
+    } else if (room.direction == L) {
         hero.bullet_x = hero.body.x - 20;
         hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
-    } else { /* Right */
+    } else { /* R */
         hero.bullet_x = hero.body.x + 20;
         hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
     }
@@ -861,7 +893,7 @@ static void update_hero_bullets()
         BULLET *bullet = &hero_bullets[i];
 
         /* Move */
-        move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->dx), bullet->body.y);
+        move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->dx), bullet->body.y + convert_pps_to_fps(bullet->dy));
 
         /* Animate */
         animate(&bullet->sprite);
