@@ -1152,7 +1152,7 @@ bool add_gameplay_room_filename_to_room_list(const char *filename)
         return false;
     }
 
-    strncpy(room_list.filenames[room_list.size], filename, MAX_FILENAME_SIZE);
+    strncpy(room_list.filenames[room_list.size], filename, MAX_FILENAME_LEN);
     room_list.size++;
 
     return true;

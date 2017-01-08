@@ -104,7 +104,7 @@ void init_room(ROOM *room)
     /* Texture list */
     /* Block list */
     for (int i = 0; i < MAX_TEXTURES; i++) {
-        strncpy(room->textures[i], "", MAX_FILENAME_SIZE);
+        strncpy(room->textures[i], "", MAX_FILENAME_LEN);
         init_sprite(&room->blocks[i], false, 0);
     }
     room->num_textures = 0;

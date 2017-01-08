@@ -31,8 +31,11 @@
 - [x] Enemies poof away when the last block disappears
 - [x] Endless retries, level resets after death
 - [x] Create levels in code first, then transition to DAT files
-- [ ] Vertical levels
-- [ ] Left-facing levels
+- [x] Vertical levels
+- [x] Left-facing levels
+- [ ] Fix vertical-level-star-color-choosing glitch
+- [ ] Allow for clearing resources at any time (use filenames instead of pointers to images)
+- [ ] Get rid of memory library - static allocation only
 
 ## Enemies
 

@@ -16,6 +16,7 @@ void init_sprite(SPRITE *sprite, bool loop, int speed)
     
     for (int i = 0; i < MAX_FRAMES; i++) {
         sprite->frames[i] = NULL;
+        strncpy(sprite->frame_filenames[i], "", MAX_FILENAME_LEN);
     }
     
     sprite->speed = speed < 0 ? 0 : speed;
@@ -64,7 +65,7 @@ void reset_sprite(SPRITE *sprite)
     sprite->fudge = 0;
 }
 
-IMAGE *get_frame(SPRITE *sprite)
+static IMAGE *get_frame(SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return NULL;
@@ -80,6 +81,16 @@ void add_frame(SPRITE *sprite, IMAGE *frame)
     assert(sprite->len <= MAX_FRAMES);
 
     sprite->frames[sprite->len] = frame;
+    sprite->len++;
+}
+
+void add_frame_filename(SPRITE *sprite, const char *filename)
+{
+    assert(sprite != NULL);
+    assert(filename != NULL);
+    assert(sprite->len <= MAX_FRAMES);
+
+    strncpy(sprite->frame_filenames[sprite->len], filename, MAX_FILENAME_LEN);
     sprite->len++;
 }
 

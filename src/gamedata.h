@@ -24,7 +24,6 @@
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
 #define MAX_ROOMS 63
-#define MAX_FILENAME_SIZE 128
 #define MAX_STRING_SIZE 128
 
 typedef enum
@@ -192,7 +191,7 @@ typedef struct
     int collision_map[MAX_ROOM_SIZE];
 
     /* List of textures used to make blocks and bullets in the level */
-    char textures[MAX_TEXTURES][MAX_FILENAME_SIZE];
+    char textures[MAX_TEXTURES][MAX_FILENAME_LEN];
     int num_textures;
 
     /* Blocks, that can be destroyed by the hero */
@@ -220,7 +219,7 @@ typedef struct
 } ROOM;
 
 typedef struct {
-    char filenames[MAX_ROOMS][MAX_FILENAME_SIZE];
+    char filenames[MAX_ROOMS][MAX_FILENAME_LEN];
     int size;
 } ROOM_LIST;
 
