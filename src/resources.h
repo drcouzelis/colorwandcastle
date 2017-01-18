@@ -15,8 +15,24 @@ typedef ALLEGRO_SAMPLE SOUND;
 /**
  * Free all the resource memory and
  * all of the resources.
+ *
+ * This WILL delete "locked" resources.
  */
 void free_resources();
+
+/**
+ * Free all the resource memory and
+ * all of the resources.
+ *
+ * This will NOT delete "locked" resources.
+ */
+void reset_resources();
+
+/**
+ * A locked resource will persist, even
+ * if the resources are cleared.
+ */
+void lock_resource(const char *name);
 
 /**
  * Add a directory that contains resource files.

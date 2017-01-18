@@ -17,6 +17,7 @@ typedef struct
 {
     char name[MAX_FILENAME_LEN];
     RESOURCE_TYPE type;
+    bool locked;
     void *data;
 } RESOURCE;
 
@@ -28,9 +29,21 @@ static int num_resource_paths = 0;
 
 void free_resources()
 {
-    int i;
+    for (int i = 0; i < num_resources; i++) {
+        resources[i]->locked = false;
+    }
+
+    reset_resources();
   
-    for (i = 0; i < num_resources; i++) {
+    num_resources = 0;
+
+    /* See if we have any naughty memory leaks */
+    check_memory();
+}
+
+void reset_resources()
+{
+    for (int i = 0; i < num_resources; i++) {
         if (resources[i]) {
             if (resources[i]->type == RESOURCE_TYPE_IMAGE) {
                 al_destroy_bitmap((IMAGE *)resources[i]->data);
@@ -41,11 +54,6 @@ void free_resources()
             resources[i] = NULL;
         }
     }
-  
-    num_resources = 0;
-
-    /* See if we have any naughty memory leaks */
-    check_memory();
 }
 
 void add_resource_path(const char *path)
@@ -88,6 +96,7 @@ static RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *dat
         strncpy(resource->name, name, MAX_FILENAME_LEN - 1);
         resource->type = type;
         resource->data = data;
+        resource->locked = false;
     }
 
     return resource;
