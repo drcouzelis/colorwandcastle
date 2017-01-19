@@ -7,6 +7,7 @@
 #include <allegro5/allegro_image.h>
 
 #define MAX_FILENAME_LEN 64
+#define MAX_FILEPATH_LEN 256
 
 /* For convenience */
 typedef ALLEGRO_BITMAP IMAGE;

@@ -15,16 +15,26 @@ typedef enum
 
 typedef struct
 {
+    /* The name / filename used to reference the resource */
     char name[MAX_FILENAME_LEN];
+
+    /* Resource type */
     RESOURCE_TYPE type;
+
+    /* A locked resource will not be deleted (except with "free_resources") */
     bool locked;
+
+    /* Pointer to the data */
     void *data;
+
 } RESOURCE;
 
+/* List of resources */
 static RESOURCE *resources[MAX_RESOURCES];
 static int num_resources = 0;
 
-static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILENAME_LEN];
+/* List of resource paths */
+static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
 static int num_resource_paths = 0;
 
 void free_resources()
@@ -66,7 +76,7 @@ void add_resource_path(const char *path)
     /**
      * Add the new path to the list of resource paths.
      */
-    strncpy(resource_paths[num_resource_paths], path, MAX_FILENAME_LEN - 1);
+    strncpy(resource_paths[num_resource_paths], path, MAX_FILEPATH_LEN - 1);
 
     num_resource_paths++;
 }
@@ -120,10 +130,10 @@ static void add_resource_to_list(RESOURCE *resource)
     }
 }
 
-void *_get_resource(const char *name, RESOURCE_TYPE type)
+static void *get_resource(const char *name, RESOURCE_TYPE type)
 {
     void *data = NULL;
-    char fullpath[MAX_FILENAME_LEN];
+    char fullpath[MAX_FILEPATH_LEN];
     int i;
 
     /**
@@ -156,8 +166,8 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
     for (i = 0; i < num_resource_paths; i++) {
 
         fullpath[0] = '\0';
-        strncat(fullpath, resource_paths[i], MAX_FILENAME_LEN);
-        strncat(fullpath, name, MAX_FILENAME_LEN);
+        strncat(fullpath, resource_paths[i], MAX_FILEPATH_LEN);
+        strncat(fullpath, name, MAX_FILEPATH_LEN);
 
         /* Load the resource, based on the filetype */
         if (type == RESOURCE_TYPE_IMAGE) {
@@ -179,12 +189,12 @@ void *_get_resource(const char *name, RESOURCE_TYPE type)
 
 IMAGE *get_image(const char *name)
 {
-    return (IMAGE *)_get_resource(name, RESOURCE_TYPE_IMAGE);
+    return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
 }
 
 SOUND *get_sound(const char *name)
 {
-    return (SOUND *)_get_resource(name, RESOURCE_TYPE_SOUND);
+    return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
 }
 
 void insert_image_resource(const char *name, IMAGE *image)

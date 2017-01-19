@@ -6,11 +6,10 @@
 
 IMAGE *get_masked_image(const char *name, const char *mask)
 {
-    int max_filename_len = 256;
-    char complete_name[max_filename_len];
+    char complete_name[MAX_FILENAME_LEN];
     complete_name[0] = '\0';
-    strncat(complete_name, name, max_filename_len);
-    strncat(complete_name, mask, max_filename_len);
+    strncat(complete_name, name, MAX_FILENAME_LEN);
+    strncat(complete_name, mask, MAX_FILENAME_LEN);
 
     /* If the image has already been added, just return it */
     IMAGE *masked_img = IMG(complete_name);

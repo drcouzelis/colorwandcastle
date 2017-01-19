@@ -23,7 +23,7 @@
 #define MAX_EFFECTS 16
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
-#define MAX_ROOMS 63
+#define MAX_ROOMS 64
 #define MAX_STRING_SIZE 128
 
 typedef enum
