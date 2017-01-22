@@ -13,21 +13,45 @@
 typedef ALLEGRO_BITMAP IMAGE;
 typedef ALLEGRO_SAMPLE SOUND;
 
+typedef enum
+{
+    RESOURCE_TYPE_NONE = 0,
+    RESOURCE_TYPE_IMAGE,
+    RESOURCE_TYPE_SOUND,
+} RESOURCE_TYPE;
+
+typedef struct
+{
+    /* If the resource is in use */
+    bool active;
+
+    /* A locked resource will not be deleted (unless specifically told) */
+    bool locked;
+
+    /* The name / filename used to reference the resource */
+    char name[MAX_FILENAME_LEN];
+
+    /* Resource type */
+    RESOURCE_TYPE type;
+
+    /* Pointer to the data */
+    void *data;
+
+} RESOURCE;
+
 /**
- * Free all the resource memory and
- * all of the resources.
+ * Free all the memory used by resources.
  *
- * This WILL delete "locked" resources.
+ * This will NOT delete "locked" resources.
  */
 void free_resources();
 
 /**
- * Free all the resource memory and
- * all of the resources.
+ * Free all the memory used by resources.
  *
- * This will NOT delete "locked" resources.
+ * This WILL delete "locked" resources.
  */
-void reset_resources();
+void free_all_resources();
 
 /**
  * A locked resource will persist, even

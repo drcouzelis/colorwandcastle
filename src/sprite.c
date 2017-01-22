@@ -16,13 +16,14 @@ void init_sprite(SPRITE *sprite, bool loop, int speed)
     
     for (int i = 0; i < MAX_FRAMES; i++) {
         sprite->frames[i] = NULL;
-        strncpy(sprite->frame_filenames[i], "", MAX_FILENAME_LEN);
+        sprite->framesV2[i] = NULL;
     }
     
     sprite->speed = speed < 0 ? 0 : speed;
     sprite->loop = loop;
 
     sprite->len = 0;
+    sprite->lenV2 = 0;
     sprite->pos = 0;
     sprite->done = false;
     sprite->fudge = 0;
@@ -84,14 +85,14 @@ void add_frame(SPRITE *sprite, IMAGE *frame)
     sprite->len++;
 }
 
-void add_frame_filename(SPRITE *sprite, const char *filename)
+void add_frameV2(SPRITE *sprite, RESOURCE *frame)
 {
     assert(sprite != NULL);
-    assert(filename != NULL);
-    assert(sprite->len <= MAX_FRAMES);
+    assert(frame != NULL);
+    assert(sprite->lenV2 <= MAX_FRAMES);
 
-    strncpy(sprite->frame_filenames[sprite->len], filename, MAX_FILENAME_LEN);
-    sprite->len++;
+    sprite->framesV2[sprite->lenV2] = frame;
+    sprite->lenV2++;
 }
 
 void delete_frames(SPRITE *sprite)

@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
  
     /* DONE, clean up */
-    free_resources();
+    free_all_resources();
     free_display();
 
     return EXIT_SUCCESS;

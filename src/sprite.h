@@ -8,8 +8,9 @@
 typedef struct
 {
     IMAGE *frames[MAX_FRAMES];
-    char frame_filenames[MAX_FRAMES][MAX_FILENAME_LEN];
+    RESOURCE *framesV2[MAX_FRAMES];
     int len;
+    int lenV2;
     int pos;
     int speed;
     int fudge;
@@ -60,7 +61,7 @@ void animate(SPRITE *sprite);
  * Add a frame to the sprite.
  */
 void add_frame(SPRITE *sprite, IMAGE *frame);
-void add_frame_filename(SPRITE *sprite, const char *filename);
+void add_frameV2(SPRITE *sprite, RESOURCE *frame);
 
 /**
  * Delete all frames.

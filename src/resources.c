@@ -7,32 +7,6 @@
 #define MAX_RESOURCE_PATHS 4
 #define GAME_VOLUME 192
 
-typedef enum
-{
-    RESOURCE_TYPE_NONE = 0,
-    RESOURCE_TYPE_IMAGE,
-    RESOURCE_TYPE_SOUND,
-} RESOURCE_TYPE;
-
-typedef struct
-{
-    /* If the resource is in use */
-    bool active;
-
-    /* A locked resource will not be deleted (unless specifically told) */
-    bool locked;
-
-    /* The name / filename used to reference the resource */
-    char name[MAX_FILENAME_LEN];
-
-    /* Resource type */
-    RESOURCE_TYPE type;
-
-    /* Pointer to the data */
-    void *data;
-
-} RESOURCE;
-
 /* List of resources */
 static RESOURCE *resources[MAX_RESOURCES];
 static int num_resources = 0;
@@ -42,20 +16,6 @@ static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
 static int num_resource_paths = 0;
 
 void free_resources()
-{
-    for (int i = 0; i < num_resources; i++) {
-        resources[i]->locked = false;
-    }
-
-    reset_resources();
-  
-    num_resources = 0;
-
-    /* See if we have any naughty memory leaks */
-    check_memory();
-}
-
-void reset_resources()
 {
     for (int i = 0; i < num_resources; i++) {
         if (resources[i]) {
@@ -68,6 +28,20 @@ void reset_resources()
             resources[i] = NULL;
         }
     }
+}
+
+void free_all_resources()
+{
+    for (int i = 0; i < num_resources; i++) {
+        resources[i]->locked = false;
+    }
+
+    free_resources();
+  
+    num_resources = 0;
+
+    /* See if we have any naughty memory leaks */
+    check_memory();
 }
 
 void add_resource_path(const char *path)
