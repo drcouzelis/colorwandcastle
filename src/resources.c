@@ -9,20 +9,24 @@
 
 typedef enum
 {
-    RESOURCE_TYPE_IMAGE = 0,
+    RESOURCE_TYPE_NONE = 0,
+    RESOURCE_TYPE_IMAGE,
     RESOURCE_TYPE_SOUND,
 } RESOURCE_TYPE;
 
 typedef struct
 {
+    /* If the resource is in use */
+    bool active;
+
+    /* A locked resource will not be deleted (unless specifically told) */
+    bool locked;
+
     /* The name / filename used to reference the resource */
     char name[MAX_FILENAME_LEN];
 
     /* Resource type */
     RESOURCE_TYPE type;
-
-    /* A locked resource will not be deleted (except with "free_resources") */
-    bool locked;
 
     /* Pointer to the data */
     void *data;
