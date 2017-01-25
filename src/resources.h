@@ -45,6 +45,7 @@ typedef struct
  * This will NOT delete "locked" resources.
  */
 void free_resources();
+void free_resourcesV2();
 
 /**
  * Free all the memory used by resources.
@@ -52,6 +53,7 @@ void free_resources();
  * This WILL delete "locked" resources.
  */
 void free_all_resources();
+void free_all_resourcesV2();
 
 /**
  * A locked resource will persist, even
@@ -77,14 +79,23 @@ void add_resource_path(const char *path);
 IMAGE *get_image(const char *name);
 SOUND *get_sound(const char *name);
 
+RESOURCE *get_resourceV2(const char *name);
+IMAGE *get_imageV2(RESOURCE *resource);
+SOUND *get_soundV2(RESOURCE *resource);
+
 /* For convenience */
 #define IMG(name) (get_image(name))
 #define SND(name) (get_sound(name))
+
+#define RSCV2(resource) (get_resourceV2(resource))
+#define IMGV2(resource) (get_imageV2(resource))
+#define SNDV2(resource) (get_soundV2(resource))
 
 /**
  * Insert your own image resource.
  * It can be retrieved by calling "get_image" with the given name.
  */
 void insert_image_resource(const char *name, IMAGE *image);
+void insert_image_resourceV2(const char *name, IMAGE *image);
 
 #endif

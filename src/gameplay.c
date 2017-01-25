@@ -650,7 +650,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
-            play_sound(SND("star_hit.wav"));
+            play_sound(SNDV2(RSCV2("star_hit.wav")));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
