@@ -71,7 +71,7 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
-            add_frame(sprite, RSC(string));
+            add_frame(sprite, IMG(string));
             continue;
         }
 
@@ -367,7 +367,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     /* Create sprites to represent each block, based on the list of textures */
     for (int i = 0; i < room->num_textures; i++) {
-        add_frame(&room->blocks[i], MASKED_IMG_RSC(room->textures[i], "mask-block.png"));
+        add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
     }
 
     /* Init any random blocks (any number < 0) */

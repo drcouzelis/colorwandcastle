@@ -15,8 +15,8 @@
  * If a masked image has already been created with these two images
  * then it will not be created again, but the original will be returned.
  */
-RESOURCE *get_masked_image_resource(const char *name, const char *mask);
+IMAGE *get_masked_image(const char *name, const char *mask);
 
-#define MASKED_IMG_RSC(name, mask) (get_masked_image_resource(name, mask))
+#define MASKED_IMG(name, mask) (get_masked_image(name, mask))
 
 #endif

@@ -13,45 +13,19 @@
 typedef ALLEGRO_BITMAP IMAGE;
 typedef ALLEGRO_SAMPLE SOUND;
 
-typedef enum
-{
-    RESOURCE_TYPE_NONE = 0,
-    RESOURCE_TYPE_IMAGE,
-    RESOURCE_TYPE_SOUND,
-} RESOURCE_TYPE;
-
-typedef struct
-{
-    /* If the resource is in use */
-    bool active;
-
-    /* A locked resource will not be deleted (unless specifically told) */
-    bool locked;
-
-    /* The name / filename used to reference the resource */
-    char name[MAX_FILENAME_LEN];
-
-    /* Resource type */
-    RESOURCE_TYPE type;
-
-    /* Pointer to the data */
-    void *data;
-
-} RESOURCE;
-
 /**
- * Free all the memory used by resources.
+ * Free all resources.
  *
  * This will NOT delete "locked" resources.
  */
 void free_resources();
 
 /**
- * Free all the memory used by resources.
+ * Unlock all resources.
  *
- * This WILL delete "locked" resources.
+ * This will NOT delete "locked" resources.
  */
-void free_all_resources();
+void unlock_resources();
 
 /**
  * A locked resource will persist, even
@@ -74,14 +48,12 @@ void add_resource_path(const char *path);
  * in order of the paths that you added. If the
  * resource isn't found it will return NULL.
  */
-RESOURCE *get_resource(const char *name);
-IMAGE *get_image(RESOURCE *resource);
-SOUND *get_sound(RESOURCE *resource);
+IMAGE *get_image(const char *name);
+SOUND *get_sound(const char *name);
 
 /* For convenience */
-#define RSC(resource) (get_resource(resource))
-#define IMG(resource) (get_image(resource))
-#define SND(resource) (get_sound(resource))
+#define IMG(name) (get_image(name))
+#define SND(name) (get_sound(name))
 
 /**
  * Insert your own image resource.

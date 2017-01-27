@@ -57,7 +57,7 @@ int main(int argc, char **argv)
   
     /* Set window properties */
     al_set_window_title(get_display(), "Colorwand Castle");
-    al_set_display_icon(get_display(), IMG(RSC("icon.png")));
+    al_set_display_icon(get_display(), IMG("icon.png"));
 
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
@@ -98,7 +98,8 @@ int main(int argc, char **argv)
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
  
     /* DONE, clean up */
-    free_all_resources();
+    unlock_resources();
+    free_resources();
     free_display();
 
     return EXIT_SUCCESS;

@@ -4,7 +4,7 @@
 #include "main.h"
 #include "mask.h"
 
-RESOURCE *get_masked_image_resource(const char *name, const char *mask)
+IMAGE *get_masked_image(const char *name, const char *mask)
 {
     char complete_name[MAX_FILENAME_LEN];
     complete_name[0] = '\0';
@@ -12,17 +12,17 @@ RESOURCE *get_masked_image_resource(const char *name, const char *mask)
     strncat(complete_name, mask, MAX_FILENAME_LEN);
 
     /* If the image has already been added, just return it */
-    RESOURCE *resource = RSC(complete_name);
-    if (IMG(resource) != NULL) {
-        return resource;
+    IMAGE *masked_img = IMG(complete_name);
+    if (masked_img != NULL) {
+        return masked_img;
     }
 
     /* Load the image */
-    IMAGE *orig_img = IMG(RSC(name));
+    IMAGE *orig_img = IMG(name);
     assert(orig_img);
 
     /* Load the mask */
-    IMAGE *mask_img = IMG(RSC(mask));
+    IMAGE *mask_img = IMG(mask);
     assert(mask_img);
 
     /* Create a canvas to draw the newly created image to */
@@ -52,5 +52,5 @@ RESOURCE *get_masked_image_resource(const char *name, const char *mask)
     /* Add it to the collection of resources */
     insert_image_resource(complete_name, canvas);
 
-    return resource;
+    return canvas;
 }

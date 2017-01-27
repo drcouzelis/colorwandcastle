@@ -7,68 +7,69 @@
 #define MAX_RESOURCE_PATHS 4
 #define GAME_VOLUME 192
 
-static bool resources_init = false;
+typedef enum
+{
+    RESOURCE_TYPE_NONE = 0,
+    RESOURCE_TYPE_IMAGE,
+    RESOURCE_TYPE_SOUND,
+} RESOURCE_TYPE;
+
+typedef struct
+{
+    /* If the resource is in use */
+    bool active;
+
+    /* A locked resource will not be deleted (unless specifically told) */
+    bool locked;
+
+    /* The name / filename used to reference the resource */
+    char name[MAX_FILENAME_LEN];
+
+    /* Resource type */
+    RESOURCE_TYPE type;
+
+    /* Pointer to the data */
+    void *data;
+
+} RESOURCE;
 
 /* List of resources */
-static RESOURCE resources[MAX_RESOURCES];
+static RESOURCE *resources[MAX_RESOURCES];
+static int num_resources = 0;
 
 /* List of resource paths */
 static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
 static int num_resource_paths = 0;
 
-static void init_resources()
-{
-    if (resources_init) {
-        return;
-    }
-
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        resources[i].active = false;
-        resources[i].locked = false;
-        resources[i].name[0] = '\0';
-        resources[i].type = RESOURCE_TYPE_NONE;
-        resources[i].data = NULL;
-    }
-
-    resources_init = true;
-}
-
 void free_resources()
 {
-    init_resources();
-
-    printf("Freeing resources!\n");
-
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i].active && !resources[i].locked) {
-            if (resources[i].type == RESOURCE_TYPE_IMAGE) {
-                al_destroy_bitmap((IMAGE *)resources[i].data);
-            } else if (resources[i].type == RESOURCE_TYPE_SOUND) {
-                al_destroy_sample((SOUND *)resources[i].data);
+    for (int i = 0; i < num_resources; i++) {
+        if (resources[i]) {
+            if (resources[i]->type == RESOURCE_TYPE_IMAGE) {
+                al_destroy_bitmap((IMAGE *)resources[i]->data);
+            } else if (resources[i]->type == RESOURCE_TYPE_SOUND) {
+                al_destroy_sample((SOUND *)resources[i]->data);
             }
-            resources[i].active = false;
-            resources[i].name[0] = '\0';
-            resources[i].data = NULL;
+            free_memory("RESOURCE", resources[i]);
+            resources[i] = NULL;
         }
     }
+  
+    num_resources = 0;
+
+    /* See if we have any naughty memory leaks */
+    check_memory();
 }
 
-void free_all_resources()
+void unlock_resources()
 {
-    init_resources();
-
-    /* Mark all resources as unlocked, then just delete them all */
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        resources[i].locked = false;
+    for (int i = 0; i < num_resources; i++) {
+        resources[i]->locked = false;
     }
-
-    free_resources();
 }
 
 void add_resource_path(const char *path)
 {
-    init_resources();
-
     if (num_resource_paths >= MAX_RESOURCE_PATHS) {
         fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_RESOURCE_PATHS.\n");
         return;
@@ -96,34 +97,76 @@ static IMAGE *load_bitmap_with_magic_pink(const char *filename)
     return bitmap;
 }
 
-static int next_free_space()
+/**
+ * Create a RESOURCE structure.
+ */
+static RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
 {
-    int n = 0;
+    RESOURCE *resource = alloc_memory("RESOURCE", sizeof(RESOURCE));
 
-    while (n < MAX_RESOURCES) {
-        if (!resources[n].active) {
-            return n;
-        }
-        n++;
+    if (resource) {
+        strncpy(resource->name, name, MAX_FILENAME_LEN - 1);
+        resource->type = type;
+        resource->data = data;
+        resource->locked = false;
+        resource->active = true;
     }
 
-    /* Sorry, no more space for resources :( */
-    fprintf(stderr, "RESOURCES: Failed to load resource, try increasing MAX_RESOURCES.\n");
-    return -1;
+    return resource;
 }
 
-static void *load_resource_data(const char *name, RESOURCE_TYPE type)
+static bool is_space_for_new_resource()
+{
+    /* See if we have space to load another resource... */
+    if (num_resources == MAX_RESOURCES) {
+        fprintf(stderr, "RESOURCES: Failed to load resource, try increasing MAX_RESOURCES.\n");
+        return false;
+    }
+    return true;
+}
+
+static void add_resource_to_list(RESOURCE *resource)
+{
+    if (is_space_for_new_resource()) {
+        resources[num_resources] = resource;
+        num_resources++;
+    }
+}
+
+static void *get_resource(const char *name, RESOURCE_TYPE type)
 {
     void *data = NULL;
     char fullpath[MAX_FILEPATH_LEN];
+    int i;
 
     /**
-     * Try to find a file with the given filename in
+     * Check the resources that have already been loaded
+     */
+    for (i = 0; i < num_resources; i++) {
+        assert(resources[i]);
+        if (resources[i] == NULL) {
+            printf("Resource %d is NULL\n", i);
+        }
+        if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
+            /* The resource has been found! Return it */
+            return resources[i]->data;
+        }
+    }
+
+    /**
+     * Uh oh. The resource WASN'T found.
+     */
+    if (!is_space_for_new_resource()) {
+        return NULL;
+    }
+
+    /**
+     * Next, try finding a file with the given filename in
      * the list of resource paths.
      *
-     * If found, load it and return it!
+     * If found, return it!
      */
-    for (int i = 0; i < num_resource_paths; i++) {
+    for (i = 0; i < num_resource_paths; i++) {
 
         fullpath[0] = '\0';
         strncat(fullpath, resource_paths[i], MAX_FILEPATH_LEN);
@@ -138,94 +181,33 @@ static void *load_resource_data(const char *name, RESOURCE_TYPE type)
 
         /* The resource has been created! Return it */
         if (data != NULL) {
+            add_resource_to_list(create_resource(name, type, data));
             return data;
         }
     }
 
+    /*fprintf(stderr, "RESOURCES: Failed to load resource: \"%s\".\n", name);*/
     return NULL;
 }
 
-RESOURCE *get_resource(const char *name)
+IMAGE *get_image(const char *name)
 {
-    init_resources();
-
-    assert(strlen(name) > 0);
-
-    /**
-     * Check the list of resources.
-     * If a resource with this name exists,
-     *     then return a pointer to the resource.
-     * Else,
-     *     create a resource with this name,
-     *     and return a pointer to the resource.
-     */
-
-    /* Check to see if the resource has already been setup */
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i].active && strncmp(resources[i].name, name, MAX_FILENAME_LEN) == 0) {
-            /* The resource has been found! Return it */
-            return &resources[i];
-        }
-    }
-
-    /* A resource with the given name wasn't found, so allocate a new one */
-    int n = next_free_space();
-
-    if (n >= 0) {
-        strncpy(resources[n].name, name, MAX_FILENAME_LEN);
-        resources[n].active = true;
-        return &resources[n];
-    }
-
-    /* Sorry, we totally failed at getting a resource :( */
-    return NULL;
+    return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
 }
 
-IMAGE *get_image(RESOURCE *resource)
+SOUND *get_sound(const char *name)
 {
-    init_resources();
-
-    assert(resource);
-    assert(resource->active);
-
-    /**
-     * If the data is NULL, that means this resources has never been used before.
-     * Load the data, then return it.
-     */
-    if (resource->data == NULL) {
-        resource->type = RESOURCE_TYPE_IMAGE;
-        resource->data = load_resource_data(resource->name, resource->type);
-    }
-
-    return (IMAGE *)resource->data;
-}
-
-SOUND *get_sound(RESOURCE *resource)
-{
-    init_resources();
-
-    assert(resource);
-    assert(resource->active);
-
-    if (resource->data == NULL) {
-        resource->type = RESOURCE_TYPE_SOUND;
-        resource->data = load_resource_data(resource->name, resource->type);
-    }
-
-    return (SOUND *)resource->data;
+    return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
 }
 
 void insert_image_resource(const char *name, IMAGE *image)
 {
-    init_resources();
-
     assert(image);
 
     /* Check if the image has already been added */
-    RESOURCE *resource = get_resource(name);
+    if (get_image(name) != NULL) {
+        return;
+    }
 
-    assert(resource);
-
-    resource->type = RESOURCE_TYPE_IMAGE;
-    resource->data = image;
+    add_resource_to_list(create_resource(name, RESOURCE_TYPE_IMAGE, image));
 }

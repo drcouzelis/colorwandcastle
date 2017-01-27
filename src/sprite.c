@@ -70,10 +70,10 @@ IMAGE *get_frame(SPRITE *sprite)
         return NULL;
     }
 
-    return IMG(sprite->frames[sprite->pos]);
+    return sprite->frames[sprite->pos];
 }
 
-void add_frame(SPRITE *sprite, RESOURCE *frame)
+void add_frame(SPRITE *sprite, IMAGE *frame)
 {
     assert(sprite != NULL);
     assert(frame != NULL);

@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    RESOURCE *frames[MAX_FRAMES];
+    IMAGE *frames[MAX_FRAMES];
     int len;
     int pos;
     int speed;
@@ -58,7 +58,7 @@ IMAGE *get_frame(SPRITE *sprite);
 /**
  * Add a frame to the sprite.
  */
-void add_frame(SPRITE *sprite, RESOURCE *frame);
+void add_frame(SPRITE *sprite, IMAGE *frame);
 
 /**
  * Delete all frames.
