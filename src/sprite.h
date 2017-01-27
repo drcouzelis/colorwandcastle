@@ -7,10 +7,8 @@
 
 typedef struct
 {
-    IMAGE *frames[MAX_FRAMES];
-    RESOURCE *framesV2[MAX_FRAMES];
+    RESOURCE *frames[MAX_FRAMES];
     int len;
-    int lenV2;
     int pos;
     int speed;
     int fudge;
@@ -55,13 +53,12 @@ void animate(SPRITE *sprite);
 /**
  * Returns a pointer to the current frame of animation.
  */
-//IMAGE *get_frame(SPRITE *sprite);
+IMAGE *get_frame(SPRITE *sprite);
 
 /**
  * Add a frame to the sprite.
  */
-void add_frame(SPRITE *sprite, IMAGE *frame);
-void add_frameV2(SPRITE *sprite, RESOURCE *frame);
+void add_frame(SPRITE *sprite, RESOURCE *frame);
 
 /**
  * Delete all frames.

@@ -16,14 +16,12 @@ void init_sprite(SPRITE *sprite, bool loop, int speed)
     
     for (int i = 0; i < MAX_FRAMES; i++) {
         sprite->frames[i] = NULL;
-        sprite->framesV2[i] = NULL;
     }
     
     sprite->speed = speed < 0 ? 0 : speed;
     sprite->loop = loop;
 
     sprite->len = 0;
-    sprite->lenV2 = 0;
     sprite->pos = 0;
     sprite->done = false;
     sprite->fudge = 0;
@@ -66,16 +64,16 @@ void reset_sprite(SPRITE *sprite)
     sprite->fudge = 0;
 }
 
-static IMAGE *get_frame(SPRITE *sprite)
+IMAGE *get_frame(SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return NULL;
     }
 
-    return sprite->frames[sprite->pos];
+    return IMG(sprite->frames[sprite->pos]);
 }
 
-void add_frame(SPRITE *sprite, IMAGE *frame)
+void add_frame(SPRITE *sprite, RESOURCE *frame)
 {
     assert(sprite != NULL);
     assert(frame != NULL);
@@ -83,16 +81,6 @@ void add_frame(SPRITE *sprite, IMAGE *frame)
 
     sprite->frames[sprite->len] = frame;
     sprite->len++;
-}
-
-void add_frameV2(SPRITE *sprite, RESOURCE *frame)
-{
-    assert(sprite != NULL);
-    assert(frame != NULL);
-    assert(sprite->lenV2 <= MAX_FRAMES);
-
-    sprite->framesV2[sprite->lenV2] = frame;
-    sprite->lenV2++;
 }
 
 void delete_frames(SPRITE *sprite)

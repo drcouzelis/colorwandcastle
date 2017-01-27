@@ -115,7 +115,7 @@ static int random_front_texture()
     }
 }
 
-static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame)
+static RESOURCE *get_hero_bullet_image_resource(char *texture_name, int hero_type, int frame)
 {
     /**
      * Return an image of the hero's bullet based on
@@ -126,14 +126,14 @@ static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame
         {"mask-plasma-1.png", "mask-plasma-2.png"}
     };
 
-    return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
+    return MASKED_IMG_RSC(texture_name, bullet_mask_names[hero_type][frame]);
 }
 
 static void load_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
 {
     init_sprite(sprite, true, 4);
-    add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 0));
-    add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 1));
+    add_frame(sprite, get_hero_bullet_image_resource(texture_name, hero_type, 0));
+    add_frame(sprite, get_hero_bullet_image_resource(texture_name, hero_type, 1));
     sprite->x_offset = -5;
     sprite->y_offset = -5;
 }
@@ -154,15 +154,15 @@ static void load_hero_sprite()
     }
 
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero.sprite_flying, IMG("hero-makayla-01.png"));
-        add_frame(&hero.sprite_flying, IMG("hero-makayla-02.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-01.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-02.png"));
+        add_frame(&hero.sprite_flying, RSC("hero-makayla-01.png"));
+        add_frame(&hero.sprite_flying, RSC("hero-makayla-02.png"));
+        add_frame(&hero.sprite_hurting, RSC("hero-makayla-hurt-01.png"));
+        add_frame(&hero.sprite_hurting, RSC("hero-makayla-hurt-02.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        add_frame(&hero.sprite_flying, IMG("hero-rawson-01.png"));
-        add_frame(&hero.sprite_flying, IMG("hero-rawson-02.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-01.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-02.png"));
+        add_frame(&hero.sprite_flying, RSC("hero-rawson-01.png"));
+        add_frame(&hero.sprite_flying, RSC("hero-rawson-02.png"));
+        add_frame(&hero.sprite_hurting, RSC("hero-rawson-hurt-01.png"));
+        add_frame(&hero.sprite_hurting, RSC("hero-rawson-hurt-02.png"));
     }
 }
 
@@ -187,10 +187,10 @@ static void load_poof_effect(float x, float y)
     }
 
     init_sprite(&effect->sprite, false, 15);
-    add_frame(&effect->sprite, IMG("effect-poof-1.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-2.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-3.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-4.png"));
+    add_frame(&effect->sprite, RSC("effect-poof-1.png"));
+    add_frame(&effect->sprite, RSC("effect-poof-2.png"));
+    add_frame(&effect->sprite, RSC("effect-poof-3.png"));
+    add_frame(&effect->sprite, RSC("effect-poof-4.png"));
     effect->sprite.x_offset = -10;
     effect->sprite.y_offset = -10;
     effect->x = x;
@@ -466,11 +466,11 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
 
     if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
         init_sprite(&enemy->sprite, true, 20);
-        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, RSC("enemy-bat-1.png"));
+        add_frame(&enemy->sprite, RSC("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, RSC("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, RSC("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, RSC("enemy-bat-3.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -480,11 +480,11 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->dx = -definition->speed;
     } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
         init_sprite(&enemy->sprite, true, 8);
-        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+        add_frame(&enemy->sprite, RSC("enemy-spider-1.png"));
+        add_frame(&enemy->sprite, RSC("enemy-spider-2.png"));
+        add_frame(&enemy->sprite, RSC("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, RSC("enemy-spider-4.png"));
+        add_frame(&enemy->sprite, RSC("enemy-spider-5.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -650,7 +650,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
-            play_sound(SNDV2(RSCV2("star_hit.wav")));
+            play_sound(SND(RSC("star_hit.wav")));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
@@ -675,7 +675,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Bounce */
             bullet->dx *= -1;
             bullet->dy *= -1;
-            play_sound(SND("star_disolve.wav"));
+            play_sound(SND(RSC("star_disolve.wav")));
         }
 
         return false;
@@ -691,12 +691,12 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         /* Just bounce */
         bullet->hits--;
         if (bullet->hits <= 0) {
-            play_sound(SND("star_disolve.wav"));
+            play_sound(SND(RSC("star_disolve.wav")));
         } else {
             /* Bounce */
             bullet->dx *= -1;
             bullet->dy *= -1;
-            play_sound(SND("star_disolve.wav"));
+            play_sound(SND(RSC("star_disolve.wav")));
         }
 
         return false;

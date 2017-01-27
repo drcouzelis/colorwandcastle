@@ -71,7 +71,7 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
-            add_frame(sprite, IMG(string));
+            add_frame(sprite, RSC(string));
             continue;
         }
 
@@ -92,7 +92,7 @@ static void load_map_from_datafile(int *map, int cols, int rows, FILE *file)
             if (fscanf(file, "%d", &num) == 1) {
                 /* WARNING: TRICKY! */
                 /* The data file counts numbers starting at 1 */
-                /* The game engile counts numbers starting at 0 */
+                /* The game engine counts numbers starting at 0 */
                 /* SUBTRACT 1! */
                 map[(r * cols) + c] = num - 1;
             } else {
@@ -367,7 +367,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     /* Create sprites to represent each block, based on the list of textures */
     for (int i = 0; i < room->num_textures; i++) {
-        add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
+        add_frame(&room->blocks[i], MASKED_IMG_RSC(room->textures[i], "mask-block.png"));
     }
 
     /* Init any random blocks (any number < 0) */
