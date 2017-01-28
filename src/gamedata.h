@@ -55,8 +55,8 @@ typedef enum
 {
     U = 0,
     D,
-    L,
-    R
+    R,
+    L
 } DIRECTION;
 
 typedef struct

@@ -4,6 +4,8 @@ colorwandcastle_CPPFLAGS = -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'
 colorwandcastle_SOURCES = \
   src/datafile.c \
   src/datafile.h \
+  src/direction.c \
+  src/direction.h \
   src/display.c \
   src/display.h \
   src/gamedata.c \
@@ -18,6 +20,8 @@ colorwandcastle_SOURCES = \
   src/memory.h \
   src/menu.c \
   src/menu.h \
+  src/path.c \
+  src/path.h \
   src/resources.c \
   src/resources.h \
   src/run.c \

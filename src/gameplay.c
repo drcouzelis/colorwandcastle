@@ -4,6 +4,7 @@
 #include "gameplay.h"
 #include "main.h"
 #include "mask.h"
+#include "path.h"
 #include "sound.h"
 #include "sprite.h"
 #include "utilities.h"
@@ -81,6 +82,12 @@ static int random_front_texture()
         textures[i] = NO_TEXTURE;
     }
 
+    /* Find the position of the hero in rows / cols */
+    int hero_row = ((int)hero.body.y  + 7) / TILE_SIZE;
+    int hero_col = ((int)hero.body.x  + 7) / TILE_SIZE;
+ 
+    printf("Hero %d %d\n", hero_row, hero_col);
+
     /* Create a list of blocks that are available to hit */
     for (int r = 0; r < room.rows; r++) {
         for (int c = 0; c < room.cols; c++) {
@@ -88,6 +95,35 @@ static int random_front_texture()
             int block_texture = room.block_map[(r * room.cols) + c];
 
             if (block_texture != NO_BLOCK) {
+
+                /**
+                 * Get the position in front of the block
+                 * (because that's where you shoot it from).
+                 */
+
+                int dest_row = r;
+                int dest_col = c;
+
+                if (room.direction == U) {
+                    dest_row++;
+                } else if (room.direction == D) {
+                    dest_row--;
+                } else if (room.direction == L) {
+                    dest_col++;
+                } else { // R
+                    dest_col--;
+                }
+
+                printf("Block row %d col %d (%d %d)\n", r, c, dest_row, dest_col);
+                if (!is_path_between_points(&room, hero_row, hero_col, dest_row, dest_col)) {
+                    continue;
+                }
+
+                /**
+                 * Great! We found a block, and it's reachable.
+                 * If this texture hasn't already been accounted for,
+                 * then add it to our list.
+                 */
 
                 bool exists_in_list = false;
 
@@ -101,8 +137,6 @@ static int random_front_texture()
                     textures[num_textures] = block_texture;
                     num_textures++;
                 }
-
-                break;
             }
         }
     }
