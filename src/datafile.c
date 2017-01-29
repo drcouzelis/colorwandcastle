@@ -259,16 +259,16 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
                 fprintf(stderr, "Failed to load direction.\n");
             }
             if (strncmp(string, "U", MAX_STRING_SIZE) == 0) {
-                room->direction = U;
+                room->direction = UP;
             } else if (strncmp(string, "D", MAX_STRING_SIZE) == 0) {
-                room->direction = D;
+                room->direction = DOWN;
             } else if (strncmp(string, "L", MAX_STRING_SIZE) == 0) {
-                room->direction = L;
+                room->direction = LEFT;
             } else if (strncmp(string, "R", MAX_STRING_SIZE) == 0) {
-                room->direction = R;
+                room->direction = RIGHT;
             } else {
                 fprintf(stderr, "Failed to read direction, must be U, D, L, or R.\n");
-                room->direction = R;
+                room->direction = RIGHT;
             }
             continue;
         }

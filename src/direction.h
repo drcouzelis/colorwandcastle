@@ -1,47 +1,32 @@
 #ifndef DIRECTION_HEADER
 #define DIRECTION_HEADER
 
-enum
+/**
+ * You can loop through the directions by going
+ * from i = FIRST_DIRECTION to i < LAST_DIRECTION.
+ */
+typedef enum
 {
-  NORTH = 0,
-  SOUTH,
-  EAST,
-  WEST
-};
+    FIRST_DIRECTION = 0,
+    UP = 0,
+    DOWN = 1,
+    LEFT = 2,
+    RIGHT = 3,
+    LAST_DIRECTION = 4
+} DIRECTION;
 
-enum
+typedef struct
 {
-  NE = 0,
-  NW,
-  SE,
-  SW
-};
-
-enum
-{
-  UP = 0,
-  DOWN,
-  RIGHT,
-  LEFT
-};
-
-typedef struct DIRECTION DIRECTION;
-
-struct DIRECTION
-{
-  int type;
+  DIRECTION type;
   
   int h_offset;
   int v_offset;
   
   int x_offset;
   int y_offset;
-};
 
+} DIRECTION_MAP;
 
-extern const DIRECTION cardinals[4];
-extern const DIRECTION intercardinals[4];
-
-extern const DIRECTION directions[4];
+extern const DIRECTION_MAP directions[4];
 
 #endif

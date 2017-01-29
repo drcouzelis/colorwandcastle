@@ -1,4 +1,3 @@
-//#include "direction.h"
 #include "path.h"
 
 static bool is_path_between_points_recursively(bool *map, int r1, int c1, int r2, int c2)
@@ -27,24 +26,11 @@ static bool is_path_between_points_recursively(bool *map, int r1, int c1, int r2
      * If you find a path, then great! Stop searching.
      * If not, keep searching and searching.
      */
-    for (int dir = U; dir <= L; dir++) {
+    for (int dir = FIRST_DIRECTION; dir < LAST_DIRECTION; dir++) {
 
-        //row = r1 + cardinals[dir].v_offset;
-        //col = c1 + cardinals[dir].h_offset;
+        int row = r1 + directions[dir].v_offset;
+        int col = c1 + directions[dir].h_offset;
 
-        int row = r1;
-        int col = c1;
-
-        if (dir == U) {
-            row--;
-        } else if (dir == D) {
-            row++;
-        } else if (dir == R) {
-            col++;
-        } else { // L
-            col--;
-        }
-  
         /* If out of bounds, then this in NOT a valid path... */
         if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
 

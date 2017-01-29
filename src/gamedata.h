@@ -2,6 +2,7 @@
 #define GAMEDATA_HEADER
 
 #include <stdio.h>
+#include "direction.h"
 #include "sprite.h"
 
 #define TILE_SIZE 20
@@ -50,14 +51,6 @@ typedef enum
     GAMEPLAY_STATE_PLAY = 0,
     GAMEPLAY_STATE_DEATH
 } GAMEPLAY_STATE;
-
-typedef enum
-{
-    U = 0,
-    D,
-    R,
-    L
-} DIRECTION;
 
 typedef struct
 {

@@ -98,19 +98,8 @@ static int random_front_texture()
                  * Get the position in front of the block
                  * (because that's where you shoot it from).
                  */
-
-                int dest_row = r;
-                int dest_col = c;
-
-                if (room.direction == U) {
-                    dest_row++;
-                } else if (room.direction == D) {
-                    dest_row--;
-                } else if (room.direction == R) {
-                    dest_col--;
-                } else { // L
-                    dest_col++;
-                }
+                int dest_row = r - directions[room.direction].v_offset;
+                int dest_col = c - directions[room.direction].h_offset;
 
                 if (!is_path_between_points(&room, hero_row, hero_col, dest_row, dest_col)) {
                     continue;
@@ -179,7 +168,7 @@ static void load_hero_sprite()
     hero.sprite_hurting.x_offset = -10;
     hero.sprite_hurting.y_offset = -10;
 
-    if (room.direction == L) {
+    if (room.direction == LEFT) {
         hero.sprite_flying.mirror = true;
         hero.sprite_hurting.mirror = true;
     }
@@ -769,19 +758,9 @@ static void shoot_bullet(int texture, float x, float y)
 
     float speed = TILE_SIZE * 10;
 
-    if (room.direction == U) {
-        bullet->dx = 0;
-        bullet->dy = -speed;
-    } else if (room.direction == D) {
-        bullet->dx = 0;
-        bullet->dy = speed;
-    } else if (room.direction == L) {
-        bullet->dx = -speed;
-        bullet->dy = 0;
-    } else { /* Right */
-        bullet->dx = speed;
-        bullet->dy = 0;
-    }
+    /* Set the bullet's velocity based on the direction of the room */
+    bullet->dx = speed * directions[room.direction].x_offset;
+    bullet->dy = speed * directions[room.direction].y_offset;
 
     bullet->is_active = true;
 
@@ -795,25 +774,25 @@ static void shoot_bullet(int texture, float x, float y)
     float orig_y = bullet->body.y;
 
     /* (See comment a few lines above) */
-    if (room.direction == U) {
+    if (room.direction == UP) {
         for (bullet->body.y = hero.body.y; bullet->body.y > orig_y; bullet->body.y--) {
             if (!move_bullet(bullet, bullet->body.x, bullet->body.y - 1)) {
                 break;
             }
         }
-    } else if (room.direction == D) {
+    } else if (room.direction == DOWN) {
         for (bullet->body.y = hero.body.y; bullet->body.y < orig_y; bullet->body.y++) {
             if (!move_bullet(bullet, bullet->body.x, bullet->body.y + 1)) {
                 break;
             }
         }
-    } else if (room.direction == L) {
+    } else if (room.direction == LEFT) {
         for (bullet->body.x = hero.body.x; bullet->body.x > orig_x; bullet->body.x--) {
             if (!move_bullet(bullet, bullet->body.x - 1, bullet->body.y)) {
                 break;
             }
         }
-    } else { /* R */
+    } else { /* RIGHT */
         for (bullet->body.x = hero.body.x; bullet->body.x < orig_x; bullet->body.x++) {
             if (!move_bullet(bullet, bullet->body.x + 1, bullet->body.y)) {
                 break;
@@ -828,13 +807,13 @@ static void update_hero_bullet_position()
      * These calculations produce a neat effect where the bullet
      * always lines up with a row of blocks.
      */
-    if (room.direction == U) {
+    if (room.direction == UP) {
         hero.bullet_x = ((((int)hero.body.x  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.x_offset;
         hero.bullet_y = hero.body.y - 20;
-    } else if (room.direction == D) {
+    } else if (room.direction == DOWN) {
         hero.bullet_x = ((((int)hero.body.x  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.x_offset;
         hero.bullet_y = hero.body.y + 20;
-    } else if (room.direction == L) {
+    } else if (room.direction == LEFT) {
         hero.bullet_x = hero.body.x - 20;
         hero.bullet_y = ((((int)hero.body.y  + 7) / TILE_SIZE) * TILE_SIZE) - hero.bullet.y_offset;
     } else { /* R */
