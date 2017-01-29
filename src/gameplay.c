@@ -86,8 +86,6 @@ static int random_front_texture()
     int hero_row = ((int)hero.body.y  + 7) / TILE_SIZE;
     int hero_col = ((int)hero.body.x  + 7) / TILE_SIZE;
  
-    printf("Hero %d %d\n", hero_row, hero_col);
-
     /* Create a list of blocks that are available to hit */
     for (int r = 0; r < room.rows; r++) {
         for (int c = 0; c < room.cols; c++) {
@@ -108,13 +106,12 @@ static int random_front_texture()
                     dest_row++;
                 } else if (room.direction == D) {
                     dest_row--;
-                } else if (room.direction == L) {
-                    dest_col++;
-                } else { // R
+                } else if (room.direction == R) {
                     dest_col--;
+                } else { // L
+                    dest_col++;
                 }
 
-                printf("Block row %d col %d (%d %d)\n", r, c, dest_row, dest_col);
                 if (!is_path_between_points(&room, hero_row, hero_col, dest_row, dest_col)) {
                     continue;
                 }
