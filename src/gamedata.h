@@ -179,8 +179,14 @@ typedef struct
     /* Each entry is an index number for the list of tiles */
     int foreground_map[MAX_ROOM_SIZE];
 
-    /* Collision detection map for the hero and bullets */
-    /* Most likely, this will line up exactly with the foreground map */
+    /**
+     * Collision detection map for the hero and bullets.
+     * Most likely, this will line up exactly with the foreground map.
+     * True (1) is a collision, false (0) is no collision.
+     *
+     * The collision map is optional, if it isn't defined
+     * then the foreground map wil be used instead.
+     */
     int collision_map[MAX_ROOM_SIZE];
 
     /* List of textures used to make blocks and bullets in the level */

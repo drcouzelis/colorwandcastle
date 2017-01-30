@@ -1,26 +1,14 @@
-# Name of the room
-# Is the entire length of the line, including spaces
 TITLE Let's clean up!
 
-# Hero start position
 START 200 80
 
-# Size of the room
-# Defaults to 16x12
 SIZE 16 12
 
-# Direction of gameplay
-# Can be U, D, L, R
-# Default is RIGHT
 DIRECTION L
 
-# Import a default set of tiles and blocks
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat
 
-# The background is tiles that are drawn underneath everything else
-# Tiles are represented by their corresponding integer value
-# 0 (zero) is an empty tile
 BACKGROUND
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -35,9 +23,6 @@ BACKGROUND
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
-# The foreground is tiles on the same plane as the hero
-# Tiles are represented by their corresponding integer value
-# 0 (zero) is an empty tile
 FOREGROUND
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -52,37 +37,16 @@ FOREGROUND
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
-# Collision map
-# 1 (one) is solid
-# 0 (zero) is able to be passed through
-COLLISION
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 01 01 01 01 01 01 01 01 01 01 00 00 00
-00 00 00 01 00 00 00 00 00 00 00 00 01 00 00 00
-00 00 00 01 00 00 00 00 00 00 00 00 01 00 00 00
-00 00 00 01 00 00 00 00 00 00 00 00 01 00 00 00
-00 00 00 01 00 00 00 00 00 00 00 00 01 00 00 00
-00 00 00 01 00 00 00 00 00 00 00 00 01 00 00 00
-00 00 00 01 00 00 00 00 00 00 00 00 01 00 00 00
-00 00 00 01 01 01 01 01 01 01 01 01 01 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-
-# Block placement
-# Enter an integer for a specific block
-# 0 (zero) is for blank
-# -1 (any negative number) will display a random block
 BLOCKS
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 -1 -1 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 -1 -1 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 -1 -1 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 -1 -1 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 -1 -1 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 -1 -1 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00

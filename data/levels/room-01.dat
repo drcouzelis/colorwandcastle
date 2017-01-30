@@ -1,21 +1,12 @@
-# Name of the room
-# Is the entire length of the line, including spaces
 TITLE Let's clean up!
 
-# Hero start position
 START 40 40
 
-# Size of the room
-# Defaults to 16x12
 SIZE 16 12
 
-# Import a default set of tiles and blocks
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat
 
-# The background is tiles that are drawn underneath everything else
-# Tiles are represented by their corresponding integer value
-# 0 (zero) is an empty tile
 BACKGROUND
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 02 02 02 02 02 02 02 02 02 02 02 02 02 02 00
@@ -30,9 +21,6 @@ BACKGROUND
 00 02 02 02 02 02 02 02 02 02 02 02 02 02 02 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
-# The foreground is tiles on the same plane as the hero
-# Tiles are represented by their corresponding integer value
-# 0 (zero) is an empty tile
 FOREGROUND
 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
 01 00 00 00 00 01 01 00 00 00 00 00 00 00 00 01
@@ -47,27 +35,6 @@ FOREGROUND
 01 00 00 01 01 00 00 00 00 00 00 00 00 00 00 01
 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
 
-# Collision map
-# 1 (one) is solid
-# 0 (zero) is able to be passed through
-COLLISION
-01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-01 00 00 00 00 01 01 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 01 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 01
-01 00 00 01 01 00 00 00 00 00 00 00 00 00 00 01
-01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-
-# Block placement
-# Enter an integer for a specific block
-# 0 (zero) is for blank
-# -1 (any negative number) will display a random block
 BLOCKS
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 -1 00
@@ -82,10 +49,5 @@ BLOCKS
 00 00 00 00 00 00 00 00 00 00 00 -1 -1 -1 -1 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
-# ENEMY type row col speed dist
-# Type: LEFTRIGHT, UPDOWN, DIAGONAL
-# Row, Col: Starting position in the room
-# Speed: In Pixels-Per-Second
-# Dist: Distance to travel in pixels, neg num to bounce
 ENEMY LEFTRIGHT 9 11 30 -1
 ENEMY UPDOWN 3 12 30 -1

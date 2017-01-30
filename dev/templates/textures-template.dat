@@ -1,6 +1,19 @@
+# TEXTURES
+
+# 1
 TEXTURE texture-red.png
+
+# 2
 TEXTURE texture-orange.png
+
+# 3
 TEXTURE texture-yellow.png
+
+# 4
 TEXTURE texture-green.png
+
+# 5
 TEXTURE texture-blue.png
+
+# 6
 TEXTURE texture-purple.png

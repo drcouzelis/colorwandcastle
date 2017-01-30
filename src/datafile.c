@@ -218,9 +218,13 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     char string[MAX_STRING_SIZE];
     int next_enemy = 0;
+    bool foreground_map_used = false;
+    bool collision_map_used = false;
 
     /* Start reading through the file! */
     while (fscanf(file, "%s", string) != EOF) {
+
+        //printf("Loading %s...\n", string);
 
         /* Ignore comments (lines that begin with a hash) */
         if (string[0] == '#') {
@@ -311,12 +315,14 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
         /* Foreground map */
         if (strncmp(string, "FOREGROUND", MAX_STRING_SIZE) == 0) {
             load_map_from_datafile(room->foreground_map, room->cols, room->rows, file);
+            foreground_map_used = true;
             continue;
         }
 
         /* Collision map */
         if (strncmp(string, "COLLISION", MAX_STRING_SIZE) == 0) {
             load_map_from_datafile(room->collision_map, room->cols, room->rows, file);
+            collision_map_used = true;
             continue;
         }
 
@@ -371,12 +377,17 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     }
 
     /* Init any random blocks (any number < 0) */
-    for (int r = 0; r < room->rows; r++) {
-        for (int c = 0; c < room->cols; c++) {
-            if (room->block_map_orig[(r * room->cols) + c] == RANDOM_BLOCK) {
-                /* Set the block to a random texture */
-                room->block_map_orig[(r * room->cols) + c] = random_number(0, room->num_textures - 1);
-            }
+    for (int i = 0; i < room->rows * room->cols; i++) {
+        if (room->block_map_orig[i] == RANDOM_BLOCK) {
+            /* Set the block to a random texture */
+            room->block_map_orig[i] = random_number(0, room->num_textures - 1);
+        }
+    }
+
+    /* If there's no collision map, just create one based on the foreground map */
+    if (foreground_map_used && !collision_map_used) {
+        for (int i = 0; i < room->rows * room->cols; i++) {
+            room->collision_map[i] = room->foreground_map[i] == 0 ? 0 : 1;
         }
     }
 
