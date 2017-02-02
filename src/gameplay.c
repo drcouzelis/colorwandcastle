@@ -505,6 +505,9 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
         add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
         add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-6.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-spider-7.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
