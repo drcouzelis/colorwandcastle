@@ -33,16 +33,19 @@
 - [x] Create levels in code first, then transition to DAT files
 - [x] Vertical levels
 - [x] Left-facing levels
-- [ ] Fix vertical-level-star-color-choosing glitch
-- [ ] Allow for clearing resources at any time (use filenames instead of pointers to images)
+- [x] Fix vertical-level-star-color-choosing glitch
+- [x] Allow for clearing resources at the end of a level
+- [ ] Implement a game-wide matching color palette
 - [ ] Get rid of memory library - static allocation only
+- [ ] Two types of rooms - NORMAL and BOSS
 
 ## Enemies
 
-- [x] A bat flies back and forth in place
-- [x] A spider slowly moves up and down the screen on his web
-- [ ] A snake walks around the border of the play area
-- [ ] A fireball bounces around the room
+- [x] A ENEMY_HORIZONTAL (bat) flies back and forth in place
+- [x] A ENEMY_VERTICAL (spider) slowly moves up and down the screen on his web
+- [ ] A ENEMY_DIAGONAL bounces around the room
+- [ ] A ENEMY_TRACER is attached to a surface and will "trace" the surface
+- [ ] A ENEMY_SNEAK is disguised as a block with a random texture
 
 ## Powerups
 
@@ -53,6 +56,14 @@
 - [ ] Slow star, shoots slow
 - [ ] Fragile star, doesn't bounce
 
+## Sound Effects
+
+- [ ] Block destroyed "POP"
+- [ ] Bullet bounce "BOING"
+- [ ] Bullet destroyed "TWINKLE"
+- [ ] Hero hit "SAD SOUND"
+
 ## Ideas
 
 - Hit-points on blocks? (No.)
+- Rooms that you "come back" to, such as one hallway above another, or going down stairs that you saw previously
