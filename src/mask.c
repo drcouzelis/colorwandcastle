@@ -40,10 +40,7 @@ IMAGE *get_masked_image(const char *name, const char *mask)
     al_draw_bitmap(orig_img, 0, 0, 0);
 
     /* Second, add the mask */
-    al_set_blender(ALLEGRO_SRC_MINUS_DEST, ALLEGRO_ONE, ALLEGRO_ONE);
-    al_draw_bitmap(mask_img, 0, 0, 0);
-
-    /* TODO: WHAT THE HECK WHAT DOES THIS DO WHY DO I NEED A SECOND CALL??? */
+    al_set_blender(ALLEGRO_ADD, ALLEGRO_DEST_COLOR, 0);
     al_draw_bitmap(mask_img, 0, 0, 0);
 
     /* RESTORE Allegro state */
