@@ -36,6 +36,7 @@
 - [x] Fix vertical-level-star-color-choosing glitch
 - [x] Allow for clearing resources at the end of a level
 - [ ] Implement a game-wide matching color palette
+- [ ] Jazz up the enemies - fuzzy bats, rainbow legged spiders
 - [ ] Get rid of memory library - static allocation only
 - [ ] Two types of rooms - NORMAL and BOSS
 
