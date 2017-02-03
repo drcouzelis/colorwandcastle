@@ -14,7 +14,6 @@
 - The player has an unlimited number of tries to complete a level.
 - The number and position of the blocks varies from room to room.
 
-
 ## TODO
 
 - [x] Player is in a room.
@@ -35,10 +34,31 @@
 - [x] Left-facing levels
 - [x] Fix vertical-level-star-color-choosing glitch
 - [x] Allow for clearing resources at the end of a level
+- [ ] New exit style: EXIT 15 9 R 1
 - [ ] Implement a game-wide matching color palette
 - [ ] Jazz up the enemies - fuzzy bats, rainbow legged spiders
 - [ ] Get rid of memory library - static allocation only
 - [ ] Two types of rooms - NORMAL and BOSS
+
+## Room Theme Ideas
+
+- [ ] Bedroom x 1
+- [ ] Hallways x many
+- [ ] Outdoor hallways x many
+- [ ] Dining area x 2
+- [ ] Kitchen x 3
+- [ ] Tower x many
+- [ ] Woods x many
+- [ ] Clouds / sky x many
+- [ ] Underground x many
+
+## Room Progression
+
+- [ ] Room 1 - Movement, no blocks
+- [ ] Room 2 - 1 color
+- [ ] Room 3 - 2 colors
+- [ ] Room 4 - Random colors, 1 simple enemy
+- [ ] Boss about every 30 rooms
 
 ## Enemies
 
@@ -47,6 +67,7 @@
 - [ ] A ENEMY_DIAGONAL bounces around the room
 - [ ] A ENEMY_TRACER is attached to a surface and will "trace" the surface
 - [ ] A ENEMY_SNEAK is disguised as a block with a random texture
+- [ ] A ENEMY_BLOCKER doesn't move, just guards the exit until all blocks are cleared
 
 ## Powerups
 
@@ -61,6 +82,7 @@
 
 - [ ] Create sound effects from http://www.superflashbros.net/as3sfxr/, http://sfbgames.com/chiptone
 - [ ] Block destroyed "POP"
+- [ ] Bullet shot "PEW"
 - [ ] Bullet bounce "BOING"
 - [ ] Bullet destroyed "TWINKLE"
 - [ ] Hero hit "SAD SOUND"
