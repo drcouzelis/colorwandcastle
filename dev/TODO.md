@@ -58,10 +58,16 @@
 
 ## Sound Effects
 
+- [ ] Create sound effects from http://www.superflashbros.net/as3sfxr/, http://sfbgames.com/chiptone
 - [ ] Block destroyed "POP"
 - [ ] Bullet bounce "BOING"
 - [ ] Bullet destroyed "TWINKLE"
 - [ ] Hero hit "SAD SOUND"
+
+## Music
+
+- [ ] Create a song for the background music
+- [ ] Make a MIDI file
 
 ## Ideas
 
