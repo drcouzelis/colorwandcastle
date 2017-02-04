@@ -199,11 +199,13 @@ static ENEMY_TYPE get_enemy_type(const char *type)
         return ENEMY_TYPE_UPDOWN;
     } else if (strncmp(type, "DIAGONAL", MAX_STRING_SIZE) == 0) {
         printf("Pretending to load enemy type DIAGONAL.\n");
-        return ENEMY_TYPE_LEFTRIGHT;
+        return ENEMY_TYPE_NONE;
+    } else if (strncmp(type, "BLOCKER", MAX_STRING_SIZE) == 0) {
+        return ENEMY_TYPE_BLOCKER;
     }
 
     fprintf(stderr, "Failed to understand enemy type \"%s\".\n", type);
-    return ENEMY_TYPE_LEFTRIGHT;
+    return ENEMY_TYPE_NONE;
 }
 
 bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)

@@ -41,7 +41,7 @@ void init_hero(HERO *hero)
 void init_enemy(ENEMY *enemy)
 {
     enemy->is_active = false;
-    enemy->type = ENEMY_TYPE_LEFTRIGHT;
+    enemy->type = ENEMY_TYPE_NONE;
     init_sprite(&enemy->sprite, false, 0);
     enemy->body.x = 0;
     enemy->body.y = 0;
@@ -57,7 +57,7 @@ void init_enemy(ENEMY *enemy)
 static void init_enemy_definition(ENEMY_DEFINITION *enemy_def)
 {
     enemy_def->is_active = false;
-    enemy_def->type = ENEMY_TYPE_LEFTRIGHT;
+    enemy_def->type = ENEMY_TYPE_NONE;
     enemy_def->row = 0;
     enemy_def->col = 0;
     enemy_def->speed = 0;

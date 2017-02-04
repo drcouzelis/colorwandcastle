@@ -362,15 +362,45 @@ static void reset_hero(float x, float y)
     hero.control = control_hero_from_keyboard;
 }
 
+static bool is_bullet_offscreen(BULLET *bullet)
+{
+    int room_w = room.cols * TILE_SIZE;
+    int room_h = room.rows * TILE_SIZE;
+
+    int body_u = bullet->body.y + bullet->sprite.y_offset;
+    int body_l = bullet->body.x + bullet->sprite.x_offset;
+    int body_d = body_u + get_sprite_height(&bullet->sprite);
+    int body_r = body_l + get_sprite_width(&bullet->sprite);
+
+    if (body_d < 0 || body_r < 0 || body_u >= room_h || body_l >= room_w) {
+        return true;
+    }
+ 
+    return false;
+}
+
+static bool is_out_of_bounds(BODY *body)
+{
+    /* Level bounds! */
+    int room_w = room.cols * TILE_SIZE;
+    int room_h = room.rows * TILE_SIZE;
+
+    if (body->y < 0 || body->x < 0 || body->y + body->h >= room_h || body->x + body->w >= room_w) {
+        return true;
+    }
+ 
+    return false;
+}
+
 static bool is_board_collision(BODY *body)
 {
     /* Level bounds! */
     int room_w = room.cols * TILE_SIZE;
     int room_h = room.rows * TILE_SIZE;
     if (body->y < 0 || body->x < 0 || body->y + body->h >= room_h || body->x + body->w >= room_w) {
-        return true;
+        return false;
     }
-    
+ 
     int r1 = (int)(body->y / TILE_SIZE);
     int c1 = (int)(body->x / TILE_SIZE);
     int r2 = (int)((body->y + body->h) / TILE_SIZE);
@@ -445,6 +475,11 @@ static bool is_block_collision(BODY *body)
     return get_colliding_block(body, &r, &c);
 }
 
+static void update_enemy_animation(ENEMY *enemy, void *data)
+{
+    animate(&enemy->sprite);
+}
+
 static void update_enemy_movement(ENEMY *enemy, void *data)
 {
     float old_x = enemy->body.x;
@@ -454,7 +489,7 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     enemy->body.y += convert_pps_to_fps(enemy->dy);
 
     /* Check for vertical collisions */
-    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
         enemy->body.y = old_y;
         enemy->dy *= -1;
     }
@@ -463,12 +498,12 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     enemy->body.x += convert_pps_to_fps(enemy->dx);
 
     /* Check for horizontal collisions */
-    if (is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
         enemy->body.x = old_x;
         enemy->dx *= -1;
     }
 
-    animate(&enemy->sprite);
+    update_enemy_animation(enemy, data);
 }
 
 static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definition)
@@ -498,6 +533,7 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.w = 10;
         enemy->body.h = 10;
         enemy->dx = -definition->speed;
+        enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
         init_sprite(&enemy->sprite, true, 8);
         add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
@@ -515,13 +551,19 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.w = 10;
         enemy->body.h = 10;
         enemy->dy = -definition->speed;
+        enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
         printf("Pretending to load enemy type DIAGONAL.\n");
+    } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
+        init_sprite(&enemy->sprite, true, 4);
+        add_frame(&enemy->sprite, IMG("enemy-dust-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-dust-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-dust-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-dust-2.png"));
+        enemy->body.w = 20;
+        enemy->body.h = 20;
+        enemy->update = update_enemy_animation;
     }
-
-    //if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
-        enemy->update = update_enemy_movement;
-    //}
 
     enemy->dist = definition->dist;
 
@@ -725,9 +767,16 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         return false;
     }
 
+    /* If the bullet flew off the screen... */
+    if (is_bullet_offscreen(bullet)) {
+        
+        /* Just destroy it */
+        bullet->hits = 0;
+        return false;
+    }
+
     return true;
 }
-
 
 static void shoot_bullet(int texture, float x, float y)
 {
@@ -834,7 +883,7 @@ static void update_hero_player_control()
     hero.body.y += convert_pps_to_fps(hero.dy);
 
     /* Check for vertical collisions */
-    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
+    if (is_out_of_bounds(&hero.body) || is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
         hero.body.y = old_y;
     }
 
@@ -842,7 +891,7 @@ static void update_hero_player_control()
     hero.body.x += convert_pps_to_fps(hero.dx);
 
     /* Check for horizontal collisions */
-    if (is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
+    if (is_out_of_bounds(&hero.body) || is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
         hero.body.x = old_x;
     }
 

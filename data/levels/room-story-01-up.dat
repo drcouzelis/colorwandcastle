@@ -2,8 +2,6 @@ TITLE Let's clean up!
 
 START 100 140
 
-SIZE 16 12
-
 DIRECTION U
 
 IMPORT tiles-castle.dat

@@ -2,8 +2,6 @@ TITLE Room 2
 
 START 40 40
 
-SIZE 16 12
-
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat
 

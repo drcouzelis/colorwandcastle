@@ -43,6 +43,9 @@ dist_imagesdata_DATA = \
   data/images/enemy-bat-1.png \
   data/images/enemy-bat-2.png \
   data/images/enemy-bat-3.png \
+  data/images/enemy-dust-1.png \
+  data/images/enemy-dust-2.png \
+  data/images/enemy-dust-3.png \
   data/images/enemy-spider-1.png \
   data/images/enemy-spider-2.png \
   data/images/enemy-spider-3.png \
