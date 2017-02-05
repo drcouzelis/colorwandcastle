@@ -21,6 +21,7 @@
 #define MAX_ROOM_SIZE (MAX_ROOM_COLS * MAX_ROOM_ROWS)
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 16
+#define MAX_EXITS 8
 #define MAX_EFFECTS 16
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
@@ -156,6 +157,16 @@ typedef struct
 
 typedef struct
 {
+    bool active;
+
+    DIRECTION direction;
+
+    int row;
+    int col;
+} EXIT;
+
+typedef struct
+{
     /* Name of the room */
     char title[MAX_STRING_SIZE];
 
@@ -213,12 +224,16 @@ typedef struct
     /* This info is used to create the enemies when the level starts */
     ENEMY_DEFINITION enemy_definitions[MAX_ENEMIES];
 
+    /* Whether or not the room is cleared of blocks */
     bool cleared;
 
     /* The door representing the exit, appears when all blocks are gone */
     SPRITE door_sprite;
     int door_x;
     int door_y;
+
+    /* Exits */
+    EXIT exits[MAX_EXITS];
 } ROOM;
 
 typedef struct {

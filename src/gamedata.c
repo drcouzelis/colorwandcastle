@@ -117,10 +117,18 @@ void init_room(ROOM *room)
 
     room->cleared = false;
 
+    /* Exits */
     init_sprite(&room->door_sprite, false, 0);
     add_frame(&room->door_sprite, IMG("tile-door.png"));
     room->door_x = 0;
     room->door_y = 0;
+
+    for (int i = 0; i < MAX_EXITS; i++) {
+        room->exits[i].active = false;
+        room->exits[i].direction = RIGHT;
+        room->exits[i].row = 0;
+        room->exits[i].col = 0;
+    }
 }
 
 void init_room_list(ROOM_LIST *list)

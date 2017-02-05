@@ -219,6 +219,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     char string[MAX_STRING_SIZE];
     int next_enemy = 0;
+    int next_exit = 0;
     bool foreground_map_used = false;
     bool collision_map_used = false;
 
@@ -356,6 +357,30 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             definition->is_active = true;
 
             next_enemy++;
+
+            continue;
+        }
+
+        /* Exit */
+        if (strncmp(string, "EXIT", MAX_STRING_SIZE) == 0) {
+
+            char direction;
+            int tile_num;
+
+            if (fscanf(file, "%c %d", &direction, &tile_num) != 2) {
+                fprintf(stderr, "Failed to load exit.\n");
+            }
+
+            //EXIT *exit = &room->exits[next_exit];
+
+            //definition->type = get_enemy_type(type);
+            //definition->row = row;
+            //definition->col = col;
+            //definition->speed = speed;
+            //definition->dist = dist;
+            //definition->is_active = true;
+
+            next_exit++;
 
             continue;
         }
