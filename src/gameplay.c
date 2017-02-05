@@ -553,7 +553,21 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
-        printf("Pretending to load enemy type DIAGONAL.\n");
+        init_sprite(&enemy->sprite, true, 20);
+        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+        enemy->body.x += 5; /* Fix the initial position */
+        enemy->body.y += 5;
+        enemy->body.w = 10;
+        enemy->body.h = 10;
+        enemy->dx = definition->speed;
+        enemy->dy = -definition->speed;
+        enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
         init_sprite(&enemy->sprite, true, 4);
         add_frame(&enemy->sprite, IMG("enemy-dust-1.png"));

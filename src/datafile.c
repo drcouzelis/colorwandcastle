@@ -198,8 +198,7 @@ static ENEMY_TYPE get_enemy_type(const char *type)
     } else if (strncmp(type, "UPDOWN", MAX_STRING_SIZE) == 0) {
         return ENEMY_TYPE_UPDOWN;
     } else if (strncmp(type, "DIAGONAL", MAX_STRING_SIZE) == 0) {
-        printf("Pretending to load enemy type DIAGONAL.\n");
-        return ENEMY_TYPE_NONE;
+        return ENEMY_TYPE_DIAGONAL;
     } else if (strncmp(type, "BLOCKER", MAX_STRING_SIZE) == 0) {
         return ENEMY_TYPE_BLOCKER;
     }
