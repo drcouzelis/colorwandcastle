@@ -553,12 +553,11 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
-        init_sprite(&enemy->sprite, true, 20);
-        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        init_sprite(&enemy->sprite, true, 10);
+        add_frame(&enemy->sprite, IMG("enemy-ghost-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-ghost-2.png"));
+        add_frame(&enemy->sprite, IMG("enemy-ghost-3.png"));
+        add_frame(&enemy->sprite, IMG("enemy-ghost-4.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
