@@ -29,4 +29,6 @@ typedef struct
 
 extern const DIRECTION_MAP directions[4];
 
+DIRECTION string_to_direction(char *string);
+
 #endif

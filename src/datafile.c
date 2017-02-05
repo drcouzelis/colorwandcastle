@@ -364,21 +364,32 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
         /* Exit */
         if (strncmp(string, "EXIT", MAX_STRING_SIZE) == 0) {
 
-            char direction;
+            char direction[MAX_STRING_SIZE];
             int tile_num;
 
-            if (fscanf(file, "%c %d", &direction, &tile_num) != 2) {
+            if (fscanf(file, "%s %d", direction, &tile_num) != 2) {
                 fprintf(stderr, "Failed to load exit.\n");
             }
 
-            //EXIT *exit = &room->exits[next_exit];
+            EXIT *exit = &room->exits[next_exit];
 
-            //definition->type = get_enemy_type(type);
-            //definition->row = row;
-            //definition->col = col;
-            //definition->speed = speed;
-            //definition->dist = dist;
-            //definition->is_active = true;
+            exit->direction = string_to_direction(direction);
+
+            if (exit->direction == DOWN) {
+                exit->row = 0;
+                exit->col = tile_num;
+            } else if (exit->direction == UP) {
+                exit->row = room->rows - 1;
+                exit->col = tile_num;
+            } else if (exit->direction == RIGHT) {
+                exit->row = tile_num;
+                exit->col = 0;
+            } else { // LEFT
+                exit->row = tile_num;
+                exit->col = room->cols - 1;
+            }
+
+            exit->active = true;
 
             next_exit++;
 

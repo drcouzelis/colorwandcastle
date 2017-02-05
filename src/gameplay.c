@@ -732,21 +732,6 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
-            if (num_blocks() == 0) {
-                /* Level clear! Add the exit door */
-                room.cleared = true;
-                room.door_x = c * TILE_SIZE;
-                room.door_y = r * TILE_SIZE;
-                /* Get rid of those nasty enemies */
-                for (int i = 0; i < MAX_ENEMIES; i++) {
-                    ENEMY *enemy = &room.enemies[i];
-                    if (enemy->is_active) {
-                        enemy->is_active = false;
-                        load_poof_effect(enemy->body.x - 5, enemy->body.y - 5);
-                    }
-                }
-            }
-
         } else {
 
             bullet->hits--;
@@ -1074,15 +1059,42 @@ static bool update_gameplay_playing()
         }
     }
 
+    /* Are there any blocks in the room? */
+    if (!room.cleared && num_blocks() == 0) {
+
+        /* Level clear! Add the exit door */
+        room.cleared = true;
+
+        /* Get rid of those nasty enemies */
+        for (int i = 0; i < MAX_ENEMIES; i++) {
+            ENEMY *enemy = &room.enemies[i];
+            if (enemy->is_active) {
+                enemy->is_active = false;
+                load_poof_effect(enemy->body.x - 5, enemy->body.y - 5);
+            }
+        }
+    }
+
     /* Check for level completion */
     if (room.cleared) {
-        BODY *b1 = &hero.body;
-        if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
-            /* The hero has entered the end-level door, go to the next level */
-            if (curr_room < room_list.size - 1) {
-                to_gameplay_state_starting_next_room();
-            } else {
-                end_gameplay = true;
+
+        /* Check each of the exits, is the hero touching an exit? */
+        for (int i = 0; i < MAX_EXITS; i++) {
+
+            if (!room.exits[i].active) {
+                continue;
+            }
+
+            BODY *b1 = &hero.body;
+
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, room.exits[i].col * TILE_SIZE, room.exits[i].row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+
+                /* The hero has entered the end-level door, go to the next level */
+                if (curr_room < room_list.size - 1) {
+                    to_gameplay_state_starting_next_room();
+                } else {
+                    end_gameplay = true;
+                }
             }
         }
     }
@@ -1141,10 +1153,6 @@ static void draw_gameplay_playing()
                 draw_sprite(&room.blocks[n], c * TILE_SIZE, r * TILE_SIZE);
             }
         }
-    }
-
-    if (room.cleared) {
-        draw_sprite(&room.door_sprite, room.door_x, room.door_y);
     }
 
     /* Draw hero bullets */
