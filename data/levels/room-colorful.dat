@@ -1,6 +1,6 @@
 TITLE Room 2
 
-START 40 40
+START 2 2
 
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat

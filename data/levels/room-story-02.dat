@@ -1,4 +1,4 @@
-START 100 80
+START 4 5
 
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat

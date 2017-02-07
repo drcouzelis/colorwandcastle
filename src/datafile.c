@@ -81,7 +81,7 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
     }
 }
 
-static void load_map_from_datafile(int *map, int cols, int rows, FILE *file)
+static void load_map_from_datafile(int *map, int rows, int cols, FILE *file)
 {
     assert(file != NULL);
 
@@ -127,7 +127,7 @@ static void trim_string(char *string, int len)
     string[i] = '\0';
 }
 
-static void print_map(int *map, int cols, int rows, bool is_data_file_form)
+static void print_map(int *map, int rows, int cols, bool is_data_file_form)
 {
     /**
      * The numbers in the maps are stored ONE LESS in
@@ -150,8 +150,8 @@ void print_room(ROOM *room, bool is_data_file_form)
     }
 
     printf("TITLE \"%s\"\n", room->title);
-    printf("START %d %d\n", room->startx, room->starty);
-    printf("SIZE %d %d\n", room->cols, room->rows);
+    printf("START %d %d\n", room->start_row, room->start_col);
+    printf("SIZE %d %d\n", room->rows, room->cols);
     printf("TILES %d\n", room->num_tiles);
     printf("TEXTURES %d\n", room->num_textures);
 
@@ -166,16 +166,16 @@ void print_room(ROOM *room, bool is_data_file_form)
     }
 
     printf("BACKGROUND MAP\n");
-    print_map(room->background_map, room->cols, room->rows, is_data_file_form);
+    print_map(room->background_map, room->rows, room->cols, is_data_file_form);
 
     printf("FOREGROUND MAP\n");
-    print_map(room->foreground_map, room->cols, room->rows, is_data_file_form);
+    print_map(room->foreground_map, room->rows, room->cols, is_data_file_form);
 
     printf("COLLISION MAP\n");
-    print_map(room->collision_map, room->cols, room->rows, is_data_file_form);
+    print_map(room->collision_map, room->rows, room->cols, is_data_file_form);
 
     printf("BLOCK MAP (ORIGINAL)\n");
-    print_map(room->block_map_orig, room->cols, room->rows, is_data_file_form);
+    print_map(room->block_map_orig, room->rows, room->cols, is_data_file_form);
 
     printf("ENEMIES (DEFINITIONS)\n");
     for (int i = 0; i < MAX_ENEMIES; i++) {
@@ -253,8 +253,8 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Hero starting position */
         if (strncmp(string, "START", MAX_STRING_SIZE) == 0) {
-            if (fscanf(file, "%d %d", &room->startx, &room->starty) != 2) {
-                fprintf(stderr, "Failed to load startx and starty.\n");
+            if (fscanf(file, "%d %d", &room->start_row, &room->start_col) != 2) {
+                fprintf(stderr, "Failed to load starting row and col.\n");
             }
             continue;
         }
@@ -281,8 +281,8 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Size of the room, in tiles */
         if (strncmp(string, "SIZE", MAX_STRING_SIZE) == 0) {
-            if (fscanf(file, "%d %d", &room->cols, &room->rows) != 2) {
-                fprintf(stderr, "Failed to load cols and rows.\n");
+            if (fscanf(file, "%d %d", &room->rows, &room->cols) != 2) {
+                fprintf(stderr, "Failed to load map size.\n");
             }
             continue;
         }
@@ -310,27 +310,27 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Background map */
         if (strncmp(string, "BACKGROUND", MAX_STRING_SIZE) == 0) {
-            load_map_from_datafile(room->background_map, room->cols, room->rows, file);
+            load_map_from_datafile(room->background_map, room->rows, room->cols, file);
             continue;
         }
 
         /* Foreground map */
         if (strncmp(string, "FOREGROUND", MAX_STRING_SIZE) == 0) {
-            load_map_from_datafile(room->foreground_map, room->cols, room->rows, file);
+            load_map_from_datafile(room->foreground_map, room->rows, room->cols, file);
             foreground_map_used = true;
             continue;
         }
 
         /* Collision map */
         if (strncmp(string, "COLLISION", MAX_STRING_SIZE) == 0) {
-            load_map_from_datafile(room->collision_map, room->cols, room->rows, file);
+            load_map_from_datafile(room->collision_map, room->rows, room->cols, file);
             collision_map_used = true;
             continue;
         }
 
         /* Block map (original) */
         if (strncmp(string, "BLOCKS", MAX_STRING_SIZE) == 0) {
-            load_map_from_datafile(room->block_map_orig, room->cols, room->rows, file);
+            load_map_from_datafile(room->block_map_orig, room->rows, room->cols, file);
             continue;
         }
 

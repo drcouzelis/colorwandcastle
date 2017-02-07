@@ -338,14 +338,14 @@ void init_gameplay()
     is_gameplay_init = true;
 }
 
-static void reset_hero(float x, float y)
+static void reset_hero(int row, int col)
 {
     /* Set the current sprite */
     hero.sprite = &hero.sprite_flying;
 
     /* Set a new given position */
-    hero.body.x = x;
-    hero.body.y = y;
+    hero.body.x = col * TILE_SIZE;
+    hero.body.y = row * TILE_SIZE;
 
     /* Clear keyboard input */
     hero.u = false;
@@ -394,10 +394,7 @@ static bool is_out_of_bounds(BODY *body)
 
 static bool is_board_collision(BODY *body)
 {
-    /* Level bounds! */
-    int room_w = room.cols * TILE_SIZE;
-    int room_h = room.rows * TILE_SIZE;
-    if (body->y < 0 || body->x < 0 || body->y + body->h >= room_h || body->x + body->w >= room_w) {
+    if (is_out_of_bounds(body)) {
         return false;
     }
  
@@ -489,7 +486,7 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     enemy->body.y += convert_pps_to_fps(enemy->dy);
 
     /* Check for vertical collisions */
-    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body)) {
         enemy->body.y = old_y;
         enemy->dy *= -1;
     }
@@ -498,7 +495,7 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     enemy->body.x += convert_pps_to_fps(enemy->dx);
 
     /* Check for horizontal collisions */
-    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
+    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body)) {
         enemy->body.x = old_x;
         enemy->dx *= -1;
     }
@@ -592,6 +589,7 @@ static void load_enemies_from_definitions()
 
 static void load_blocks_from_orig()
 {
+    /* Reload the original layout of the room */
     for (int r = 0; r < room.rows; r++) {
         for (int c = 0; c < room.cols; c++) {
             room.block_map[(r * room.cols) + c] = room.block_map_orig[(r * room.cols) + c];
@@ -614,7 +612,7 @@ static void to_gameplay_state_starting_after_dying()
     }
 
     /* Reset the hero */
-    reset_hero(room.startx, room.starty);
+    reset_hero(room.start_row, room.start_col);
 
     /* Load enemies */
     load_enemies_from_definitions();
@@ -632,7 +630,7 @@ static void to_gameplay_state_starting_next_room()
     load_gameplay_room_from_num(curr_room + 1);
 
     /* Reset the hero */
-    reset_hero(room.startx, room.starty);
+    reset_hero(room.start_row, room.start_col);
 
     /* Ready to start playing! */
     to_gameplay_state_playing();
@@ -646,7 +644,7 @@ static bool update_gameplay_starting_new_game()
 
     /* Load the hero sprites */
     /* Reset the hero */
-    reset_hero(room.startx, room.starty);
+    reset_hero(room.start_row, room.start_col);
     load_hero_sprite();
 
     /* Ready to start playing! */
@@ -731,6 +729,10 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             play_sound(SND("star_hit.wav"));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
+
+            /* Save the location that was cleared, in case we need to draw a door */
+            room.door_x = c * TILE_SIZE;
+            room.door_y = r * TILE_SIZE;
 
         } else {
 
@@ -1062,7 +1064,7 @@ static bool update_gameplay_playing()
     /* Are there any blocks in the room? */
     if (!room.cleared && num_blocks() == 0) {
 
-        /* Level clear! Add the exit door */
+        /* Level clear! */
         room.cleared = true;
 
         /* Get rid of those nasty enemies */
@@ -1075,8 +1077,12 @@ static bool update_gameplay_playing()
         }
     }
 
+    bool exited_room = false;
+
     /* Check for level completion */
     if (room.cleared) {
+
+        BODY *b1 = &hero.body;
 
         /* Check each of the exits, is the hero touching an exit? */
         for (int i = 0; i < MAX_EXITS; i++) {
@@ -1085,17 +1091,26 @@ static bool update_gameplay_playing()
                 continue;
             }
 
-            BODY *b1 = &hero.body;
-
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.exits[i].col * TILE_SIZE, room.exits[i].row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
-
-                /* The hero has entered the end-level door, go to the next level */
-                if (curr_room < room_list.size - 1) {
-                    to_gameplay_state_starting_next_room();
-                } else {
-                    end_gameplay = true;
-                }
+                exited_room = true;
             }
+        }
+
+        /* There are no declared exits, use a door instead */
+        if (!room.exits[0].active) {
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
+                exited_room = true;
+            }
+        }
+    }
+
+    /* Go to the next level? */
+    if (exited_room) {
+        /* The hero has entered the end-level door, go to the next level */
+        if (curr_room < room_list.size - 1) {
+            to_gameplay_state_starting_next_room();
+        } else {
+            end_gameplay = true;
         }
     }
 
@@ -1153,6 +1168,12 @@ static void draw_gameplay_playing()
                 draw_sprite(&room.blocks[n], c * TILE_SIZE, r * TILE_SIZE);
             }
         }
+    }
+
+    /* If the room is cleared and there's no other exits... */
+    if (room.cleared && !room.exits[0].active) {
+        /* ...then draw a door */
+        draw_sprite(&room.door_sprite, room.door_x, room.door_y);
     }
 
     /* Draw hero bullets */

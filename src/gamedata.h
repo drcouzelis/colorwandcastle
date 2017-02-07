@@ -171,12 +171,12 @@ typedef struct
     char title[MAX_STRING_SIZE];
 
     /* Size of the room */
-    int cols;
     int rows;
+    int cols;
 
     /* Starting position for the hero */
-    int startx;
-    int starty;
+    int start_row;
+    int start_col;
     
     /* The general orientation of the room */
     DIRECTION direction;
@@ -227,7 +227,7 @@ typedef struct
     /* Whether or not the room is cleared of blocks */
     bool cleared;
 
-    /* The door representing the exit, appears when all blocks are gone */
+    /* The door representing the exit, appears when all blocks are gone AND there are no other exits */
     SPRITE door_sprite;
     int door_x;
     int door_y;

@@ -74,12 +74,12 @@ void init_room(ROOM *room)
     strncpy(room->title, "", MAX_STRING_SIZE);
 
     /* Size */
-    room->cols = MAX_ROOM_COLS;
     room->rows = MAX_ROOM_ROWS;
+    room->cols = MAX_ROOM_COLS;
 
     /* Starting position */
-    room->startx = TILE_SIZE;
-    room->startx = TILE_SIZE;
+    room->start_row = 2;
+    room->start_col = 2;
 
     room->direction = RIGHT;
     
