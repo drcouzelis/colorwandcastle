@@ -12,12 +12,17 @@
 static void to_gameplay_state_starting_new_game();
 static void to_gameplay_state_starting_after_dying();
 static void to_gameplay_state_starting_next_room();
+static void to_gameplay_state_leaving_room();
 static void to_gameplay_state_playing();
 static void to_gameplay_state_dying();
+static void to_gameplay_state_win();
+static void to_gameplay_state_door_entered();
 static bool update_gameplay_starting_new_game();
+static bool update_gameplay_leaving_room();
 static bool update_gameplay_playing();
 static bool update_gameplay_dying();
 static void draw_gameplay_playing();
+static void control_gameplay_options();
 static void control_gameplay_playing();
 
 /* Don't do anything if the gameplay hasn't been initialized! */
@@ -133,6 +138,15 @@ static int random_front_texture()
     } else {
         return textures[random_number(0, num_textures - 1)];
     }
+}
+
+static bool room_has_exits()
+{
+    if (room.exits[0].active) {
+        return true;
+    }
+
+    return false;
 }
 
 static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame)
@@ -600,8 +614,37 @@ static void load_blocks_from_orig()
 static void to_gameplay_state_starting_new_game()
 {
     update = update_gameplay_starting_new_game;
-    control = NULL;
+    control = control_gameplay_options;
     draw = NULL;
+}
+
+static void to_gameplay_state_win()
+{
+    end_gameplay = true;
+}
+
+static void to_gameplay_state_door_entered()
+{
+    /* Go to the next level? */
+    if (curr_room < room_list.size - 1) {
+
+        /* The hero has entered the end-level door, go to the next level */
+
+        if (room_has_exits()) {
+
+            /* Looks like an "invisible" door was used, scroll the level! */
+            to_gameplay_state_leaving_room();
+
+        } else {
+
+            /* Otherwise, just change levels */
+            to_gameplay_state_starting_next_room();
+
+        }
+
+    } else {
+        to_gameplay_state_win();
+    }
 }
 
 static void to_gameplay_state_starting_after_dying()
@@ -637,6 +680,22 @@ static void to_gameplay_state_starting_next_room()
 
 }
 
+static void to_gameplay_state_leaving_room()
+{
+    update = update_gameplay_leaving_room;
+    control = control_gameplay_options;
+    draw = draw_gameplay_playing;
+}
+
+static bool update_gameplay_leaving_room()
+{
+    printf("Pretending to leave the room...\n");
+
+    to_gameplay_state_starting_next_room();
+
+    return true;
+}
+
 static bool update_gameplay_starting_new_game()
 {
     /* Load the current room */
@@ -662,7 +721,7 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 }
 
-static void control_gameplay_playing(ALLEGRO_EVENT *event)
+static void control_gameplay_options(ALLEGRO_EVENT *event)
 {
     /* General application control */
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
@@ -684,6 +743,11 @@ static void control_gameplay_playing(ALLEGRO_EVENT *event)
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
     }
+}
+
+static void control_gameplay_playing(ALLEGRO_EVENT *event)
+{
+    control_gameplay_options(event);
 
     /* Hero control */
     if (hero.control != NULL) {
@@ -1077,8 +1141,6 @@ static bool update_gameplay_playing()
         }
     }
 
-    bool exited_room = false;
-
     /* Check for level completion */
     if (room.cleared) {
 
@@ -1092,25 +1154,15 @@ static bool update_gameplay_playing()
             }
 
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.exits[i].col * TILE_SIZE, room.exits[i].row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
-                exited_room = true;
+                to_gameplay_state_door_entered();
             }
         }
 
         /* There are no declared exits, use a door instead */
-        if (!room.exits[0].active) {
+        if (!room_has_exits()) {
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
-                exited_room = true;
+                to_gameplay_state_door_entered();
             }
-        }
-    }
-
-    /* Go to the next level? */
-    if (exited_room) {
-        /* The hero has entered the end-level door, go to the next level */
-        if (curr_room < room_list.size - 1) {
-            to_gameplay_state_starting_next_room();
-        } else {
-            end_gameplay = true;
         }
     }
 
@@ -1171,7 +1223,7 @@ static void draw_gameplay_playing()
     }
 
     /* If the room is cleared and there's no other exits... */
-    if (room.cleared && !room.exits[0].active) {
+    if (room.cleared && !room_has_exits()) {
         /* ...then draw a door */
         draw_sprite(&room.door_sprite, room.door_x, room.door_y);
     }
