@@ -9,6 +9,8 @@
 #include "sprite.h"
 #include "utilities.h"
 
+#define HERO_SPEED (TILE_SIZE * 4)
+
 static void to_gameplay_state_starting_new_game();
 static void to_gameplay_state_starting_after_dying();
 static void to_gameplay_state_starting_next_room();
@@ -252,7 +254,7 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
     ALLEGRO_EVENT *event = (ALLEGRO_EVENT *)data;
 
     /* The hero can move four tiles in one second */
-    int speed = TILE_SIZE * 4;
+    int speed = HERO_SPEED;
 
     if (event->type == ALLEGRO_EVENT_KEY_DOWN) {
         int key = event->keyboard.keycode;
@@ -376,15 +378,15 @@ static void reset_hero(int row, int col)
     hero.control = control_hero_from_keyboard;
 }
 
-static bool is_bullet_offscreen(BULLET *bullet)
+static bool is_offscreen(BODY *body, SPRITE *sprite)
 {
     int room_w = room.cols * TILE_SIZE;
     int room_h = room.rows * TILE_SIZE;
 
-    int body_u = bullet->body.y + bullet->sprite.y_offset;
-    int body_l = bullet->body.x + bullet->sprite.x_offset;
-    int body_d = body_u + get_sprite_height(&bullet->sprite);
-    int body_r = body_l + get_sprite_width(&bullet->sprite);
+    int body_u = body->y + sprite->y_offset;
+    int body_l = body->x + sprite->x_offset;
+    int body_d = body_u + get_sprite_height(sprite);
+    int body_r = body_l + get_sprite_width(sprite);
 
     if (body_d < 0 || body_r < 0 || body_u >= room_h || body_l >= room_w) {
         return true;
@@ -689,9 +691,12 @@ static void to_gameplay_state_leaving_room()
 
 static bool update_gameplay_leaving_room()
 {
-    printf("Pretending to leave the room...\n");
+    hero.body.x += convert_pps_to_fps(directions[room.direction].x_offset * HERO_SPEED);
+    hero.body.y += convert_pps_to_fps(directions[room.direction].y_offset * HERO_SPEED);
 
-    to_gameplay_state_starting_next_room();
+    if (is_offscreen(&hero.body, hero.sprite)) {
+        to_gameplay_state_starting_next_room();
+    }
 
     return true;
 }
@@ -832,7 +837,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
     }
 
     /* If the bullet flew off the screen... */
-    if (is_bullet_offscreen(bullet)) {
+    if (is_offscreen(&bullet->body, &bullet->sprite)) {
         
         /* Just destroy it */
         bullet->hits = 0;
