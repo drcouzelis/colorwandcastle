@@ -73,6 +73,10 @@ typedef struct EFFECT
     float x;
     float y;
 
+    BODY body;
+    int dx; /* In pixels per second */
+    int dy; /* In pixels per second */
+
     void (*update)(struct EFFECT *effect, void *data);
 } EFFECT;
 

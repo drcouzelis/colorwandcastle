@@ -149,4 +149,10 @@ void init_effect(EFFECT *effect)
     init_sprite(&effect->sprite, false, 0);
     effect->x = 0;
     effect->y = 0;
+    effect->dx = 0;
+    effect->dy = 0;
+    effect->body.x = 0;
+    effect->body.y = 0;
+    effect->body.w = 0;
+    effect->body.h = 0;
 }

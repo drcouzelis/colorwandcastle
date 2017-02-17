@@ -15,15 +15,18 @@ static void to_gameplay_state_starting_new_game();
 static void to_gameplay_state_starting_after_dying();
 static void to_gameplay_state_starting_next_room();
 static void to_gameplay_state_leaving_room();
+static void to_gameplay_state_scroll_rooms();
 static void to_gameplay_state_playing();
 static void to_gameplay_state_dying();
 static void to_gameplay_state_win();
 static void to_gameplay_state_door_entered();
 static bool update_gameplay_starting_new_game();
 static bool update_gameplay_leaving_room();
+static bool update_gameplay_scroll_rooms();
 static bool update_gameplay_playing();
 static bool update_gameplay_dying();
 static void draw_gameplay_playing();
+static void draw_gameplay_scrolling_rooms();
 static void control_gameplay_options();
 static void control_gameplay_playing();
 
@@ -56,6 +59,10 @@ static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
+
+/* To hold "screenshots" of the rooms, for room transitions */
+static EFFECT screenshot1;
+static EFFECT screenshot2;
 
 /**
  * ...ENDS HERE.
@@ -327,6 +334,18 @@ static void init_hero_bullets()
     }
 }
 
+static void init_screenshot(EFFECT *screenshot, const char *name)
+{
+    init_effect(screenshot);
+
+    IMAGE *canvas = al_create_bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    assert(canvas);
+
+    insert_image_resource(name, canvas);
+
+    add_frame(&screenshot->sprite, IMG(name));
+}
+
 void init_gameplay()
 {
     /* Hero */
@@ -344,6 +363,10 @@ void init_gameplay()
     /* Filename list */
     init_room_list(&room_list);
     curr_room = 0;
+
+    /* Screenshots */
+    init_screenshot(&screenshot1, "screenshot1");
+    init_screenshot(&screenshot2, "screenshot2");
 
     control = NULL;
     update = NULL;
@@ -666,7 +689,7 @@ static void to_gameplay_state_starting_after_dying()
     to_gameplay_state_playing();
 }
 
-static void to_gameplay_state_starting_next_room()
+static void start_next_room()
 {
     /* Clear the old room */
     init_room(&room);
@@ -676,6 +699,12 @@ static void to_gameplay_state_starting_next_room()
 
     /* Reset the hero */
     reset_hero(room.start_row, room.start_col);
+
+}
+
+static void to_gameplay_state_starting_next_room()
+{
+    start_next_room();
 
     /* Ready to start playing! */
     to_gameplay_state_playing();
@@ -695,7 +724,62 @@ static bool update_gameplay_leaving_room()
     hero.body.y += convert_pps_to_fps(directions[room.direction].y_offset * HERO_SPEED);
 
     if (is_offscreen(&hero.body, hero.sprite)) {
-        to_gameplay_state_starting_next_room();
+        to_gameplay_state_scroll_rooms();
+    }
+
+    return true;
+}
+
+static void to_gameplay_state_scroll_rooms()
+{
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+
+    /* Take a screenshot of the current room */
+    al_set_target_bitmap(get_frame(&screenshot1.sprite));
+    draw_gameplay_playing();
+
+    /* Clear all resources before loading the new room */
+    //free_resources();
+
+    /* Load the next room */
+    start_next_room();
+
+    /* Take a screenshot of the next room */
+    al_set_target_bitmap(get_frame(&screenshot2.sprite));
+    draw_gameplay_playing();
+
+    al_restore_state(&state);
+
+    screenshot1.body.x = 0;
+    screenshot1.body.y = 0;
+    screenshot1.dx = 0;
+    screenshot1.dy = 0;
+
+    screenshot2.body.x = 0;
+    screenshot2.body.y = 0;
+    screenshot2.dx = 0;
+    screenshot2.dy = 0;
+
+    if (room.direction == RIGHT) {
+        screenshot2.body.x = DISPLAY_WIDTH;
+        screenshot2.dx = -DISPLAY_WIDTH;
+    }
+
+    update = update_gameplay_scroll_rooms;
+    control = control_gameplay_options;
+    draw = draw_gameplay_scrolling_rooms;
+}
+
+static bool update_gameplay_scroll_rooms()
+{
+    float change = convert_pps_to_fps(screenshot2.dx);
+
+    screenshot1.body.x += change;
+    screenshot2.body.x += change;
+
+    if ((int)screenshot2.body.x == 0 && (int)screenshot2.body.y == 0) {
+        to_gameplay_state_playing();
     }
 
     return true;
@@ -1197,6 +1281,12 @@ void draw_gameplay(void *data)
     if (draw != NULL) {
         draw();
     }
+}
+
+static void draw_gameplay_scrolling_rooms()
+{
+    draw_sprite(&screenshot1.sprite, screenshot1.body.x, screenshot1.body.y);
+    draw_sprite(&screenshot2.sprite, screenshot2.body.x, screenshot2.body.y);
 }
 
 static void draw_gameplay_playing()
