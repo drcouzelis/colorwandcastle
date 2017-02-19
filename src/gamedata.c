@@ -125,10 +125,12 @@ void init_room(ROOM *room)
 
     for (int i = 0; i < MAX_EXITS; i++) {
         room->exits[i].active = false;
-        room->exits[i].direction = RIGHT;
+        room->exits[i].direction = NO_DIRECTION;
         room->exits[i].row = 0;
         room->exits[i].col = 0;
     }
+
+    room->used_exit_num = -1;
 }
 
 void init_room_list(ROOM_LIST *list)
@@ -149,7 +151,7 @@ void init_screenshot(SCREENSHOT *screenshot)
     screenshot->y = 0;
     screenshot->dx = 0;
     screenshot->dy = 0;
-    screenshot->direction = RIGHT;
+    screenshot->direction = NO_DIRECTION;
 }
 
 void init_effect(EFFECT *effect)

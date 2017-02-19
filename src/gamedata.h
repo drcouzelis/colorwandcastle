@@ -247,6 +247,7 @@ typedef struct
 
     /* Exits */
     EXIT exits[MAX_EXITS];
+    int used_exit_num;
 } ROOM;
 
 typedef struct {

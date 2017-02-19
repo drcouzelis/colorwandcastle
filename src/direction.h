@@ -7,6 +7,7 @@
  */
 typedef enum
 {
+    NO_DIRECTION = -1,
     FIRST_DIRECTION = 0,
     UP = 0,
     DOWN = 1,

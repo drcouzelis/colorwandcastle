@@ -720,10 +720,8 @@ static void to_gameplay_state_leaving_room()
 
 static bool update_gameplay_leaving_room()
 {
-    /* TODO */
-    /* This should be using the USED exit, not the FIRST exit... */
-    hero.body.x += convert_pps_to_fps(directions[room.exits[0].direction].x_offset * HERO_SPEED);
-    hero.body.y += convert_pps_to_fps(directions[room.exits[0].direction].y_offset * HERO_SPEED);
+    hero.body.x += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].x_offset * HERO_SPEED);
+    hero.body.y += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].y_offset * HERO_SPEED);
 
     if (is_offscreen(&hero.body, hero.sprite)) {
         to_gameplay_state_scroll_rooms();
@@ -734,6 +732,10 @@ static bool update_gameplay_leaving_room()
 
 static void to_gameplay_state_scroll_rooms()
 {
+    /* Let the screen scrolling data know which direction to scroll */
+    screenshot1.direction = room.exits[room.used_exit_num].direction;
+    screenshot2.direction = room.exits[room.used_exit_num].direction;
+
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 
@@ -744,30 +746,25 @@ static void to_gameplay_state_scroll_rooms()
 
     /* Clear all resources before loading the new room */
     //free_resources();
+    
+    /* Grab a copy of the hero position */
+    float old_hero_pos_x = hero.body.x;
+    float old_hero_pos_y = hero.body.y;
 
-    /* Load the next room */
-    start_next_room();
-
-    /* TODO */
-    /* Set the hero pos to match where they entered the room... */
-
-    /* Take a screenshot of the next room */
-    al_set_target_bitmap(get_frame(&screenshot2.sprite));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    draw_gameplay_playing();
-
-    al_restore_state(&state);
-
+    /* Clear the screnshots, in preparation of making the screen scroll */
     screenshot1.x = 0;
     screenshot1.y = 0;
     screenshot1.dx = 0;
     screenshot1.dy = 0;
-
     screenshot2.x = 0;
     screenshot2.y = 0;
     screenshot2.dx = 0;
     screenshot2.dy = 0;
 
+    /* Load the next room */
+    start_next_room();
+
+    /* Configure the screenshots to scroll, based on the direction of the exit used */
     if (screenshot1.direction == RIGHT) {
         screenshot2.x = DISPLAY_WIDTH;
         screenshot2.dx = -DISPLAY_WIDTH;
@@ -777,10 +774,21 @@ static void to_gameplay_state_scroll_rooms()
     } else if (screenshot1.direction == UP) {
         screenshot2.y = -DISPLAY_HEIGHT;
         screenshot2.dy = DISPLAY_HEIGHT;
-    } else { // DOWN
+    } else if (screenshot1.direction == DOWN) {
         screenshot2.y = DISPLAY_HEIGHT;
         screenshot2.dy = -DISPLAY_HEIGHT;
     }
+
+    /* Set the hero pos to match where they entered the room... */
+    hero.body.x = old_hero_pos_x - screenshot2.x;
+    hero.body.y = old_hero_pos_y - screenshot2.y;
+
+    /* Take a screenshot of the next room */
+    al_set_target_bitmap(get_frame(&screenshot2.sprite));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    draw_gameplay_playing();
+
+    al_restore_state(&state);
 
     update = update_gameplay_scroll_rooms;
     control = control_gameplay_options;
@@ -798,11 +806,16 @@ static bool update_gameplay_scroll_rooms()
     screenshot2.x += change_x;
     screenshot2.y += change_y;
 
-    /* Find out if we're done scrolling */
-    int x = (int)screenshot2.x;
-    int y = (int)screenshot2.y;
+    /* Find out if we're done scrolling (and don't over-scroll!) */
+    if (screenshot2.dx < 0 && (int)screenshot2.x <= 0) {
+        to_gameplay_state_playing();
+    } else if (screenshot2.dx > 0 && (int)screenshot2.x >= 0) {
+        to_gameplay_state_playing();
+    }
 
-    if ((int)x == 0 && (int)y == 0) {
+    if (screenshot2.dy < 0 && (int)screenshot2.y <= 0) {
+        to_gameplay_state_playing();
+    } else if (screenshot2.dy > 0 && (int)screenshot2.y >= 0) {
         to_gameplay_state_playing();
     }
 
@@ -1268,9 +1281,7 @@ static bool update_gameplay_playing()
 
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.exits[i].col * TILE_SIZE, room.exits[i].row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
 
-                /* Let the screen scrolling data know which direction to scroll */
-                screenshot1.direction = room.exits[i].direction;
-                screenshot2.direction = room.exits[i].direction;
+                room.used_exit_num = i;
 
                 to_gameplay_state_door_entered();
             }
