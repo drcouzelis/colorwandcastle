@@ -177,6 +177,17 @@ void print_room(ROOM *room, bool is_data_file_form)
     printf("BLOCK MAP (ORIGINAL)\n");
     print_map(room->block_map_orig, room->rows, room->cols, is_data_file_form);
 
+    printf("EXITS\n");
+    for (int i = 0; i < MAX_EXITS; i++) {
+        EXIT *exit = &room->exits[i];
+        if (exit->active) {
+            printf("EXIT\n");
+            printf("  DIRECTION "); print_direction(exit->direction);
+            printf("  ROW %d\n", exit->row);
+            printf("  COL %d\n", exit->col);
+        }
+    }
+
     printf("ENEMIES (DEFINITIONS)\n");
     for (int i = 0; i < MAX_ENEMIES; i++) {
         ENEMY_DEFINITION *definition = &room->enemy_definitions[i];
@@ -264,18 +275,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load direction.\n");
             }
-            if (strncmp(string, "U", MAX_STRING_SIZE) == 0) {
-                room->direction = UP;
-            } else if (strncmp(string, "D", MAX_STRING_SIZE) == 0) {
-                room->direction = DOWN;
-            } else if (strncmp(string, "L", MAX_STRING_SIZE) == 0) {
-                room->direction = LEFT;
-            } else if (strncmp(string, "R", MAX_STRING_SIZE) == 0) {
-                room->direction = RIGHT;
-            } else {
-                fprintf(stderr, "Failed to read direction, must be U, D, L, or R.\n");
-                room->direction = RIGHT;
-            }
+            room->direction = string_to_direction(string);
             continue;
         }
 
@@ -376,17 +376,17 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             exit->direction = string_to_direction(direction);
 
             if (exit->direction == DOWN) {
-                exit->row = 0;
+                exit->row = room->rows - 1;
                 exit->col = tile_num;
             } else if (exit->direction == UP) {
-                exit->row = room->rows - 1;
+                exit->row = 0;
                 exit->col = tile_num;
             } else if (exit->direction == RIGHT) {
                 exit->row = tile_num;
-                exit->col = 0;
+                exit->col = room->cols - 1;
             } else { // LEFT
                 exit->row = tile_num;
-                exit->col = room->cols - 1;
+                exit->col = 0;
             }
 
             exit->active = true;

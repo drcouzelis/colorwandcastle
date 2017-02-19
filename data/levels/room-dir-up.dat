@@ -1,6 +1,6 @@
 START 7 5
 
-DIRECTION U
+DIRECTION UP
 
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat

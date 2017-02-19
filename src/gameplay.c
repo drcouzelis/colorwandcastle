@@ -61,8 +61,8 @@ static EFFECT effects[MAX_EFFECTS];
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
 /* To hold "screenshots" of the rooms, for room transitions */
-static EFFECT screenshot1;
-static EFFECT screenshot2;
+static SCREENSHOT screenshot1;
+static SCREENSHOT screenshot2;
 
 /**
  * ...ENDS HERE.
@@ -334,9 +334,9 @@ static void init_hero_bullets()
     }
 }
 
-static void init_screenshot(EFFECT *screenshot, const char *name)
+static void load_screenshot(SCREENSHOT *screenshot, const char *name)
 {
-    init_effect(screenshot);
+    init_screenshot(screenshot);
 
     IMAGE *canvas = al_create_bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT);
     assert(canvas);
@@ -365,8 +365,8 @@ void init_gameplay()
     curr_room = 0;
 
     /* Screenshots */
-    init_screenshot(&screenshot1, "screenshot1");
-    init_screenshot(&screenshot2, "screenshot2");
+    load_screenshot(&screenshot1, "screenshot1");
+    load_screenshot(&screenshot2, "screenshot2");
 
     control = NULL;
     update = NULL;
@@ -720,8 +720,10 @@ static void to_gameplay_state_leaving_room()
 
 static bool update_gameplay_leaving_room()
 {
-    hero.body.x += convert_pps_to_fps(directions[room.direction].x_offset * HERO_SPEED);
-    hero.body.y += convert_pps_to_fps(directions[room.direction].y_offset * HERO_SPEED);
+    /* TODO */
+    /* This should be using the USED exit, not the FIRST exit... */
+    hero.body.x += convert_pps_to_fps(directions[room.exits[0].direction].x_offset * HERO_SPEED);
+    hero.body.y += convert_pps_to_fps(directions[room.exits[0].direction].y_offset * HERO_SPEED);
 
     if (is_offscreen(&hero.body, hero.sprite)) {
         to_gameplay_state_scroll_rooms();
@@ -737,6 +739,7 @@ static void to_gameplay_state_scroll_rooms()
 
     /* Take a screenshot of the current room */
     al_set_target_bitmap(get_frame(&screenshot1.sprite));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
     draw_gameplay_playing();
 
     /* Clear all resources before loading the new room */
@@ -745,25 +748,38 @@ static void to_gameplay_state_scroll_rooms()
     /* Load the next room */
     start_next_room();
 
+    /* TODO */
+    /* Set the hero pos to match where they entered the room... */
+
     /* Take a screenshot of the next room */
     al_set_target_bitmap(get_frame(&screenshot2.sprite));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
     draw_gameplay_playing();
 
     al_restore_state(&state);
 
-    screenshot1.body.x = 0;
-    screenshot1.body.y = 0;
+    screenshot1.x = 0;
+    screenshot1.y = 0;
     screenshot1.dx = 0;
     screenshot1.dy = 0;
 
-    screenshot2.body.x = 0;
-    screenshot2.body.y = 0;
+    screenshot2.x = 0;
+    screenshot2.y = 0;
     screenshot2.dx = 0;
     screenshot2.dy = 0;
 
-    if (room.direction == RIGHT) {
-        screenshot2.body.x = DISPLAY_WIDTH;
+    if (screenshot1.direction == RIGHT) {
+        screenshot2.x = DISPLAY_WIDTH;
         screenshot2.dx = -DISPLAY_WIDTH;
+    } else if (screenshot1.direction == LEFT) {
+        screenshot2.x = -DISPLAY_WIDTH;
+        screenshot2.dx = DISPLAY_WIDTH;
+    } else if (screenshot1.direction == UP) {
+        screenshot2.y = -DISPLAY_HEIGHT;
+        screenshot2.dy = DISPLAY_HEIGHT;
+    } else { // DOWN
+        screenshot2.y = DISPLAY_HEIGHT;
+        screenshot2.dy = -DISPLAY_HEIGHT;
     }
 
     update = update_gameplay_scroll_rooms;
@@ -773,12 +789,20 @@ static void to_gameplay_state_scroll_rooms()
 
 static bool update_gameplay_scroll_rooms()
 {
-    float change = convert_pps_to_fps(screenshot2.dx);
+    float change_x = convert_pps_to_fps(screenshot2.dx);
+    float change_y = convert_pps_to_fps(screenshot2.dy);
 
-    screenshot1.body.x += change;
-    screenshot2.body.x += change;
+    screenshot1.x += change_x;
+    screenshot1.y += change_y;
 
-    if ((int)screenshot2.body.x == 0 && (int)screenshot2.body.y == 0) {
+    screenshot2.x += change_x;
+    screenshot2.y += change_y;
+
+    /* Find out if we're done scrolling */
+    int x = (int)screenshot2.x;
+    int y = (int)screenshot2.y;
+
+    if ((int)x == 0 && (int)y == 0) {
         to_gameplay_state_playing();
     }
 
@@ -1243,6 +1267,11 @@ static bool update_gameplay_playing()
             }
 
             if (is_collision(b1->x, b1->y, b1->w, b1->h, room.exits[i].col * TILE_SIZE, room.exits[i].row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+
+                /* Let the screen scrolling data know which direction to scroll */
+                screenshot1.direction = room.exits[i].direction;
+                screenshot2.direction = room.exits[i].direction;
+
                 to_gameplay_state_door_entered();
             }
         }
@@ -1285,8 +1314,8 @@ void draw_gameplay(void *data)
 
 static void draw_gameplay_scrolling_rooms()
 {
-    draw_sprite(&screenshot1.sprite, screenshot1.body.x, screenshot1.body.y);
-    draw_sprite(&screenshot2.sprite, screenshot2.body.x, screenshot2.body.y);
+    draw_sprite(&screenshot1.sprite, screenshot1.x, screenshot1.y);
+    draw_sprite(&screenshot2.sprite, screenshot2.x, screenshot2.y);
 }
 
 static void draw_gameplay_playing()

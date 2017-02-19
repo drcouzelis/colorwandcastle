@@ -142,6 +142,16 @@ void init_room_list(ROOM_LIST *list)
     list->size = 0;
 }
 
+void init_screenshot(SCREENSHOT *screenshot)
+{
+    init_sprite(&screenshot->sprite, false, 0);
+    screenshot->x = 0;
+    screenshot->y = 0;
+    screenshot->dx = 0;
+    screenshot->dy = 0;
+    screenshot->direction = RIGHT;
+}
+
 void init_effect(EFFECT *effect)
 {
     effect->is_active = false;
@@ -149,10 +159,4 @@ void init_effect(EFFECT *effect)
     init_sprite(&effect->sprite, false, 0);
     effect->x = 0;
     effect->y = 0;
-    effect->dx = 0;
-    effect->dy = 0;
-    effect->body.x = 0;
-    effect->body.y = 0;
-    effect->body.w = 0;
-    effect->body.h = 0;
 }

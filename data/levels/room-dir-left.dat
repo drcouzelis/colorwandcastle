@@ -1,6 +1,6 @@
 START 4 10
 
-DIRECTION L
+DIRECTION LEFT
 
 IMPORT tiles-castle.dat
 IMPORT textures-colored.dat

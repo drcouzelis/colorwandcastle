@@ -73,12 +73,21 @@ typedef struct EFFECT
     float x;
     float y;
 
-    BODY body;
-    int dx; /* In pixels per second */
-    int dy; /* In pixels per second */
-
     void (*update)(struct EFFECT *effect, void *data);
 } EFFECT;
+
+typedef struct
+{
+    SPRITE sprite;
+    float x;
+    float y;
+
+    int dx;
+    int dy;
+
+    DIRECTION direction;
+
+} SCREENSHOT;
 
 typedef struct
 {
@@ -257,5 +266,7 @@ void init_room(ROOM *room);
 void init_room_list(ROOM_LIST *room_list);
 
 void init_effect(EFFECT *effect);
+
+void init_screenshot(SCREENSHOT *screenshot);
 
 #endif
