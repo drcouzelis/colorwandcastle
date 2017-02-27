@@ -3,5 +3,5 @@ TILE
 END
 
 TILE
-  IMAGE tile-gray-wall.png
+  IMAGE tile-wall.png
 END
