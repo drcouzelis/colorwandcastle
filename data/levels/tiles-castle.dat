@@ -5,3 +5,7 @@ END
 TILE
   IMAGE tile-wall.png
 END
+
+TILE
+  IMAGE tile-wall-worn.png
+END

@@ -43,9 +43,8 @@ dist_imagesdata_DATA = \
   data/images/enemy-bat-1.png \
   data/images/enemy-bat-2.png \
   data/images/enemy-bat-3.png \
-  data/images/enemy-dust-1.png \
-  data/images/enemy-dust-2.png \
-  data/images/enemy-dust-3.png \
+  data/images/enemy-blocker-1.png \
+  data/images/enemy-blocker-2.png \
   data/images/enemy-ghost-1.png \
   data/images/enemy-ghost-2.png \
   data/images/enemy-ghost-3.png \
@@ -57,14 +56,14 @@ dist_imagesdata_DATA = \
   data/images/enemy-spider-5.png \
   data/images/enemy-spider-6.png \
   data/images/enemy-spider-7.png \
-  data/images/hero-makayla-01.png \
-  data/images/hero-makayla-02.png \
-  data/images/hero-makayla-hurt-01.png \
-  data/images/hero-makayla-hurt-02.png \
-  data/images/hero-rawson-01.png \
-  data/images/hero-rawson-02.png \
-  data/images/hero-rawson-hurt-01.png \
-  data/images/hero-rawson-hurt-02.png \
+  data/images/hero-makayla-1.png \
+  data/images/hero-makayla-2.png \
+  data/images/hero-makayla-hurt-1.png \
+  data/images/hero-makayla-hurt-2.png \
+  data/images/hero-rawson-1.png \
+  data/images/hero-rawson-2.png \
+  data/images/hero-rawson-hurt-1.png \
+  data/images/hero-rawson-hurt-2.png \
   data/images/icon.png \
   data/images/mask-block.png \
   data/images/mask-plasma-1.png \
@@ -79,7 +78,8 @@ dist_imagesdata_DATA = \
   data/images/texture-yellow.png \
   data/images/tile-bricks.png \
   data/images/tile-door.png \
-  data/images/tile-wall.png
+  data/images/tile-wall.png \
+  data/images/tile-wall-worn.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels
@@ -90,8 +90,8 @@ dist_levelsdata_DATA = \
   data/levels/room-dir-left.dat \
   data/levels/room-dir-up.dat \
   data/levels/room-hard.dat \
-  data/levels/room-story-01.dat \
-  data/levels/room-story-02.dat \
+  data/levels/room-story-1.dat \
+  data/levels/room-story-2.dat \
   data/levels/room-test.dat \
   data/levels/textures-colored.dat \
   data/levels/tiles-castle.dat

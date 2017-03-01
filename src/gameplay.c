@@ -197,15 +197,15 @@ static void load_hero_sprite()
     }
 
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero.sprite_flying, IMG("hero-makayla-01.png"));
-        add_frame(&hero.sprite_flying, IMG("hero-makayla-02.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-01.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-02.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-makayla-1.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-makayla-2.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-1.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-2.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        add_frame(&hero.sprite_flying, IMG("hero-rawson-01.png"));
-        add_frame(&hero.sprite_flying, IMG("hero-rawson-02.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-01.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-02.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-rawson-1.png"));
+        add_frame(&hero.sprite_flying, IMG("hero-rawson-2.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-1.png"));
+        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-2.png"));
     }
 }
 
@@ -604,11 +604,9 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
-        init_sprite(&enemy->sprite, true, 4);
-        add_frame(&enemy->sprite, IMG("enemy-dust-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-dust-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-dust-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-dust-2.png"));
+        init_sprite(&enemy->sprite, true, 1);
+        add_frame(&enemy->sprite, IMG("enemy-blocker-1.png"));
+        add_frame(&enemy->sprite, IMG("enemy-blocker-2.png"));
         enemy->body.w = 20;
         enemy->body.h = 20;
         enemy->update = update_enemy_animation;
@@ -681,6 +679,9 @@ static void to_gameplay_state_starting_after_dying()
 
     /* Reset the hero */
     reset_hero(room.start_row, room.start_col);
+
+    /* Get rid of any shooting bullets */
+    init_hero_bullets();
 
     /* Load enemies */
     load_enemies_from_definitions();
