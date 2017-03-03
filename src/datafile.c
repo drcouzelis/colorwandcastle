@@ -424,12 +424,12 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     /* If there's no collision map, just create one based on the foreground map */
     if (foreground_map_used && !collision_map_used) {
         for (int i = 0; i < room->rows * room->cols; i++) {
-            room->collision_map[i] = room->foreground_map[i] == 0 ? 0 : 1;
+            room->collision_map[i] = room->foreground_map[i] == -1 ? NO_COLLISION : COLLISION;
         }
     }
 
     /* Uncomment if you want to see what was loaded in this room */
-    //print_room(room, false);
+    print_room(room, false);
 
     return true;
 }

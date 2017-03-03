@@ -78,8 +78,7 @@ dist_imagesdata_DATA = \
   data/images/texture-yellow.png \
   data/images/tile-bricks.png \
   data/images/tile-door.png \
-  data/images/tile-wall.png \
-  data/images/tile-wall-worn.png
+  data/images/tile-wall.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels

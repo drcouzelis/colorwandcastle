@@ -88,7 +88,71 @@ void add_resource_path(const char *path)
  */
 static IMAGE *load_bitmap_with_magic_pink(const char *filename)
 {
+    /* Try loading an image from the filename you've been given */
     IMAGE *bitmap = al_load_bitmap(filename);
+
+    if (bitmap == NULL) {
+
+        /* Hmmm.... Failed to load image... */
+        /* Maybe it's a tilemap, try again... */
+        char actual_filename[MAX_FILEPATH_LEN];
+        actual_filename[0] = '\0';
+        int w = 0;
+        int h = 0;
+        int r = 0;
+        int c = 0;
+
+        char *ptr = NULL;
+
+        char working_filename[MAX_FILEPATH_LEN];
+        strncpy(working_filename, filename, MAX_FILEPATH_LEN);
+
+        /* Get the actual filename */
+        ptr = strtok(working_filename, ":");
+        if (ptr == NULL) {
+            return NULL;
+        }
+        strncpy(actual_filename, ptr, MAX_FILEPATH_LEN);
+
+        /* Get the "WxH" size of each tile in the tilemap */
+        ptr = strtok(NULL, ":");
+        if (ptr == NULL) {
+            return NULL;
+        }
+        if (sscanf(ptr, "%dx%d", &w, &h) != 2) {
+            return NULL;
+        }
+
+        /* Finally, get the "ROW,COL" entry in the tilemap */
+        ptr = strtok(NULL, ":");
+        if (ptr == NULL) {
+            return NULL;
+        }
+        if (sscanf(ptr, "%d,%d", &r, &c) != 2) {
+            return NULL;
+        }
+
+        //printf("\"%s\", %d, %d, %d, %d\n", actual_filename, w, h, r, c);
+
+        /* Load the image from a section of the tilemap */
+        IMAGE *tilemap = al_load_bitmap(actual_filename);
+        if (tilemap == NULL) {
+            return NULL;
+        }
+
+        bitmap = al_create_bitmap(w, h);
+        assert(bitmap != NULL);
+
+        ALLEGRO_STATE state;
+        al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+
+        al_set_target_bitmap(bitmap);
+        al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+        al_draw_bitmap_region(tilemap, c * w, r * h, w, h, 0, 0, 0);
+
+        al_restore_state(&state);
+        al_destroy_bitmap(tilemap);
+    }
 
     if (bitmap) {
         al_convert_mask_to_alpha(bitmap, al_map_rgb(255, 0, 255));
