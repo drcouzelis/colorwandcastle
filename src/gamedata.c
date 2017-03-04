@@ -78,8 +78,8 @@ void init_room(ROOM *room)
     room->cols = MAX_ROOM_COLS;
 
     /* Starting position */
-    room->start_row = 2;
-    room->start_col = 2;
+    room->start_x = 2 * TILE_SIZE;
+    room->start_y = 2 * TILE_SIZE;
 
     room->direction = RIGHT;
     

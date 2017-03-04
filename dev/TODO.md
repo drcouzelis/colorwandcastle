@@ -34,9 +34,8 @@
 - [x] Left-facing levels
 - [x] Fix vertical-level-star-color-choosing glitch
 - [x] Allow for clearing resources at the end of a level
-- [ ] New exit style: EXIT 15 9 R 1
-- [ ] Implement a game-wide matching color palette
-- [ ] Jazz up the enemies - fuzzy bats, rainbow legged spiders
+- [x] New exit style: EXIT 15 9 R 1
+- [x] Simplify and unify the color scheme
 - [ ] Get rid of memory library - static allocation only
 - [ ] Two types of rooms - NORMAL and BOSS
 
@@ -64,10 +63,10 @@
 
 - [x] A ENEMY_HORIZONTAL (bat) flies back and forth in place
 - [x] A ENEMY_VERTICAL (spider) slowly moves up and down the screen on his web
-- [ ] A ENEMY_DIAGONAL bounces around the room
+- [x] A ENEMY_DIAGONAL bounces around the room
+- [x] A ENEMY_BLOCKER doesn't move, just guards the exit until all blocks are cleared
 - [ ] A ENEMY_TRACER is attached to a surface and will "trace" the surface
 - [ ] A ENEMY_SNEAK is disguised as a block with a random texture
-- [ ] A ENEMY_BLOCKER doesn't move, just guards the exit until all blocks are cleared
 
 ## Powerups
 
@@ -80,7 +79,7 @@
 
 ## Sound Effects
 
-- [ ] Create sound effects from http://www.superflashbros.net/as3sfxr/, http://sfbgames.com/chiptone
+- [ ] Create sound effects from http://www.superflashbros.net/as3sfxr/ (old), http://sfbgames.com/chiptone (new)
 - [ ] Block destroyed "POP"
 - [ ] Bullet shot "PEW"
 - [ ] Bullet bounce "BOING"

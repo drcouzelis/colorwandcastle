@@ -377,14 +377,14 @@ void init_gameplay()
     is_gameplay_init = true;
 }
 
-static void reset_hero(int row, int col)
+static void reset_hero(int x, int y)
 {
     /* Set the current sprite */
     hero.sprite = &hero.sprite_flying;
 
     /* Set a new given position */
-    hero.body.x = col * TILE_SIZE;
-    hero.body.y = row * TILE_SIZE;
+    hero.body.x = x;
+    hero.body.y = y;
 
     /* Clear keyboard input */
     hero.u = false;
@@ -678,7 +678,7 @@ static void to_gameplay_state_starting_after_dying()
     }
 
     /* Reset the hero */
-    reset_hero(room.start_row, room.start_col);
+    reset_hero(room.start_x, room.start_y);
 
     /* Get rid of any shooting bullets */
     init_hero_bullets();
@@ -699,7 +699,7 @@ static void start_next_room()
     load_gameplay_room_from_num(curr_room + 1);
 
     /* Reset the hero */
-    reset_hero(room.start_row, room.start_col);
+    reset_hero(room.start_x, room.start_y);
 
 }
 
@@ -784,6 +784,10 @@ static void to_gameplay_state_scroll_rooms()
     hero.body.x = old_hero_pos_x - screenshot2.x;
     hero.body.y = old_hero_pos_y - screenshot2.y;
 
+    /* And save the hero pos as the new room default */
+    room.start_x = hero.body.x;
+    room.start_y = hero.body.y;
+
     /* Take a screenshot of the next room */
     al_set_target_bitmap(get_frame(&screenshot2.sprite));
     al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -830,7 +834,7 @@ static bool update_gameplay_starting_new_game()
 
     /* Load the hero sprites */
     /* Reset the hero */
-    reset_hero(room.start_row, room.start_col);
+    reset_hero(room.start_x, room.start_y);
     load_hero_sprite();
 
     /* Ready to start playing! */
@@ -917,7 +921,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
-            play_sound(SND("star_hit.wav"));
+            play_sound(SND("block-destroyed.wav"));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
@@ -931,7 +935,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Bounce */
             bullet->dx *= -1;
             bullet->dy *= -1;
-            play_sound(SND("star_disolve.wav"));
+            play_sound(SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -947,12 +951,12 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         /* Just bounce */
         bullet->hits--;
         if (bullet->hits <= 0) {
-            play_sound(SND("star_disolve.wav"));
+            play_sound(SND("bullet-disolve.wav"));
         } else {
             /* Bounce */
             bullet->dx *= -1;
             bullet->dy *= -1;
-            play_sound(SND("star_disolve.wav"));
+            play_sound(SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1006,6 +1010,8 @@ static void shoot_bullet(int texture, float x, float y)
     bullet->dy = speed * directions[room.direction].y_offset;
 
     bullet->is_active = true;
+
+    play_sound(SND("bullet-shoot.wav"));
 
     /**
      * Do some fancy footwork to find out if this bullet
@@ -1169,6 +1175,8 @@ static void set_hero_death()
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
 
+    play_sound(SND("hero-die.wav"));
+
     hero.control = NULL;
 }
 
@@ -1257,6 +1265,8 @@ static bool update_gameplay_playing()
 
         /* Level clear! */
         room.cleared = true;
+
+        play_sound(SND("room-cleared.wav"));
 
         /* Get rid of those nasty enemies */
         for (int i = 0; i < MAX_ENEMIES; i++) {

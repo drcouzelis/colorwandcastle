@@ -150,7 +150,7 @@ void print_room(ROOM *room, bool is_data_file_form)
     }
 
     printf("TITLE \"%s\"\n", room->title);
-    printf("START %d %d\n", room->start_row, room->start_col);
+    printf("START %d %d\n", room->start_x, room->start_y);
     printf("SIZE %d %d\n", room->rows, room->cols);
     printf("TILES %d\n", room->num_tiles);
     printf("TEXTURES %d\n", room->num_textures);
@@ -264,9 +264,14 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Hero starting position */
         if (strncmp(string, "START", MAX_STRING_SIZE) == 0) {
-            if (fscanf(file, "%d %d", &room->start_row, &room->start_col) != 2) {
+            int r = 0;
+            int c = 0;
+            if (fscanf(file, "%d %d", &r, &c) != 2) {
                 fprintf(stderr, "Failed to load starting row and col.\n");
             }
+            /* Convert the given values to X / Y position */
+            room->start_x = c * TILE_SIZE;
+            room->start_y = r * TILE_SIZE;
             continue;
         }
 
@@ -429,7 +434,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     }
 
     /* Uncomment if you want to see what was loaded in this room */
-    print_room(room, false);
+    //print_room(room, false);
 
     return true;
 }

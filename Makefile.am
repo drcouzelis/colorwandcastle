@@ -98,8 +98,12 @@ dist_levelsdata_DATA = \
 # Data - Sounds
 soundsdatadir = $(pkgdatadir)/sounds
 dist_soundsdata_DATA = \
-  data/sounds/star_disolve.wav \
-  data/sounds/star_hit.wav
+  data/sounds/block-destroyed.wav \
+  data/sounds/bullet-bounce.wav \
+  data/sounds/bullet-disolve.wav \
+  data/sounds/bullet-shoot.wav \
+  data/sounds/hero-die.wav \
+  data/sounds/room-cleared.wav
 
 # Distribution files
 EXTRA_DIST = \

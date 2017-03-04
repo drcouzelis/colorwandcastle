@@ -188,8 +188,8 @@ typedef struct
     int cols;
 
     /* Starting position for the hero */
-    int start_row;
-    int start_col;
+    int start_x;
+    int start_y;
     
     /* The general orientation of the room */
     DIRECTION direction;
