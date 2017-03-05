@@ -94,3 +94,15 @@ TILE
   IMAGE tile-bricks.png:20x20:4,0
 END
 
+# 17
+# Bricks, left + right edges open
+TILE
+  IMAGE tile-bricks.png:20x20:4,2
+END
+
+# 18
+# Bricks, top + bottom edges open
+TILE
+  IMAGE tile-bricks.png:20x20:4,3
+END
+
