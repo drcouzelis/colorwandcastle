@@ -79,12 +79,12 @@
 
 ## Sound Effects
 
-- [ ] Create sound effects from http://www.superflashbros.net/as3sfxr/ (old), http://sfbgames.com/chiptone (new)
-- [ ] Block destroyed "POP"
-- [ ] Bullet shot "PEW"
-- [ ] Bullet bounce "BOING"
-- [ ] Bullet destroyed "TWINKLE"
-- [ ] Hero hit "SAD SOUND"
+- [x] Create sound effects from http://www.superflashbros.net/as3sfxr/ (old), http://sfbgames.com/chiptone (new)
+- [x] Block destroyed "POP"
+- [x] Bullet shot "PEW"
+- [x] Bullet bounce "BOING"
+- [x] Bullet destroyed "TWINKLE"
+- [x] Hero hit "SAD SOUND"
 
 ## Music
 
