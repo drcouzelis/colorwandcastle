@@ -17,5 +17,6 @@ install-sh
 missing
 stamp-h1
 autom4te.cache
+dev/buildit
 src/.deps
 src/colorwandcastle
