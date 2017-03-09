@@ -6,7 +6,7 @@
 - Written in the C programming language
 - Using the [Allegro game library](http://liballeg.org/).
 
-![Screenshot](/dev/screenshots/screenshot-2016-12-09.png?raw=true)
+![Screenshot](/dev/screenshots/screenshot-2017-03-08.png?raw=true)
 
 - [x] Shoot the blocks to clear the room.
 - [x] Don't get hit by your own shots!
