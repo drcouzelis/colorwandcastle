@@ -81,6 +81,29 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
     }
 }
 
+static bool load_next_number_from_datafile(FILE *file, int *num)
+{
+    char string[MAX_STRING_SIZE];
+
+    while (fscanf(file, "%s", string) != EOF) {
+
+        /* Ignore comments (lines that begin with a hash) */
+        if (string[0] == '#') {
+            fgets(string, MAX_STRING_SIZE, file);
+            continue;
+        }
+
+        /* Look for a number */
+        if (sscanf(string, "%d", num) == 1) {
+            return true;
+        } else {
+            fprintf(stderr, "WARNING: Looking for number, skipping %s...\n", string);
+        }
+    }
+
+    return false;
+}
+
 static void load_map_from_datafile(int *map, int rows, int cols, FILE *file)
 {
     assert(file != NULL);
@@ -89,7 +112,8 @@ static void load_map_from_datafile(int *map, int rows, int cols, FILE *file)
 
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-            if (fscanf(file, "%d", &num) == 1) {
+
+            if (load_next_number_from_datafile(file, &num)) {
                 /* WARNING: TRICKY! */
                 /* The data file counts numbers starting at 1 */
                 /* The game engine counts numbers starting at 0 */

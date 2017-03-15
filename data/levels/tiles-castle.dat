@@ -91,18 +91,18 @@ END
 # 16
 # Bricks, all edges open
 TILE
-  IMAGE tile-bricks.png:20x20:4,0
+  IMAGE tile-bricks.png:20x20:0,1
 END
 
 # 17
 # Bricks, left + right edges open
 TILE
-  IMAGE tile-bricks.png:20x20:4,2
+  IMAGE tile-bricks.png:20x20:0,2
 END
 
 # 18
 # Bricks, top + bottom edges open
 TILE
-  IMAGE tile-bricks.png:20x20:4,3
+  IMAGE tile-bricks.png:20x20:0,3
 END
 
