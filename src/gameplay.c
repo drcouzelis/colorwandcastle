@@ -197,15 +197,15 @@ static void load_hero_sprite()
     }
 
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero.sprite_flying, IMG("hero-makayla-1.png"));
-        add_frame(&hero.sprite_flying, IMG("hero-makayla-2.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-1.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-makayla-hurt-2.png"));
+        add_frame(&hero.sprite_flying, IMGL("hero-makayla-1.png"));
+        add_frame(&hero.sprite_flying, IMGL("hero-makayla-2.png"));
+        add_frame(&hero.sprite_hurting, IMGL("hero-makayla-hurt-1.png"));
+        add_frame(&hero.sprite_hurting, IMGL("hero-makayla-hurt-2.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        add_frame(&hero.sprite_flying, IMG("hero-rawson-1.png"));
-        add_frame(&hero.sprite_flying, IMG("hero-rawson-2.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-1.png"));
-        add_frame(&hero.sprite_hurting, IMG("hero-rawson-hurt-2.png"));
+        add_frame(&hero.sprite_flying, IMGL("hero-rawson-1.png"));
+        add_frame(&hero.sprite_flying, IMGL("hero-rawson-2.png"));
+        add_frame(&hero.sprite_hurting, IMGL("hero-rawson-hurt-1.png"));
+        add_frame(&hero.sprite_hurting, IMGL("hero-rawson-hurt-2.png"));
     }
 }
 
@@ -342,6 +342,7 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
     assert(canvas);
 
     insert_image_resource(name, canvas);
+    lock_resource(name);
 
     add_frame(&screenshot->sprite, IMG(name));
 }
@@ -377,15 +378,8 @@ void init_gameplay()
     is_gameplay_init = true;
 }
 
-static void reset_hero(int x, int y)
+static void clear_hero_input()
 {
-    /* Set the current sprite */
-    hero.sprite = &hero.sprite_flying;
-
-    /* Set a new given position */
-    hero.body.x = x;
-    hero.body.y = y;
-
     /* Clear keyboard input */
     hero.u = false;
     hero.d = false;
@@ -396,6 +390,16 @@ static void reset_hero(int x, int y)
     /* Stop the hero from moving for the moment */
     hero.dx = 0;
     hero.dy = 0;
+}
+
+static void reset_hero(int x, int y)
+{
+    /* Set the current sprite */
+    hero.sprite = &hero.sprite_flying;
+
+    /* Set a new given position */
+    hero.body.x = x;
+    hero.body.y = y;
 
     /* Allow the hero to be controlled by the player */
     hero.control = control_hero_from_keyboard;
@@ -679,6 +683,7 @@ static void to_gameplay_state_starting_after_dying()
 
     /* Reset the hero */
     reset_hero(room.start_x, room.start_y);
+    clear_hero_input();
 
     /* Get rid of any shooting bullets */
     init_hero_bullets();
@@ -715,7 +720,7 @@ static void to_gameplay_state_starting_next_room()
 static void to_gameplay_state_leaving_room()
 {
     update = update_gameplay_leaving_room;
-    control = control_gameplay_options;
+    control = control_gameplay_playing;
     draw = draw_gameplay_playing;
 }
 
@@ -723,6 +728,7 @@ static bool update_gameplay_leaving_room()
 {
     hero.body.x += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].x_offset * HERO_SPEED);
     hero.body.y += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].y_offset * HERO_SPEED);
+    animate(hero.sprite);
 
     if (is_offscreen(&hero.body, hero.sprite)) {
         to_gameplay_state_scroll_rooms();
@@ -746,6 +752,7 @@ static void to_gameplay_state_scroll_rooms()
     draw_gameplay_playing();
 
     /* Clear all resources before loading the new room */
+    /* ONLY DO THIS WHEN NEEDED */
     //free_resources();
     
     /* Grab a copy of the hero position */
@@ -796,7 +803,7 @@ static void to_gameplay_state_scroll_rooms()
     al_restore_state(&state);
 
     update = update_gameplay_scroll_rooms;
-    control = control_gameplay_options;
+    control = control_gameplay_playing;
     draw = draw_gameplay_scrolling_rooms;
 }
 

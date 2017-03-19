@@ -4,6 +4,7 @@
 #include "display.h"
 #include "gameplay.h"
 #include "main.h"
+#include "memory.h"
 #include "run.h"
 #include "sound.h"
 #include "sprite.h"
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
   
     /* Set window properties */
     al_set_window_title(get_display(), "Colorwand Castle");
-    al_set_display_icon(get_display(), IMG("icon.png"));
+    al_set_display_icon(get_display(), IMGL("icon.png"));
 
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
@@ -101,6 +102,9 @@ int main(int argc, char **argv)
     unlock_resources();
     free_resources();
     free_display();
+
+    /* See if we have any naughty memory leaks */
+    check_memory();
 
     return EXIT_SUCCESS;
 }

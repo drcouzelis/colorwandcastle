@@ -35,7 +35,6 @@ typedef struct
 
 /* List of resources */
 static RESOURCE *resources[MAX_RESOURCES];
-static int num_resources = 0;
 
 /* List of resource paths */
 static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
@@ -43,8 +42,8 @@ static int num_resource_paths = 0;
 
 void free_resources()
 {
-    for (int i = 0; i < num_resources; i++) {
-        if (resources[i]) {
+    for (int i = 0; i < MAX_RESOURCES; i++) {
+        if (resources[i] && !resources[i]->locked) {
             if (resources[i]->type == RESOURCE_TYPE_IMAGE) {
                 al_destroy_bitmap((IMAGE *)resources[i]->data);
             } else if (resources[i]->type == RESOURCE_TYPE_SOUND) {
@@ -54,17 +53,26 @@ void free_resources()
             resources[i] = NULL;
         }
     }
-  
-    num_resources = 0;
+}
 
-    /* See if we have any naughty memory leaks */
-    check_memory();
+void lock_resource(const char *name)
+{
+    for (int i = 0; i < MAX_RESOURCES; i++) {
+        if (resources[i] != NULL) {
+            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
+                resources[i]->locked = true;
+                return;
+            }
+        }
+    }
 }
 
 void unlock_resources()
 {
-    for (int i = 0; i < num_resources; i++) {
-        resources[i]->locked = false;
+    for (int i = 0; i < MAX_RESOURCES; i++) {
+        if (resources[i] != NULL) {
+            resources[i]->locked = false;
+        }
     }
 }
 
@@ -179,21 +187,23 @@ static RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *dat
     return resource;
 }
 
-static bool is_space_for_new_resource()
+static int next_available_resource_index()
 {
-    /* See if we have space to load another resource... */
-    if (num_resources == MAX_RESOURCES) {
-        fprintf(stderr, "RESOURCES: Failed to load resource, try increasing MAX_RESOURCES.\n");
-        return false;
+    for (int i = 0; i < MAX_RESOURCES; i++) {
+        if (resources[i] == NULL) {
+            return i;
+        }
     }
-    return true;
+
+    return -1;
 }
 
 static void add_resource_to_list(RESOURCE *resource)
 {
-    if (is_space_for_new_resource()) {
-        resources[num_resources] = resource;
-        num_resources++;
+    int n = next_available_resource_index();
+
+    if (n >= 0) {
+        resources[n] = resource;
     }
 }
 
@@ -206,21 +216,20 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
     /**
      * Check the resources that have already been loaded
      */
-    for (i = 0; i < num_resources; i++) {
-        assert(resources[i]);
-        if (resources[i] == NULL) {
-            printf("Resource %d is NULL\n", i);
-        }
-        if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
-            /* The resource has been found! Return it */
-            return resources[i]->data;
+    for (i = 0; i < MAX_RESOURCES; i++) {
+        if (resources[i] != NULL) {
+            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
+                /* The resource has been found! Return it */
+                return resources[i]->data;
+            }
         }
     }
 
     /**
      * Uh oh. The resource WASN'T found.
      */
-    if (!is_space_for_new_resource()) {
+
+    if (next_available_resource_index() < 0) {
         return NULL;
     }
 
@@ -257,6 +266,13 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
 IMAGE *get_image(const char *name)
 {
     return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
+}
+
+IMAGE *get_locked_image(const char *name)
+{
+    IMAGE *image = (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
+    lock_resource(name);
+    return image;
 }
 
 SOUND *get_sound(const char *name)

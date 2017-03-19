@@ -55,6 +55,9 @@ SOUND *get_sound(const char *name);
 #define IMG(name) (get_image(name))
 #define SND(name) (get_sound(name))
 
+IMAGE *get_locked_image(const char *name);
+#define IMGL(name) (get_locked_image(name))
+
 /**
  * Insert your own image resource.
  * It can be retrieved by calling "get_image" with the given name.
