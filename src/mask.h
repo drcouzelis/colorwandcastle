@@ -17,6 +17,7 @@
  */
 IMAGE *get_masked_image(const char *name, const char *mask);
 
+/* For convenience */
 #define MASKED_IMG(name, mask) (get_masked_image(name, mask))
 
 #endif

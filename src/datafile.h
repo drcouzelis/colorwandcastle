@@ -3,6 +3,19 @@
 
 #include "gamedata.h"
 
+/**
+ * The directory paths that are entered using this function
+ * are added a prefix to any filename that is opened.
+ *
+ * For example:
+ *
+ *   add_datafile_path("/path/to/datafiles");
+ *   open_data_file("mydatafile.dat");
+ *
+ * Will look for the file:
+ *
+ *   "/path/to/datafiles/mydatafile.dat"
+ */
 void add_datafile_path(const char *path);
 
 /**
@@ -15,10 +28,15 @@ void add_datafile_path(const char *path);
 FILE *open_data_file(const char *name);
 void close_data_file(FILE *file);
 
-/* Load a room from the data in the given file */
-/* Returns true if the room was successfully loaded */
+/**
+ * Load a room from the data in the given file.
+ * Returns true if the room was successfully loaded.
+ */
 bool load_room_from_datafile_with_filename(const char *filename, ROOM *room);
 
+/**
+ * A room list is a text file with a list of datafiles for rooms.
+ */
 bool load_room_list_from_datafile_with_filename(const char *filename, ROOM_LIST *room_list);
 
 /* Print a room data structure to stdout */
