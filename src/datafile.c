@@ -63,7 +63,9 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
 
         /* Ignore comments (lines that begin with a hash) */
         if (string[0] == '#') {
-            fgets(string, MAX_STRING_SIZE, file);
+            if (fgets(string, MAX_STRING_SIZE, file) == NULL) {
+                fprintf(stderr, "Failed to read comment.\n");
+            }
             continue;
         }
 
@@ -89,7 +91,9 @@ static bool load_next_number_from_datafile(FILE *file, int *num)
 
         /* Ignore comments (lines that begin with a hash) */
         if (string[0] == '#') {
-            fgets(string, MAX_STRING_SIZE, file);
+            if (fgets(string, MAX_STRING_SIZE, file) == NULL) {
+                fprintf(stderr, "Failed to read comment.\n");
+            }
             continue;
         }
 
@@ -265,7 +269,9 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Ignore comments (lines that begin with a hash) */
         if (string[0] == '#') {
-            fgets(string, MAX_STRING_SIZE, file);
+            if (fgets(string, MAX_STRING_SIZE, file) == NULL) {
+                fprintf(stderr, "Failed to read comment.\n");
+            }
             continue;
         }
 
@@ -280,9 +286,12 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
         /* Title (name) of the room */
         if (strncmp(string, "TITLE", MAX_STRING_SIZE) == 0) {
-            fgets(room->title, MAX_STRING_SIZE, file);
-            /* Get rid of the spaces at the beginning */
-            trim_string(room->title, strnlen(room->title, MAX_STRING_SIZE));
+            if (fgets(room->title, MAX_STRING_SIZE, file) != NULL) {
+                /* Get rid of the spaces at the beginning */
+                trim_string(room->title, strnlen(room->title, MAX_STRING_SIZE));
+            } else {
+                fprintf(stderr, "Failed to read title of room.\n");
+            }
             continue;
         }
 
