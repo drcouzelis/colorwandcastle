@@ -1,6 +1,6 @@
 # Sources
 bin_PROGRAMS = colorwandcastle
-colorwandcastle_CPPFLAGS = -Wall -Werror -DPKGDATADIR='"$(pkgdatadir)"'
+colorwandcastle_CPPFLAGS = -Wall -DPKGDATADIR='"$(pkgdatadir)"'
 colorwandcastle_SOURCES = \
   src/datafile.c \
   src/datafile.h \
