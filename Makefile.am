@@ -103,6 +103,7 @@ dist_soundsdata_DATA = \
   data/sounds/bullet-disolve.wav \
   data/sounds/bullet-shoot.wav \
   data/sounds/hero-die.wav \
+  data/sounds/hero-toggle.wav \
   data/sounds/room-cleared.wav
 
 # Distribution files

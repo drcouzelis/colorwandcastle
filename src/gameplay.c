@@ -254,6 +254,7 @@ static void toggle_hero()
     }
 
     load_poof_effect(hero.body.x - 5, hero.body.y - 5);
+    play_sound(SND("hero-toggle.wav"));
 }
 
 static void control_hero_from_keyboard(HERO *hero, void *data)
