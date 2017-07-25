@@ -76,24 +76,17 @@ dist_imagesdata_DATA = \
   data/images/texture-purple.png \
   data/images/texture-red.png \
   data/images/texture-yellow.png \
-  data/images/tile-bricks.png \
-  data/images/tile-door.png \
-  data/images/tile-wall.png
+  data/images/tile-castle.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels
 dist_levelsdata_DATA = \
   data/levels/list-story.dat \
-  data/levels/room-colorful.dat \
-  data/levels/room-dir-down.dat \
-  data/levels/room-dir-left.dat \
-  data/levels/room-dir-up.dat \
-  data/levels/room-hard.dat \
-  data/levels/room-story-1.dat \
-  data/levels/room-story-2.dat \
+  data/levels/room-story-001.dat \
+  data/levels/room-story-002.dat \
   data/levels/room-test.dat \
-  data/levels/textures-colored.dat \
-  data/levels/tiles-castle.dat
+  data/levels/texture-colored.dat \
+  data/levels/tile-castle.dat
 
 # Data - Sounds
 soundsdatadir = $(pkgdatadir)/sounds

@@ -4,6 +4,9 @@ import sys
 import xmltodict
 
 def split_map(m):
+    print('# 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15')
+    print('#################################################################')
+    i = 0
     for n in m.split('\n'):
         first = True
         for c in n.split(','):
@@ -13,7 +16,8 @@ def split_map(m):
                 else:
                     first = False
                 print('{:03}'.format(int(c)), end='')
-        print()
+        print(' # {:2}'.format(i))
+        i = i + 1
 
 with open(sys.argv[1]) as f:
     map = xmltodict.parse(f.read())
