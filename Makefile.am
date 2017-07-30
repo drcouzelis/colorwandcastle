@@ -84,8 +84,10 @@ dist_levelsdata_DATA = \
   data/levels/list-story.dat \
   data/levels/room-story-001.dat \
   data/levels/room-story-002.dat \
+  data/levels/room-story-003.dat \
   data/levels/room-test.dat \
   data/levels/texture-colored.dat \
+  data/levels/texture-colored-2.dat \
   data/levels/tile-castle.dat
 
 # Data - Sounds

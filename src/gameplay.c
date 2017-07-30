@@ -1439,6 +1439,13 @@ bool load_gameplay_room_list_from_filename(const char *filename)
     return true;
 }
 
+void set_curr_room(int room_num)
+{
+    assert(room_num < room_list.size);
+
+    curr_room = room_num;
+}
+
 bool load_gameplay_room_from_num(int room_num)
 {
     assert(is_gameplay_init);
