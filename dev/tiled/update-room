@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "Arg 1 must be a filename (without the '.tmx' or '.dat' extension)."
+    exit 1
+fi
+
+./convert.py "$1".tmx ../../data/levels/"$1".dat > "$1".dat && \
+mv -f "$1".dat ../../data/levels/"$1".dat
