@@ -76,7 +76,8 @@ dist_imagesdata_DATA = \
   data/images/texture-purple.png \
   data/images/texture-red.png \
   data/images/texture-yellow.png \
-  data/images/tile-castle.png
+  data/images/tile-castle.png \
+  data/images/tile-door.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels
@@ -85,9 +86,11 @@ dist_levelsdata_DATA = \
   data/levels/room-story-001.dat \
   data/levels/room-story-002.dat \
   data/levels/room-story-003.dat \
+  data/levels/room-story-004.dat \
   data/levels/room-test.dat \
   data/levels/texture-colored.dat \
   data/levels/texture-colored-2.dat \
+  data/levels/texture-colored-3.dat \
   data/levels/tile-castle.dat
 
 # Data - Sounds

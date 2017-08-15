@@ -5,6 +5,9 @@ TITLE Blargitty!
 # Hero start position
 START 2 2
 
+# The direction of the level (shooting stars)
+DIRECTION RIGHT
+
 # Size of the room
 # Defaults to 16x12
 SIZE 16 12

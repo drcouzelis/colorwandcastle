@@ -5,5 +5,10 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-./convert.py "$1".tmx ../../data/levels/"$1".dat > "$1".dat && \
-mv -f "$1".dat ../../data/levels/"$1".dat
+if [ -f ../../data/levels/"$1".dat ]; then
+    ./convert.py "$1".tmx ../../data/levels/"$1".dat > "$1".dat && \
+    mv -f "$1".dat ../../data/levels/"$1".dat
+else
+    ./convert.py "$1".tmx > "$1".dat && \
+    mv -f "$1".dat ../../data/levels/"$1".dat
+fi
