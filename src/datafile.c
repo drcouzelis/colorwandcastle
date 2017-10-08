@@ -317,6 +317,19 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             continue;
         }
 
+        /* Room facing */
+        if (strncmp(string, "FACING", MAX_STRING_SIZE) == 0) {
+            if (fscanf(file, "%s", string) != 1) {
+                fprintf(stderr, "Failed to load facing.\n");
+            }
+            room->facing = string_to_direction(string);
+            if (!(room->facing == RIGHT || room->facing == LEFT)) {
+                fprintf(stderr, "Failed to set facing direction, using RIGHT.\n");
+                room->facing = RIGHT;
+            }
+            continue;
+        }
+
         /* Size of the room, in tiles */
         if (strncmp(string, "SIZE", MAX_STRING_SIZE) == 0) {
             if (fscanf(file, "%d %d", &room->rows, &room->cols) != 2) {

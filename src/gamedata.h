@@ -192,7 +192,11 @@ typedef struct
     int start_y;
     
     /* The general orientation of the room */
+    /* This determines the direction bullets are thrown */
     DIRECTION direction;
+
+    /* The way the hero is facing, left or right */
+    DIRECTION facing;
 
     /* List of tiles used in the room */
     /* Tiles define the play area */

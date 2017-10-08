@@ -82,6 +82,7 @@ void init_room(ROOM *room)
     room->start_y = 2 * TILE_SIZE;
 
     room->direction = RIGHT;
+    room->facing = RIGHT;
     
     /* Tile list */
     for (int i = 0; i < MAX_TILES; i++) {

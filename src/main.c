@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 
     /* If a room number was given on the command line, then load that room */
     if (room_num > 0) {
-        set_curr_room(room_num - 1);
+        load_gameplay_room_from_num(room_num - 1);
     }
 
     /* RUN THE GAME */

@@ -191,7 +191,7 @@ static void load_hero_sprite()
     hero.sprite_hurting.x_offset = -10;
     hero.sprite_hurting.y_offset = -10;
 
-    if (room.direction == LEFT) {
+    if (room.facing == LEFT) {
         hero.sprite_flying.mirror = true;
         hero.sprite_hurting.mirror = true;
     }

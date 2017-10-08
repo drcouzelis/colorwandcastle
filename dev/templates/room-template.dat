@@ -1,24 +1,33 @@
 # Name of the room
 # Is the entire length of the line, including spaces
+# Default: no title
 TITLE Blargitty!
 
 # Hero start position
+# Default: 2 2
 START 2 2
 
 # The direction of the level (shooting stars)
+# Default: RIGHT
 DIRECTION RIGHT
 
+# The direction the hero is facing, left or right
+# Default: RIGHT
+FACING RIGHT
+
 # Size of the room
-# Defaults to 16x12
+# Default: 16 12
 SIZE 16 12
 
 # Import a default set of tiles and blocks
+# Default: no tiles or blocks
 IMPORT tiles-template.dat
 IMPORT textures-template.dat
 
 # The background is tiles that are drawn underneath everything else
 # Tiles are represented by their corresponding integer value
 # 0 (zero) is an empty tile
+# Default: all 0
 BACKGROUND
 #    01  02  03  04  05  06  07  08  09  10  11  12  13  14  15
 #################################################################
@@ -38,6 +47,7 @@ BACKGROUND
 # The foreground is tiles on the same plane as the hero
 # Tiles are represented by their corresponding integer value
 # 0 (zero) is an empty tile
+# Default: all 0
 FOREGROUND
 #    01  02  03  04  05  06  07  08  09  10  11  12  13  14  15
 #################################################################
@@ -58,6 +68,7 @@ FOREGROUND
 # If no collision map is defined, then the foreground is used
 # 1 (one) is solid
 # 0 (zero) is able to be passed through
+# Default: set to the same as the foreground map
 COLLISION
 #    01  02  03  04  05  06  07  08  09  10  11  12  13  14  15
 #################################################################
@@ -78,6 +89,7 @@ COLLISION
 # Enter an integer for a specific block
 # 0 (zero) is for blank
 # -1 (any negative number) will display a random block
+# Default: all 0
 BLOCKS
 #    01  02  03  04  05  06  07  08  09  10  11  12  13  14  15
 #################################################################
@@ -94,10 +106,19 @@ BLOCKS
 000 000 000 000 000 000 000 000 000 000 000 000 000 002 -01 000 # 10
 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 # 11
 
+# Exit location
+# Can be on any of the four borders of the room
+# The number specifies the corresponding row or column on that edge
+# Default: no exits, a door will appear when the last block is cleared
+EXIT DOWN 1
+
 # ENEMY type row col speed dist
 # Type: LEFTRIGHT, UPDOWN, DIAGONAL
 # Row, Col: Starting position in the room
 # Speed: In Pixels-Per-Second
 # Dist: Distance to travel in pixels, neg num to bounce
+# Default: no enemies
 ENEMY LEFTRIGHT 9 5 30 -1
 ENEMY UPDOWN 6 9 30 -1
+ENEMY DIAGONAL 8 6 30 -1
+ENEMY BLOCKER 11 1 30 -1
