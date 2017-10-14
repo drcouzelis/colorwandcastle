@@ -696,6 +696,34 @@ static void to_gameplay_state_starting_after_dying()
     to_gameplay_state_playing();
 }
 
+static bool load_gameplay_room_from_filename(const char *filename)
+{
+    assert(is_gameplay_init);
+
+    bool success = load_room_from_datafile_with_filename(filename, &room);
+
+    if (success) {
+        load_blocks_from_orig();
+        load_enemies_from_definitions();
+    }
+
+    return success;
+}
+
+static bool load_gameplay_room_from_num(int room_num)
+{
+    assert(is_gameplay_init);
+    assert(room_num < room_list.size);
+
+    bool success = load_gameplay_room_from_filename(room_list.filenames[room_num]);
+
+    if (success) {
+        curr_room = room_num;
+    }
+
+    return success;
+}
+
 static void start_next_room()
 {
     /* Clear the old room */
@@ -1414,20 +1442,6 @@ static void draw_gameplay_playing()
     }
 }
 
-static bool load_gameplay_room_from_filename(const char *filename)
-{
-    assert(is_gameplay_init);
-
-    bool success = load_room_from_datafile_with_filename(filename, &room);
-
-    if (success) {
-        load_blocks_from_orig();
-        load_enemies_from_definitions();
-    }
-
-    return success;
-}
-
 bool load_gameplay_room_list_from_filename(const char *filename)
 {
     assert(is_gameplay_init);
@@ -1444,20 +1458,6 @@ void set_curr_room(int room_num)
     assert(room_num < room_list.size);
 
     curr_room = room_num;
-}
-
-bool load_gameplay_room_from_num(int room_num)
-{
-    assert(is_gameplay_init);
-    assert(room_num < room_list.size);
-
-    bool success = load_gameplay_room_from_filename(room_list.filenames[room_num]);
-
-    if (success) {
-        curr_room = room_num;
-    }
-
-    return success;
 }
 
 bool add_gameplay_room_filename_to_room_list(const char *filename)

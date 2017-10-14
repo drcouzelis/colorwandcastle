@@ -262,6 +262,12 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     bool foreground_map_used = false;
     bool collision_map_used = false;
 
+    /* Use the filename as the "title" */
+    /* (This will get overwritten if the "TITLE" value is set) */
+    if (strnlen(room->title, MAX_STRING_SIZE) == 0) {
+        strncpy(room->title, filename, MAX_STRING_SIZE);
+    }
+
     /* Start reading through the file! */
     while (fscanf(file, "%s", string) != EOF) {
 
@@ -504,6 +510,13 @@ bool load_room_list_from_datafile_with_filename(const char *filename, ROOM_LIST 
     }
 
     close_data_file(file);
+
+    /*
+    printf("Room list loaded:\n");
+    for (int i = 0; i < room_list->size; i++) {
+        printf("    \"%s\"\n", room_list->filenames[i]);
+    }
+    */
 
     return true;
 }

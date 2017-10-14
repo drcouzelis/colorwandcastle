@@ -84,10 +84,11 @@ int main(int argc, char **argv)
 
     /* LOAD THE FIRST LEVEL */
 
-    /* If command line arguments have been given and it's not a number... */
-    int room_num = -1;
+    int room_num = 1;
+
+    /* Try to read the command line argument as a number... */
     if (argc > 1 && sscanf(argv[1], "%d", &room_num) != 1) {
-        /* ...otherwise add them all as level filenames */
+        /* ...otherwise add all command line arguments as level filenames */
         for (int i = 1; i < argc; i++) {
             add_gameplay_room_filename_to_room_list(argv[i]);
         }
@@ -96,10 +97,9 @@ int main(int argc, char **argv)
         load_gameplay_room_list_from_filename("list-story.dat"); /* This can eventually be chosen from a menu */
     }
 
-    /* If a room number was given on the command line, then load that room */
-    if (room_num > 0) {
-        load_gameplay_room_from_num(room_num - 1);
-    }
+    /* Set the first room number */
+    /* In a normal game, this will start at 0 */
+    set_curr_room(room_num - 1);
 
     /* RUN THE GAME */
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);

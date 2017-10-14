@@ -89,6 +89,7 @@ dist_levelsdata_DATA = \
   data/levels/room-story-004.dat \
   data/levels/room-story-005.dat \
   data/levels/room-story-006.dat \
+  data/levels/room-story-007.dat \
   data/levels/room-makayla.dat \
   data/levels/room-rawson.dat \
   data/levels/room-rawson-2.dat \
