@@ -59,7 +59,7 @@ void lock_resource(const char *name)
 {
     for (int i = 0; i < MAX_RESOURCES; i++) {
         if (resources[i] != NULL) {
-            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
+            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
                 resources[i]->locked = true;
                 return;
             }
@@ -113,14 +113,14 @@ static IMAGE *load_bitmap_with_magic_pink(const char *filename)
         char *ptr = NULL;
 
         char working_filename[MAX_FILEPATH_LEN];
-        strncpy(working_filename, filename, MAX_FILEPATH_LEN);
+        strncpy(working_filename, filename, MAX_FILEPATH_LEN - 1);
 
         /* Get the actual filename */
         ptr = strtok(working_filename, ":");
         if (ptr == NULL) {
             return NULL;
         }
-        strncpy(actual_filename, ptr, MAX_FILEPATH_LEN);
+        strncpy(actual_filename, ptr, MAX_FILEPATH_LEN - 1);
 
         /* Get the "WxH" size of each tile in the tilemap */
         ptr = strtok(NULL, ":");
@@ -218,7 +218,7 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
      */
     for (i = 0; i < MAX_RESOURCES; i++) {
         if (resources[i] != NULL) {
-            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN) == 0) {
+            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
                 /* The resource has been found! Return it */
                 return resources[i]->data;
             }
@@ -242,8 +242,8 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
     for (i = 0; i < num_resource_paths; i++) {
 
         fullpath[0] = '\0';
-        strncat(fullpath, resource_paths[i], MAX_FILEPATH_LEN);
-        strncat(fullpath, name, MAX_FILEPATH_LEN);
+        strncat(fullpath, resource_paths[i], MAX_FILEPATH_LEN - 1);
+        strncat(fullpath, name, MAX_FILEPATH_LEN - 1);
 
         /* Load the resource, based on the filetype */
         if (type == RESOURCE_TYPE_IMAGE) {

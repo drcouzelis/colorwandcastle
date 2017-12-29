@@ -35,8 +35,8 @@ FILE *open_data_file(const char *name)
     for (int i = 0; i < num_datafile_paths; i++) {
 
         fullpath[0] = '\0';
-        strncat(fullpath, datafile_paths[i], MAX_DATAFILE_FILENAME_SIZE);
-        strncat(fullpath, name, MAX_DATAFILE_FILENAME_SIZE);
+        strncat(fullpath, datafile_paths[i], MAX_DATAFILE_FILENAME_SIZE - 1);
+        strncat(fullpath, name, MAX_DATAFILE_FILENAME_SIZE - 1);
 
         file = fopen(fullpath, "r");
 
@@ -69,7 +69,7 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
             continue;
         }
 
-        if (strncmp(string, "IMAGE", MAX_STRING_SIZE) == 0) {
+        if (strncmp(string, "IMAGE", MAX_STRING_SIZE - 1) == 0) {
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
@@ -77,7 +77,7 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
             continue;
         }
 
-        if (strncmp(string, "END", MAX_STRING_SIZE) == 0) {
+        if (strncmp(string, "END", MAX_STRING_SIZE - 1) == 0) {
             break;
         }
     }
@@ -264,8 +264,8 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     /* Use the filename as the "title" */
     /* (This will get overwritten if the "TITLE" value is set) */
-    if (strnlen(room->title, MAX_STRING_SIZE) == 0) {
-        strncpy(room->title, filename, MAX_STRING_SIZE);
+    if (strlen(room->title) == 0) {
+        strncpy(room->title, filename, MAX_STRING_SIZE - 1);
     }
 
     /* Start reading through the file! */
@@ -294,7 +294,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
         if (strncmp(string, "TITLE", MAX_STRING_SIZE) == 0) {
             if (fgets(room->title, MAX_STRING_SIZE, file) != NULL) {
                 /* Get rid of the spaces at the beginning */
-                trim_string(room->title, strnlen(room->title, MAX_STRING_SIZE));
+                trim_string(room->title, strlen(room->title));
             } else {
                 fprintf(stderr, "Failed to read title of room.\n");
             }

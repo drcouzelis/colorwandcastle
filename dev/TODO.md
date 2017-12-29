@@ -1,5 +1,8 @@
 # Colorwand Castle
 
+# Remove strcpy, strcat, strncpy, strncat
+# Use malloc, free, strlen, memcpy, snprintf
+
 ## Game specs
 
 - Resolution: 320x240 (16x12 blocks)
