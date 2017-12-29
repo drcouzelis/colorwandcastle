@@ -755,6 +755,8 @@ static void to_gameplay_state_leaving_room()
 
 static bool update_gameplay_leaving_room()
 {
+    /* YOU LEFT OFF HERE!!! */
+    /* Make sure the hero ends up in a position that is playable */
     hero.body.x += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].x_offset * HERO_SPEED);
     hero.body.y += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].y_offset * HERO_SPEED);
     animate(hero.sprite);
@@ -819,6 +821,11 @@ static void to_gameplay_state_scroll_rooms()
     /* Set the hero pos to match where they entered the room... */
     hero.body.x = old_hero_pos_x - screenshot2.x;
     hero.body.y = old_hero_pos_y - screenshot2.y;
+
+    /* YOU LEFT OFF HERE!!! */
+    /* Fix a temporary bug, which let the hero get stuck in a wall in a new room */
+    hero.body.x = room.start_x;
+    hero.body.y = room.start_y;
 
     /* And save the hero pos as the new room default */
     room.start_x = hero.body.x;
@@ -1322,11 +1329,13 @@ static bool update_gameplay_playing()
         /* Check each of the exits, is the hero touching an exit? */
         for (int i = 0; i < MAX_EXITS; i++) {
 
-            if (!room.exits[i].active) {
+            EXIT *exit = &room.exits[i];
+
+            if (!exit->active) {
                 continue;
             }
 
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, room.exits[i].col * TILE_SIZE, room.exits[i].row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
 
                 room.used_exit_num = i;
 
