@@ -43,3 +43,18 @@ bool is_inside(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
     /* ...NOT completely inside the other */
     return false;
 }
+
+bool is_point_in(int x, int y, int x1, int y1, int w1, int h1)
+{
+    /**
+     * If one is to the right of two or if one is below two or
+     * if two is to the right of one or if two is below one...
+     */
+    if ((x >= x1) && (x <= x1 + w1) && (y >= y1) && (y <= y1 + h1)) {
+        /* The point is completely inside the rectangle */
+        return true;
+    }
+
+    /* ...NOT completely inside the rectangle */
+    return false;
+}

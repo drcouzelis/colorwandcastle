@@ -141,7 +141,9 @@ bool init_display(int width, int height, bool fullscreen)
         return false;
     }
 
-    /* Clear the display */
+    /* Clear both the display and the buffer */
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_flip_display();
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
     display_fullscreen = fullscreen;

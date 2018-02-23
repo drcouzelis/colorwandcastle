@@ -755,8 +755,6 @@ static void to_gameplay_state_leaving_room()
 
 static bool update_gameplay_leaving_room()
 {
-    /* YOU LEFT OFF HERE!!! */
-    /* Make sure the hero ends up in a position that is playable */
     hero.body.x += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].x_offset * HERO_SPEED);
     hero.body.y += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].y_offset * HERO_SPEED);
     animate(hero.sprite);
@@ -821,11 +819,6 @@ static void to_gameplay_state_scroll_rooms()
     /* Set the hero pos to match where they entered the room... */
     hero.body.x = old_hero_pos_x - screenshot2.x;
     hero.body.y = old_hero_pos_y - screenshot2.y;
-
-    /* YOU LEFT OFF HERE!!! */
-    /* Fix a temporary bug, which let the hero get stuck in a wall in a new room */
-    hero.body.x = room.start_x;
-    hero.body.y = room.start_y;
 
     /* And save the hero pos as the new room default */
     room.start_x = hero.body.x;
@@ -1257,6 +1250,40 @@ static void to_gameplay_state_dying()
     update = update_gameplay_dying;
 }
 
+static bool is_hero_in_exit(EXIT *exit)
+{
+    BODY *b = &hero.body;
+    int num_corners = 0;
+
+    /* If more than one corner is in the exit, return true */
+
+    /* Upper left */
+    if (is_point_in(b->x, b->y, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+        num_corners++;
+    }
+
+    /* Upper right */
+    if (is_point_in(b->x + b->w, b->y, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+        num_corners++;
+    }
+
+    /* Lower left */
+    if (is_point_in(b->x, b->y + b->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+        num_corners++;
+    }
+
+    /* Lower right */
+    if (is_point_in(b->x + b->w, b->y + b->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+        num_corners++;
+    }
+
+    if (num_corners < 2) {
+        return false;
+    }
+
+    return true;
+}
+
 static bool update_gameplay_playing()
 {
     /* Hero */
@@ -1335,10 +1362,9 @@ static bool update_gameplay_playing()
                 continue;
             }
 
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
-
+            // YOU LEFT OFF HERE!!
+            if (is_hero_in_exit(exit)) {
                 room.used_exit_num = i;
-
                 to_gameplay_state_door_entered();
             }
         }
