@@ -117,6 +117,23 @@ ALLEGRO_DISPLAY *get_display(void)
     return display;
 }
 
+void clear_frame(void)
+{
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+
+    /**
+     * This complicated mess of functions will ensure that the ENTIRE screen
+     * is cleared, not just the part that's being used as a display.
+     */
+    al_get_clipping_rectangle(&x, &y, &w, &h);
+    al_set_clipping_rectangle(0, 0, al_get_display_width(display), al_get_display_height(display));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_set_clipping_rectangle(x, y, w, h);
+}
+
 bool init_display(int width, int height, bool fullscreen)
 {
     /* Get rid of the old display */

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "display.h"
 #include "run.h"
 
@@ -11,6 +12,7 @@ void set_fps(int fps)
 
 void set_display(ALLEGRO_DISPLAY *display)
 {
+    fprintf(stderr, "WARNING: set_display is empty.\n");
 }
 
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
@@ -48,7 +50,7 @@ void run(void (*control)(void *data, ALLEGRO_EVENT *event),
     
         if (redraw && al_is_event_queue_empty(events)) {
             if (draw != NULL) {
-                al_clear_to_color(al_map_rgb(0, 0, 0));
+                clear_frame();
                 draw(data); /* DRAW */
                 al_flip_display();
                 redraw = false;

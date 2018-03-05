@@ -22,6 +22,12 @@ void free_display();
 ALLEGRO_DISPLAY *get_display(void);
 
 /**
+ * Clear the entire screen (not just the part that is
+ * being drawn on).
+ */
+void clear_frame(void);
+
+/**
  * Simply use this function to toggle between windowed
  * mode and fullscreen mode.
  */
