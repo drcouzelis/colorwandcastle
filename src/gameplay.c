@@ -905,7 +905,7 @@ static void control_gameplay_options(ALLEGRO_EVENT *event)
             toggle_fullscreen();
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
             /* Toggle the hero */
-            toggle_hero(&hero, &room);
+            toggle_hero();
         }
     } else if (event->type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         end_gameplay = true;
