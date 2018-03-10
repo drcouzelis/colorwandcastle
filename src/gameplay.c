@@ -1336,7 +1336,18 @@ static bool update_gameplay_playing()
         /* Level clear! */
         room.cleared = true;
 
-        play_sound(SND("room-cleared.wav"));
+        /* Play the room cleared sound, but only if there were blocks to clear */
+        for (int r = 0; r < room.rows; r++) {
+            for (int c = 0; c < room.cols; c++) {
+                if (room.block_map_orig[(r * room.cols) + c] >= 0) {
+                    /* At least one block has been found! */
+                    play_sound(SND("room-cleared.wav"));
+                    /* Break out of the loop */
+                    r = room.rows;
+                    c = room.cols;
+                }
+            }
+        }
 
         /* Get rid of those nasty enemies */
         for (int i = 0; i < MAX_ENEMIES; i++) {
