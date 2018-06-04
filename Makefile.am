@@ -97,6 +97,7 @@ dist_levelsdata_DATA = \
   data/levels/room-makayla.dat \
   data/levels/room-rawson.dat \
   data/levels/room-rawson-2.dat \
+  data/levels/room-hard.dat \
   data/levels/room-test.dat \
   data/levels/texture-colored.dat \
   data/levels/texture-colored-2.dat \
