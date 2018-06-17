@@ -134,23 +134,46 @@ void clear_frame(void)
     al_set_clipping_rectangle(x, y, w, h);
 }
 
+static void set_display_clipping()
+{
+    int scale = get_max_display_scale(display_width, display_height, display_fullscreen);
+
+    int offset_x = 0;
+    int offset_y = 0;
+    
+    if (display_fullscreen) {
+        int current_w = 0;
+        int current_h = 0;
+        get_current_desktop_resolution(&current_w, &current_h);
+        offset_x = (int)(current_w - (display_width * scale)) / 2;
+        offset_y = (int)(current_h - (display_height * scale)) / 2;
+    }
+
+    /* Scale and center the display as big as possible on this screen */
+    set_display_transform(scale, offset_x, offset_y, display_fullscreen);
+
+    /* Crop the drawing area, to not accidentally draw in the black borders */
+    al_set_clipping_rectangle(offset_x, offset_y, display_width * scale, display_height * scale);
+}
+
 bool init_display(int width, int height, bool fullscreen)
 {
-    /* Get rid of the old display */
-    free_display();
-
-    /**
-     * Find out how many times we can scale the window and still fit
-     * the resolution of the monitor.
-     */
-    int scale = get_max_display_scale(width, height, fullscreen);
-
+    display_fullscreen = fullscreen;
+    display_width = width;
+    display_height = height;
+  
     if (fullscreen) {
         al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
     } else {
         al_set_new_display_flags(ALLEGRO_WINDOWED);
     }
   
+    /**
+     * Find out how many times we can scale the window and still fit
+     * the resolution of the monitor.
+     */
+    int scale = get_max_display_scale(width, height, fullscreen);
+
     /* Initialize the one and only global display for the game */
     display = al_create_display(width * scale, height * scale);
     if (display == NULL) {
@@ -163,26 +186,7 @@ bool init_display(int width, int height, bool fullscreen)
     al_flip_display();
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
-    display_fullscreen = fullscreen;
-    display_width = width;
-    display_height = height;
-  
-    int offset_x = 0;
-    int offset_y = 0;
-    
-    if (fullscreen) {
-        int current_w = 0;
-        int current_h = 0;
-        get_current_desktop_resolution(&current_w, &current_h);
-        offset_x = (int)(current_w - (width * scale)) / 2;
-        offset_y = (int)(current_h - (height * scale)) / 2;
-    }
-
-    /* Scale and center the display as big as possible on this screen */
-    set_display_transform(scale, offset_x, offset_y, fullscreen);
-
-    /* Crop the drawing area, to not accidentally draw in the black borders */
-    al_set_clipping_rectangle(offset_x, offset_y, display_width * scale, display_height * scale);
+    set_display_clipping();
   
     /* Hide the mouse cursor */
     al_hide_mouse_cursor(display);
@@ -193,7 +197,16 @@ bool init_display(int width, int height, bool fullscreen)
 bool toggle_fullscreen(void)
 {
     display_fullscreen = display_fullscreen ? false : true;
-    return init_display(display_width, display_height, display_fullscreen);
+
+    /* Toggle the ALLEGRO_FULLSCREEN_WINDOW flag */
+    if (!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, display_fullscreen)) {
+        fprintf(stderr, "WARNING: Fullscreen toggle failed.\n");
+        return false;
+    }
+
+    set_display_clipping();
+  
+    return true;
 }
 
 void free_display()
