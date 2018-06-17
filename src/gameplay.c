@@ -370,8 +370,8 @@ void init_gameplay()
     load_screenshot(&screenshot1, "screenshot1");
     load_screenshot(&screenshot2, "screenshot2");
 
-    control = NULL;
     update = NULL;
+    control = NULL;
     draw = NULL;
 
     to_gameplay_state_starting_new_game();
@@ -1236,8 +1236,8 @@ static bool update_gameplay_dying()
 
 static void to_gameplay_state_playing()
 {
-    control = control_gameplay_playing;
     update = update_gameplay_playing;
+    control = control_gameplay_playing;
     draw = draw_gameplay_playing;
 }
 
