@@ -81,6 +81,12 @@ static float convert_pps_to_fps(int pps)
 
 static void update_powerup_travel(POWERUP *powerup, void *data)
 {
+    // TODO: Make powerup move
+    // 
+    // If out of bounds then disappear
+    // If hit any block or tile then poof
+    // If collected then powerup
+
     animate(&powerup->sprite);
 }
 
@@ -226,17 +232,6 @@ static POWERUP *find_available_powerup()
     return NULL;
 }
 
-static EFFECT *find_available_effect()
-{
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        if (!effects[i].is_active) {
-            return &effects[i];
-        }
-    }
-
-    return NULL;
-}
-
 static void load_powerup(POWERUP_TYPE type, float x, float y)
 {
     POWERUP *powerup = find_available_powerup();
@@ -246,16 +241,35 @@ static void load_powerup(POWERUP_TYPE type, float x, float y)
         return;
     }
 
-    init_sprite(&powerup->sprite, false, 15);
-    add_frame(&powerup->sprite, IMG("powerup-speed-1.png"));
-    add_frame(&powerup->sprite, IMG("powerup-speed-2.png"));
-    powerup->sprite.x_offset = 0;
-    powerup->sprite.y_offset = 0;
     powerup->body.x = x;
     powerup->body.y = y;
     powerup->type = type;
+
+    init_sprite(&powerup->sprite, false, 15);
+
+    if (type == POWERUP_TYPE_SPEED) {
+        add_frame(&powerup->sprite, IMG("powerup-speed-1.png"));
+        add_frame(&powerup->sprite, IMG("powerup-speed-2.png"));
+    } else {
+        fprintf(stderr, "WARNING: Unknown powerup type %d.\n", type);
+        return;
+    }
+
+    /* Make the powerup move */
     powerup->update = update_powerup_travel;
+
     powerup->is_active = true;
+}
+
+static EFFECT *find_available_effect()
+{
+    for (int i = 0; i < MAX_EFFECTS; i++) {
+        if (!effects[i].is_active) {
+            return &effects[i];
+        }
+    }
+
+    return NULL;
 }
 
 static void load_poof_effect(float x, float y)
