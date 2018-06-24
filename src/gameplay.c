@@ -57,6 +57,7 @@ static HERO hero;
 static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
+static POWERUP powerups[MAX_POWERUPS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
@@ -76,6 +77,11 @@ static SCREENSHOT screenshot2;
 static float convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
+}
+
+static void update_powerup_travel(POWERUP *powerup, void *data)
+{
+    animate(&powerup->sprite);
 }
 
 static void update_effect_until_done_animating(EFFECT *effect, void *data)
@@ -209,6 +215,17 @@ static void load_hero_sprite()
     }
 }
 
+static POWERUP *find_available_powerup()
+{
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (!powerups[i].is_active) {
+            return &powerups[i];
+        }
+    }
+
+    return NULL;
+}
+
 static EFFECT *find_available_effect()
 {
     for (int i = 0; i < MAX_EFFECTS; i++) {
@@ -218,6 +235,27 @@ static EFFECT *find_available_effect()
     }
 
     return NULL;
+}
+
+static void load_powerup(POWERUP_TYPE type, float x, float y)
+{
+    POWERUP *powerup = find_available_powerup();
+
+    if (powerup == NULL) {
+        fprintf(stderr, "Failed to find available powerup.\n");
+        return;
+    }
+
+    init_sprite(&powerup->sprite, false, 15);
+    add_frame(&powerup->sprite, IMG("powerup-speed-1.png"));
+    add_frame(&powerup->sprite, IMG("powerup-speed-2.png"));
+    powerup->sprite.x_offset = 0;
+    powerup->sprite.y_offset = 0;
+    powerup->body.x = x;
+    powerup->body.y = y;
+    powerup->type = type;
+    powerup->update = update_powerup_travel;
+    powerup->is_active = true;
 }
 
 static void load_poof_effect(float x, float y)
@@ -318,6 +356,13 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
                 hero->dx = hero->l ? -speed : 0;
                 break;
         }
+    }
+}
+
+static void init_powerups()
+{
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        init_powerups(&powerups[i]);
     }
 }
 
@@ -1401,6 +1446,13 @@ bool update_gameplay(void *data)
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (effects[i].is_active && effects[i].update != NULL) {
             effects[i].update(&effects[i], NULL);
+        }
+    }
+
+    /* Powerups */
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (powerups[i].is_active && powerups[i].update != NULL) {
+            powerups[i].update(&powerups[i], NULL);
         }
     }
 

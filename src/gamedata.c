@@ -155,6 +155,18 @@ void init_screenshot(SCREENSHOT *screenshot)
     screenshot->direction = NO_DIRECTION;
 }
 
+void init_powerup(POWERUP *powerup)
+{
+    powerup->is_active = false;
+    powerup->update = NULL;
+    init_sprite(&powerup->sprite, false, 0);
+    powerup->body.x = 0;
+    powerup->body.y = 0;
+    powerup->body.w = TILE_SIZE;
+    powerup->body.h = TILE_SIZE;
+    powerup->type = POWERUP_TYPE_NONE;
+}
+
 void init_effect(EFFECT *effect)
 {
     effect->is_active = false;

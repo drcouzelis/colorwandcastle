@@ -22,6 +22,7 @@
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 64
 #define MAX_EXITS 8
+#define MAX_POWERUPS 8
 #define MAX_EFFECTS 64
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
@@ -47,6 +48,14 @@ typedef enum
 
 typedef enum
 {
+    POWERUP_TYPE_NONE = 0,
+    POWERUP_TYPE_SPEED,
+    POWERUP_TYPE_SLOW,
+    POWERUP_TYPE_MULTI
+} POWERUP_TYPE;
+
+typedef enum
+{
     GAMEPLAY_DIFFICULTY_EASY = 0,
     GAMEPLAY_DIFFICULTY_NORMAL
 } GAMEPLAY_DIFFICULTY;
@@ -64,6 +73,18 @@ typedef struct
     int w;
     int h;
 } BODY;
+
+typedef struct POWERUP
+{
+    bool is_active;
+
+    SPRITE sprite;
+    BODY body;
+
+    POWERUP_TYPE type;
+
+    void (*update)(struct POWERUP *powerup, void *data);
+} POWERUP;
 
 typedef struct EFFECT
 {
@@ -269,6 +290,8 @@ void init_enemy(ENEMY *enemy);
 void init_room(ROOM *room);
 
 void init_room_list(ROOM_LIST *room_list);
+
+void init_powerup(POWERUP *powerup);
 
 void init_effect(EFFECT *effect);
 
