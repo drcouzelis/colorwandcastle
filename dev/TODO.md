@@ -73,12 +73,21 @@
 
 ## Powerups
 
-- [ ] Mega star, clears any two complete rows of blocks
 - [ ] Flashing star, clears any color block
-- [ ] Rapid star, shoot multiple stars at once
+- [ ] Speed up, cumulative, to end of room
+- [ ] Speed down, cumulative, to end of room
+- [ ] Star weaken, cumulative
+- [ ] Star toughen, cumulative
+- [ ] Laser star, 5 shots, clear all stars in path to wall
+- [ ] Boom star, 5 shots, clear all adjacent blocks
+- [ ] Time stop, Freeze all enemies for 5 shots
+- [ ] Random, 3 shots, unknown color until shot
+- [ ] Invincible, to stars and enemies for 5 shots
 - [ ] Speed star, shoots fast
 - [ ] Slow star, shoots slow
 - [ ] Fragile star, doesn't bounce
+- [ ] Rapid star, shoot multiple stars at once
+- [ ] Mega star, clears any two complete rows of blocks
 
 ## Sound Effects
 
