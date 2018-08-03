@@ -73,21 +73,22 @@
 
 ## Powerups
 
-- [ ] Flashing star, clears any color block
-- [ ] Speed up, cumulative, to end of room
-- [ ] Speed down, cumulative, to end of room
-- [ ] Star weaken, cumulative
-- [ ] Star toughen, cumulative
-- [ ] Laser star, 5 shots, clear all stars in path to wall
-- [ ] Boom star, 5 shots, clear all adjacent blocks
+- [ ] Implemented in code like enemies (body, movement, collision)
+- [ ] Randomize each time the room is started / restarted
+- [ ] An item type will not appear if it won't have any effect
+- [ ] Flashing star, clears any color block (rainbow pattern)
+- [ ] Speed up, cumulative, to end of room (faster throb animation)
+- [ ] Speed down, cumulative, to end of room (slower throb animation)
+- [ ] Star weaken, cumulative (thinner border)
+- [ ] Star toughen, cumulative (thicker border)
+- [ ] Laser star, 5 shots, clear all stars in path to wall (fast throb animation, color cycle)
+- [ ] Boom star, 5 shots, clear all adjacent blocks (constant poof behind bullet)
 - [ ] Time stop, Freeze all enemies for 5 shots
-- [ ] Random, 3 shots, unknown color until shot
+- [ ] Random, 3 shots, unknown color until shot (cycle colors)
 - [ ] Invincible, to stars and enemies for 5 shots
 - [ ] Speed star, shoots fast
 - [ ] Slow star, shoots slow
-- [ ] Fragile star, doesn't bounce
-- [ ] Rapid star, shoot multiple stars at once
-- [ ] Mega star, clears any two complete rows of blocks
+- [ ] Fragile star, doesn't bounce (see star weaken)
 
 ## Sound Effects
 
