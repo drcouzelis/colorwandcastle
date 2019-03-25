@@ -86,7 +86,7 @@ void add_resource_path(const char *path)
     /**
      * Add the new path to the list of resource paths.
      */
-    strncpy(resource_paths[num_resource_paths], path, MAX_FILEPATH_LEN - 1);
+    strncpy(resource_paths[num_resource_paths], path, MAX_FILEPATH_LEN);
 
     num_resource_paths++;
 }
@@ -113,7 +113,7 @@ static IMAGE *load_bitmap_with_magic_pink(const char *filename)
         char *ptr = NULL;
 
         char working_filename[MAX_FILEPATH_LEN];
-        strncpy(working_filename, filename, MAX_FILEPATH_LEN - 1);
+        strncpy(working_filename, filename, MAX_FILEPATH_LEN);
 
         /* Get the actual filename */
         ptr = strtok(working_filename, ":");

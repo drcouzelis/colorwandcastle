@@ -21,7 +21,7 @@ void add_datafile_path(const char *path)
     /**
      * Add the new path to the list of resource paths.
      */
-    strncpy(datafile_paths[num_datafile_paths], path, MAX_DATAFILE_FILENAME_SIZE - 1);
+    strncpy(datafile_paths[num_datafile_paths], path, MAX_DATAFILE_FILENAME_SIZE);
 
     num_datafile_paths++;
 }
