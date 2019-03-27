@@ -271,19 +271,19 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = true;
-                hero->dy = -speed;
+                hero->body.dy = -speed;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = true;
-                hero->dy = speed;
+                hero->body.dy = speed;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = true;
-                hero->dx = -speed;
+                hero->body.dx = -speed;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = true;
-                hero->dx = speed;
+                hero->body.dx = speed;
                 break;
             case ALLEGRO_KEY_SPACE:
                 hero->shoot = true;
@@ -303,19 +303,19 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
         switch (key) {
             case ALLEGRO_KEY_UP:
                 hero->u = false;
-                hero->dy = hero->d ? speed : 0;
+                hero->body.dy = hero->d ? speed : 0;
                 break;
             case ALLEGRO_KEY_DOWN:
                 hero->d = false;
-                hero->dy = hero->u ? -speed : 0;
+                hero->body.dy = hero->u ? -speed : 0;
                 break;
             case ALLEGRO_KEY_LEFT:
                 hero->l = false;
-                hero->dx = hero->r ? speed : 0;
+                hero->body.dx = hero->r ? speed : 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 hero->r = false;
-                hero->dx = hero->l ? -speed : 0;
+                hero->body.dx = hero->l ? -speed : 0;
                 break;
         }
     }
@@ -389,8 +389,8 @@ static void clear_hero_input()
     hero.shoot = false;
 
     /* Stop the hero from moving for the moment */
-    hero.dx = 0;
-    hero.dy = 0;
+    hero.body.dx = 0;
+    hero.body.dy = 0;
 }
 
 static void reset_hero(int x, int y)
@@ -527,21 +527,21 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     float old_y = enemy->body.y;
 
     /* Vertical movement */
-    enemy->body.y += convert_pps_to_fps(enemy->dy);
+    enemy->body.y += convert_pps_to_fps(enemy->body.dy);
 
     /* Check for vertical collisions */
     if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body)) {
         enemy->body.y = old_y;
-        enemy->dy *= -1;
+        enemy->body.dy *= -1;
     }
 
     /* Horizontal movement */
-    enemy->body.x += convert_pps_to_fps(enemy->dx);
+    enemy->body.x += convert_pps_to_fps(enemy->body.dx);
 
     /* Check for horizontal collisions */
     if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body)) {
         enemy->body.x = old_x;
-        enemy->dx *= -1;
+        enemy->body.dx *= -1;
     }
 
     update_enemy_animation(enemy, data);
@@ -573,7 +573,7 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.y += 5;
         enemy->body.w = 10;
         enemy->body.h = 10;
-        enemy->dx = -definition->speed;
+        enemy->body.dx = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
         init_sprite(&enemy->sprite, true, 8);
@@ -591,7 +591,7 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.y += 5;
         enemy->body.w = 10;
         enemy->body.h = 10;
-        enemy->dy = -definition->speed;
+        enemy->body.dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
         init_sprite(&enemy->sprite, true, 10);
@@ -605,8 +605,8 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.y += 5;
         enemy->body.w = 10;
         enemy->body.h = 10;
-        enemy->dx = definition->speed;
-        enemy->dy = -definition->speed;
+        enemy->body.dx = definition->speed;
+        enemy->body.dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
         init_sprite(&enemy->sprite, true, 1);
@@ -969,8 +969,8 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
 
             bullet->hits--;
             /* Bounce */
-            bullet->dx *= -1;
-            bullet->dy *= -1;
+            bullet->body.dx *= -1;
+            bullet->body.dy *= -1;
             play_sound(SND("bullet-bounce.wav"));
         }
 
@@ -990,8 +990,8 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             play_sound(SND("bullet-disolve.wav"));
         } else {
             /* Bounce */
-            bullet->dx *= -1;
-            bullet->dy *= -1;
+            bullet->body.dx *= -1;
+            bullet->body.dy *= -1;
             play_sound(SND("bullet-bounce.wav"));
         }
 
@@ -1042,8 +1042,8 @@ static void shoot_bullet(int texture, float x, float y)
     float speed = TILE_SIZE * 10;
 
     /* Set the bullet's velocity based on the direction of the room */
-    bullet->dx = speed * directions[room.direction].x_offset;
-    bullet->dy = speed * directions[room.direction].y_offset;
+    bullet->body.dx = speed * directions[room.direction].x_offset;
+    bullet->body.dy = speed * directions[room.direction].y_offset;
 
     bullet->is_active = true;
 
@@ -1113,7 +1113,7 @@ static void update_hero_player_control()
     float old_y = hero.body.y;
 
     /* Vertical movement */
-    hero.body.y += convert_pps_to_fps(hero.dy);
+    hero.body.y += convert_pps_to_fps(hero.body.dy);
 
     /* Check for vertical collisions */
     if (is_out_of_bounds(&hero.body) || is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
@@ -1121,7 +1121,7 @@ static void update_hero_player_control()
     }
 
     /* Horizontal movement */
-    hero.body.x += convert_pps_to_fps(hero.dx);
+    hero.body.x += convert_pps_to_fps(hero.body.dx);
 
     /* Check for horizontal collisions */
     if (is_out_of_bounds(&hero.body) || is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
@@ -1188,7 +1188,7 @@ static void update_hero_bullets()
         BULLET *bullet = &hero_bullets[i];
 
         /* Move */
-        move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->dx), bullet->body.y + convert_pps_to_fps(bullet->dy));
+        move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->body.dx), bullet->body.y + convert_pps_to_fps(bullet->body.dy));
 
         /* Animate */
         animate(&bullet->sprite);
@@ -1205,8 +1205,8 @@ static void set_hero_death()
     hero.sprite = &hero.sprite_hurting;
 
     /* These velocity settings create a nice "up then down" movement for the dying hero */
-    hero.dx = 0;
-    hero.dy = -300;
+    hero.body.dx = 0;
+    hero.body.dy = -300;
 
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
@@ -1221,8 +1221,8 @@ static bool update_gameplay_dying()
     /* HERO IS DEAD */
 
     /* This creates a nice "up then down" motion for the hero to fall when dying */
-    hero.dy += 10;
-    hero.body.y += convert_pps_to_fps(hero.dy);
+    hero.body.dy += 10;
+    hero.body.y += convert_pps_to_fps(hero.body.dy);
 
     animate(hero.sprite);
 

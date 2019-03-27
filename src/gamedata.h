@@ -67,10 +67,12 @@ typedef enum
 
 typedef struct
 {
-    float x;
-    float y;
-    int w;
-    int h;
+    float x; /* X position */
+    float y; /* Y position */
+    int w;   /* Width */
+    int h;   /* Height */
+    int dx;  /* Horizontal velocity, in pixels per second */
+    int dy;  /* Vertical velocity */
 } BODY;
 
 //typedef struct POWERUP
@@ -121,8 +123,6 @@ typedef struct
     int hits;
 
     BODY body;
-    int dx; /* In pixels per second */
-    int dy; /* In pixels per second */
 } BULLET;
 
 typedef struct HERO
@@ -134,8 +134,6 @@ typedef struct HERO
     SPRITE *sprite; /* The current active sprite */
 
     BODY body;
-    int dx; /* In pixels per second */
-    int dy; /* In pixels per second */
 
     /* Movement toggles */
     /* True means the hero is moving in that direction */
@@ -169,8 +167,6 @@ typedef struct ENEMY
     SPRITE sprite;
 
     BODY body;
-    int dx;
-    int dy;
 
     int speed; /* In PPS */
     int dist; /* In pixels, how far to travel before turning around, -1 to bounce */

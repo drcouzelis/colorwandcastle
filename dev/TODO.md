@@ -41,6 +41,8 @@
 - [x] Simplify and unify the color scheme
 - [ ] Get rid of memory library - static allocation only
 - [ ] Two types of rooms - NORMAL and BOSS
+- [ ] Gamepad support
+- [ ] Background music
 
 ## Room Theme Ideas
 

@@ -17,13 +17,13 @@ void init_hero(HERO *hero)
     hero->body.w = 10;
     hero->body.h = 10;
 
+    hero->body.dx = 0;
+    hero->body.dy = 0;
+
     hero->u = false;
     hero->d = false;
     hero->l = false;
     hero->r = false;
-
-    hero->dx = 0;
-    hero->dy = 0;
 
     hero->shoot = false;
 
@@ -47,8 +47,8 @@ void init_enemy(ENEMY *enemy)
     enemy->body.y = 0;
     enemy->body.w = 0;
     enemy->body.h = 0;
-    enemy->dx = 0;
-    enemy->dy = 0;
+    enemy->body.dx = 0;
+    enemy->body.dy = 0;
     enemy->speed = 0;
     enemy->dist = 0;
     enemy->update = NULL;
