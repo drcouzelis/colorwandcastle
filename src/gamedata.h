@@ -24,6 +24,7 @@
 #define MAX_ENEMIES 64
 #define MAX_EXITS 8
 #define MAX_EFFECTS 64
+#define MAX_POWERUPS 8
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
 #define MAX_ROOMS 64
@@ -32,8 +33,6 @@
 #define TYPE int
 #define SUBTYPE int
 #define UNDEFINED_TYPE -1
-
-#define EFFECT2 ACTOR
 
 typedef enum
 {
@@ -82,6 +81,17 @@ typedef struct
     int dy;  /* Vertical velocity */
 } BODY;
 
+typedef struct EFFECT
+{
+    bool is_active;
+
+    SPRITE sprite;
+    float x;
+    float y;
+
+    void (*update)(struct EFFECT *effect, void *data);
+} EFFECT;
+
 typedef struct ACTOR
 {
     bool is_active;
@@ -98,29 +108,6 @@ typedef struct ACTOR
     void (*update)(struct ACTOR *actor, void *data);
     void (*draw)(struct ACTOR *actor, void *data);
 } ACTOR;
-
-//typedef struct POWERUP
-//{
-//    bool is_active;
-//
-//    SPRITE sprite;
-//    BODY body;
-//
-//    POWERUP_TYPE type;
-//
-//    void (*update)(struct POWERUP *powerup, void *data);
-//} POWERUP;
-
-typedef struct EFFECT
-{
-    bool is_active;
-
-    SPRITE sprite;
-    float x;
-    float y;
-
-    void (*update)(struct EFFECT *effect, void *data);
-} EFFECT;
 
 typedef struct
 {

@@ -57,7 +57,7 @@ static HERO hero;
 static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
-static EFFECT2 effects2[MAX_EFFECTS];
+static ACTOR powerups[MAX_POWERUPS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
@@ -88,13 +88,9 @@ static void update_effect_until_done_animating(EFFECT *effect, void *data)
     }
 }
 
-static void update_effect_until_done_animating2(EFFECT2 *effect, void *data)
+static void update_powerup(ACTOR *powerup, void *data)
 {
-    animate(get_curr_sprite(effect));
-
-    if (get_curr_sprite(effect)->done) {
-        effect->is_active = false;
-    }
+    animate(&powerup->sprites[powerup->curr_sprite]);
 }
 
 static int random_front_texture()
@@ -252,6 +248,48 @@ static void load_poof_effect(float x, float y)
     effect->is_active = true;
 }
 
+static ACTOR *find_available_powerup()
+{
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (!powerups[i].is_active) {
+            return &powerups[i];
+        }
+    }
+
+    return NULL;
+}
+
+static void draw_powerup(ACTOR *powerup, void *data)
+{
+    draw_sprite(&powerup->sprites[powerup->curr_sprite], powerup->body.x, powerup->body.y);
+}
+
+static void load_powerup(float x, float y)
+{
+    printf("Pretending to load a powerup...\n");
+
+    ACTOR *powerup = find_available_powerup();
+
+    if (powerup == NULL) {
+        fprintf(stderr, "Failed to find available powerup.\n");
+        return;
+    }
+
+    SPRITE *sprite = &powerup->sprites[powerup->curr_sprite];
+    init_sprite(sprite, true, 15);
+    add_frame(sprite, IMG("effect-poof-1.png"));
+    add_frame(sprite, IMG("effect-poof-2.png"));
+    add_frame(sprite, IMG("effect-poof-3.png"));
+    add_frame(sprite, IMG("effect-poof-4.png"));
+    sprite->x_offset = -10;
+    sprite->y_offset = -10;
+    powerup->body.x = x;
+    powerup->body.y = y;
+    powerup->draw = draw_powerup;
+    powerup->update = update_powerup;
+    powerup->is_active = true;
+}
+
 static void toggle_hero()
 {
     /* Toggle the hero type */
@@ -338,6 +376,13 @@ static void init_effects()
     }
 }
 
+static void init_powerups()
+{
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        init_actor(&powerups[i]);
+    }
+}
+
 static void init_hero_bullets()
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
@@ -371,6 +416,9 @@ void init_gameplay()
 
     /* Effects */
     init_effects();
+
+    /* Powerups */
+    init_powerups();
 
     /* Filename list */
     init_room_list(&room_list);
@@ -1249,6 +1297,10 @@ static void to_gameplay_state_playing()
     update = update_gameplay_playing;
     control = control_gameplay_playing;
     draw = draw_gameplay_playing;
+
+    /* TODO */
+    /* Create a dummy test powerup */
+    //load_powerup(5 * TILE_SIZE, 5 * TILE_SIZE);
 }
 
 static void to_gameplay_state_dying()
@@ -1294,6 +1346,11 @@ static bool is_hero_in_exit(EXIT *exit)
     return true;
 }
 
+static void collect_powerup(ACTOR *powerup)
+{
+    printf("Pretending to collect powerup...\n");
+}
+
 static bool update_gameplay_playing()
 {
     /* Hero */
@@ -1310,7 +1367,27 @@ static bool update_gameplay_playing()
         }
     }
 
-    /* Check for hurting collisions... */
+    /* Powerups */
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (powerups[i].is_active && powerups[i].update != NULL) {
+            powerups[i].update(&powerups[i], NULL);
+        }
+    }
+
+    /* Check for collisions... */
+
+    /* ...from powerups */
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (powerups[i].is_active) {
+            BODY *b1 = &hero.body;
+            BODY *b2 = &powerups[i].body;
+            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+                /* Destroy the powerup, because it was collected */
+                powerups[i].is_active = false;
+                collect_powerup(&powerups[i]);
+            }
+        }
+    }
 
     /* ...from bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
@@ -1479,6 +1556,13 @@ static void draw_gameplay_playing()
         ENEMY *enemy = &room.enemies[i];
         if (enemy->is_active) {
             draw_sprite(&enemy->sprite, enemy->body.x, enemy->body.y);
+        }
+    }
+
+    /* Draw powerups */
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (powerups[i].is_active && powerups[i].draw != NULL) {
+            powerups[i].draw(&powerups[i], NULL);
         }
     }
 
