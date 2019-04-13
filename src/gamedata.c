@@ -163,3 +163,32 @@ void init_effect(EFFECT *effect)
     effect->x = 0;
     effect->y = 0;
 }
+
+void init_actor(ACTOR *actor)
+{
+    actor->is_active = false;
+
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        init_sprite(&actor->sprites[i], false, 0);
+    }
+    actor->curr_sprite = 0;
+
+    actor->body.x = 0;
+    actor->body.y = 0;
+    actor->body.w = 0;
+    actor->body.h = 0;
+    actor->body.dx = 0;
+    actor->body.dy = 0;
+
+    actor->type = UNDEFINED_TYPE;
+    actor->subtype = UNDEFINED_TYPE;
+
+    actor->control = NULL;
+    actor->update = NULL;
+    actor->draw = NULL;
+}
+
+SPRITE *get_curr_sprite(ACTOR *actor)
+{
+    return &actor->sprites[actor->curr_sprite];
+}

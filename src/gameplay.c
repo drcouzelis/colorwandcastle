@@ -57,6 +57,7 @@ static HERO hero;
 static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
 static EFFECT effects[MAX_EFFECTS];
+static EFFECT2 effects2[MAX_EFFECTS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
@@ -83,6 +84,15 @@ static void update_effect_until_done_animating(EFFECT *effect, void *data)
     animate(&effect->sprite);
 
     if (effect->sprite.done) {
+        effect->is_active = false;
+    }
+}
+
+static void update_effect_until_done_animating2(EFFECT2 *effect, void *data)
+{
+    animate(get_curr_sprite(effect));
+
+    if (get_curr_sprite(effect)->done) {
         effect->is_active = false;
     }
 }

@@ -19,6 +19,7 @@
 #define MAX_ROOM_COLS 16
 #define MAX_ROOM_ROWS 12
 #define MAX_ROOM_SIZE (MAX_ROOM_COLS * MAX_ROOM_ROWS)
+#define MAX_SPRITES 4
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 64
 #define MAX_EXITS 8
@@ -27,6 +28,12 @@
 #define MAX_TEXTURES 128
 #define MAX_ROOMS 64
 #define MAX_STRING_SIZE 128
+
+#define TYPE int
+#define SUBTYPE int
+#define UNDEFINED_TYPE -1
+
+#define EFFECT2 ACTOR
 
 typedef enum
 {
@@ -74,6 +81,23 @@ typedef struct
     int dx;  /* Horizontal velocity, in pixels per second */
     int dy;  /* Vertical velocity */
 } BODY;
+
+typedef struct ACTOR
+{
+    bool is_active;
+
+    SPRITE sprites[MAX_SPRITES];
+    int curr_sprite;
+
+    BODY body;
+
+    TYPE type;
+    SUBTYPE subtype;
+
+    void (*control)(struct ACTOR *actor, void *data);
+    void (*update)(struct ACTOR *actor, void *data);
+    void (*draw)(struct ACTOR *actor, void *data);
+} ACTOR;
 
 //typedef struct POWERUP
 //{
@@ -289,5 +313,8 @@ void init_room_list(ROOM_LIST *room_list);
 void init_effect(EFFECT *effect);
 
 void init_screenshot(SCREENSHOT *screenshot);
+
+void init_actor(ACTOR *actor);
+SPRITE *get_curr_sprite(ACTOR *actor);
 
 #endif
