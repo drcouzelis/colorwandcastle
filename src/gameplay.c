@@ -276,11 +276,9 @@ static void load_powerup(float x, float y)
     }
 
     SPRITE *sprite = &powerup->sprites[powerup->curr_sprite];
-    init_sprite(sprite, true, 15);
-    add_frame(sprite, IMG("effect-poof-1.png"));
-    add_frame(sprite, IMG("effect-poof-2.png"));
-    add_frame(sprite, IMG("effect-poof-3.png"));
-    add_frame(sprite, IMG("effect-poof-4.png"));
+    init_sprite(sprite, true, 6);
+    add_frame(sprite, IMG("powerup-rainbow-1.png"));
+    add_frame(sprite, IMG("powerup-rainbow-2.png"));
     sprite->x_offset = -10;
     sprite->y_offset = -10;
     powerup->body.x = x;
