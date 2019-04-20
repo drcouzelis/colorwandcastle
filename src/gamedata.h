@@ -30,6 +30,8 @@
 #define MAX_ROOMS 64
 #define MAX_STRING_SIZE 128
 
+#define POWERUP_SPEED TILE_SIZE
+
 #define TYPE int
 #define SUBTYPE int
 #define UNDEFINED_TYPE -1
@@ -302,6 +304,6 @@ void init_effect(EFFECT *effect);
 void init_screenshot(SCREENSHOT *screenshot);
 
 void init_actor(ACTOR *actor);
-SPRITE *get_curr_sprite(ACTOR *actor);
+SPRITE *get_actor_sprite(ACTOR *actor);
 
 #endif

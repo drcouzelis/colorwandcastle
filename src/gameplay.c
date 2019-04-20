@@ -65,6 +65,10 @@ static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 static SCREENSHOT screenshot1;
 static SCREENSHOT screenshot2;
 
+/* The number of blocks to clear before a powerup appears */
+#define RESET_POWERUP_COUNTER -1
+static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
+
 /**
  * ...ENDS HERE.
  */
@@ -90,7 +94,11 @@ static void update_effect_until_done_animating(EFFECT *effect, void *data)
 
 static void update_powerup(ACTOR *powerup, void *data)
 {
-    animate(&powerup->sprites[powerup->curr_sprite]);
+    /* Powerup moves accross the screen */
+    powerup->body.x += convert_pps_to_fps(powerup->body.dx);
+    powerup->body.y += convert_pps_to_fps(powerup->body.dy);
+
+    animate(get_actor_sprite(powerup));
 }
 
 static int random_front_texture()
@@ -261,7 +269,7 @@ static ACTOR *find_available_powerup()
 
 static void draw_powerup(ACTOR *powerup, void *data)
 {
-    draw_sprite(&powerup->sprites[powerup->curr_sprite], powerup->body.x, powerup->body.y);
+    draw_sprite(get_actor_sprite(powerup), powerup->body.x, powerup->body.y);
 }
 
 static void load_powerup(float x, float y)
@@ -275,17 +283,21 @@ static void load_powerup(float x, float y)
         return;
     }
 
-    SPRITE *sprite = &powerup->sprites[powerup->curr_sprite];
+    SPRITE *sprite = get_actor_sprite(powerup);
     init_sprite(sprite, true, 6);
     add_frame(sprite, IMG("powerup-rainbow-1.png"));
     add_frame(sprite, IMG("powerup-rainbow-2.png"));
-    sprite->x_offset = -10;
-    sprite->y_offset = -10;
     powerup->body.x = x;
     powerup->body.y = y;
+    powerup->body.w = 20;
+    powerup->body.h = 20;
     powerup->draw = draw_powerup;
     powerup->update = update_powerup;
     powerup->is_active = true;
+
+    /* Set the powerup's velocity based on the direction of the room */
+    powerup->body.dx = POWERUP_SPEED * directions[room.direction].x_offset * -1;
+    powerup->body.dy = POWERUP_SPEED * directions[room.direction].y_offset * -1;
 }
 
 static void toggle_hero()
@@ -1021,6 +1033,11 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             room.door_x = c * TILE_SIZE;
             room.door_y = r * TILE_SIZE;
 
+            /* It could be time to give the player a powerup */
+            if (blocks_until_powerup_appears > 0) {
+                blocks_until_powerup_appears--;
+            }
+
         } else {
 
             bullet->hits--;
@@ -1295,10 +1312,6 @@ static void to_gameplay_state_playing()
     update = update_gameplay_playing;
     control = control_gameplay_playing;
     draw = draw_gameplay_playing;
-
-    /* TODO */
-    /* Create a dummy test powerup */
-    //load_powerup(5 * TILE_SIZE, 5 * TILE_SIZE);
 }
 
 static void to_gameplay_state_dying()
@@ -1347,6 +1360,9 @@ static bool is_hero_in_exit(EXIT *exit)
 static void collect_powerup(ACTOR *powerup)
 {
     printf("Pretending to collect powerup...\n");
+
+    /* Clear the powerup */
+    init_actor(powerup);
 }
 
 static bool update_gameplay_playing()
@@ -1442,6 +1458,19 @@ static bool update_gameplay_playing()
                 load_poof_effect(enemy->body.x - 5, enemy->body.y - 5);
             }
         }
+    }
+
+    /* Give the player a powerup? */
+    if (blocks_until_powerup_appears == 0 && !room.cleared && num_blocks() > 0) {
+        /* Create a dummy test powerup */
+        load_powerup(room.door_x, room.door_y);
+        blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
+    }
+
+    /* Set the number of blocks needed to be cleared until a new powerup appears */
+    if (blocks_until_powerup_appears == RESET_POWERUP_COUNTER) {
+        blocks_until_powerup_appears = random_number(5, 8);
+        printf("Next powerup will appear after %d blocks cleared.\n", blocks_until_powerup_appears);
     }
 
     /* Check for level completion */

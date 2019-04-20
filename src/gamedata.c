@@ -188,7 +188,7 @@ void init_actor(ACTOR *actor)
     actor->draw = NULL;
 }
 
-SPRITE *get_curr_sprite(ACTOR *actor)
+SPRITE *get_actor_sprite(ACTOR *actor)
 {
     return &actor->sprites[actor->curr_sprite];
 }
