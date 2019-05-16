@@ -1243,6 +1243,11 @@ static void update_hero()
 {
     update_hero_player_control();
 
+    /* Powerups */
+    if (hero.powerup_type == POWERUP_TYPE_MULTI) {
+        
+    }
+
     /* Graphics */
     animate(hero.sprite);
     animate(&hero.bullet);
@@ -1360,6 +1365,10 @@ static bool is_hero_in_exit(EXIT *exit)
 static void collect_powerup(ACTOR *powerup)
 {
     printf("Pretending to collect powerup...\n");
+
+    // YOU LEFT OFF HERE!!
+    //hero.powerup_type = POWERUP_TYPE_MULTI;
+    //hero.powerup_remaining = 3;
 
     /* Clear the powerup */
     init_actor(powerup);

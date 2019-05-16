@@ -33,6 +33,9 @@ void init_hero(HERO *hero)
     hero->texture = NO_TEXTURE;
     hero->has_bullet = false;
 
+    hero->powerup_type = POWERUP_TYPE_NONE;
+    hero->powerup_remaining = 0;
+
     hero->control = NULL;
     hero->update = NULL;
     hero->draw = NULL;

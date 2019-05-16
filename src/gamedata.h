@@ -165,6 +165,9 @@ typedef struct HERO
     float bullet_y;
     int texture;
 
+    POWERUP_TYPE powerup_type;
+    int powerup_remaining;
+
     void (*control)(struct HERO *hero, void *data);
     void (*update)(struct HERO *hero, void *data);
     void (*draw)(struct HERO *hero, void *data);
