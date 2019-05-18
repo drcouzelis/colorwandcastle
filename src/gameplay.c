@@ -189,10 +189,15 @@ static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame
 static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
 {
     if (texture == MULTI_TEXTURE) {
+        /* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
         init_sprite(sprite, true, 16);
+        /* Keep track of which "rotation" of the bullet you're on */
         int next_frame = 0;
+        /* Keep track of when to change to the next "rotation" of the bullet */
         int next_frame_count = 0;
-        for (int i = 0; i < room.num_textures * 4; i++) {
+        /* (If there's only one texture in the room, the bullet won't animate...) */
+        int num_textures = (room.num_textures == 1 ? 8 : room.num_textures * 4);
+        for (int i = 0; i < num_textures; i++) {
             add_frame(sprite, get_hero_bullet_image(room.textures[i % room.num_textures], hero_type, next_frame));
             next_frame_count++;
             if (next_frame_count >= 4) {
