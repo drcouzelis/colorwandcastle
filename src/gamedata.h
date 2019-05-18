@@ -11,6 +11,7 @@
 
 #define NO_TILE -1
 #define NO_TEXTURE -1
+#define MULTI_TEXTURE -2
 #define NO_BLOCK -1
 #define RANDOM_BLOCK -2
 #define COLLISION 0

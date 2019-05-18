@@ -3,7 +3,7 @@
 
 #include "resources.h"
 
-#define MAX_FRAMES 16
+#define MAX_FRAMES 32
 
 typedef struct
 {

@@ -186,11 +186,26 @@ static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame
     return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
 }
 
-static void load_hero_bullet_sprite(SPRITE *sprite, char *texture_name, int hero_type)
+static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
 {
-    init_sprite(sprite, true, 4);
-    add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 0));
-    add_frame(sprite, get_hero_bullet_image(texture_name, hero_type, 1));
+    if (texture == MULTI_TEXTURE) {
+        init_sprite(sprite, true, 16);
+        int next_frame = 0;
+        int next_frame_count = 0;
+        for (int i = 0; i < room.num_textures * 4; i++) {
+            add_frame(sprite, get_hero_bullet_image(room.textures[i % room.num_textures], hero_type, next_frame));
+            next_frame_count++;
+            if (next_frame_count >= 4) {
+                next_frame = (next_frame == 1 ? 0 : 1);
+                next_frame_count = 0;
+            }
+        }
+    } else {
+        init_sprite(sprite, true, 4);
+        add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 0));
+        add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 1));
+    }
+
     sprite->x_offset = -5;
     sprite->y_offset = -5;
 }
@@ -308,7 +323,7 @@ static void toggle_hero()
     load_hero_sprite();
 
     if (hero.has_bullet) {
-        load_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+        load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
     }
 
     load_poof_effect(hero.body.x - 5, hero.body.y - 5);
@@ -1084,6 +1099,10 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
 
 static void shoot_bullet(int texture, float x, float y)
 {
+    if (texture == NO_TEXTURE) {
+        return;
+    }
+
     /* Find the next available bullet slot */
     int i = 0;
     while (i < MAX_BULLETS) {
@@ -1102,7 +1121,7 @@ static void shoot_bullet(int texture, float x, float y)
     BULLET *bullet = &hero_bullets[i];
 
     /* Create the bullet! */
-    load_hero_bullet_sprite(&bullet->sprite, room.textures[texture], hero.type);
+    load_hero_bullet_sprite(&bullet->sprite, texture, hero.type);
     bullet->texture = texture;
     bullet->hits = 2;
     bullet->body.x = x;
@@ -1228,7 +1247,7 @@ static void update_hero_player_control()
         hero.texture = random_front_texture();
 
         if (hero.texture != NO_TEXTURE) {
-            load_hero_bullet_sprite(&hero.bullet, room.textures[hero.texture], hero.type);
+            load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
             hero.has_bullet = true;
         }
     }
