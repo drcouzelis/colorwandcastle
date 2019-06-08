@@ -33,11 +33,11 @@ typedef struct
 
 /**
  * Supply a direction, and get an offset, for convenience.
- * For example:
+ * For example...
  *
  *   directions[LEFT].x_offset
  *
- * Is "-1".
+ * ...is "-1".
  */
 extern const DIRECTION_MAP directions[4];
 
@@ -46,6 +46,7 @@ extern const DIRECTION_MAP directions[4];
  */
 DIRECTION string_to_direction(char *string);
 
+/* Print the text string of the direction to STDOUT */
 void print_direction(DIRECTION direction);
 
 #endif

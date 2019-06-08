@@ -61,11 +61,15 @@ static ACTOR powerups[MAX_POWERUPS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
-/* To hold "screenshots" of the rooms, for room transitions */
+/**
+ * To hold "screenshots" of the rooms, for room transitions.
+ * We need two, one for the current room (to scroll away),
+ * and one for the next room (to scroll in).
+ */
 static SCREENSHOT screenshot1;
 static SCREENSHOT screenshot2;
 
-/* The number of blocks to clear before a powerup appears */
+/* The number of blocks the hero needs to destroy before a powerup appears */
 #define RESET_POWERUP_COUNTER -1
 static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
 
@@ -103,6 +107,16 @@ static void update_powerup(ACTOR *powerup, void *data)
 
 static int random_front_texture()
 {
+    /**
+     * Returns a texture from the "front" of the pile of blocks.
+     * In other words, it's a block that is available to be hit
+     * by the hero.
+     *
+     * Used to generate the next bullet, since we only give the
+     * hero bullets that match a texture of a block that is
+     * possible to hit.
+     */
+
     int textures[MAX_TEXTURES];
     int num_textures = 0;
 

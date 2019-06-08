@@ -5,7 +5,7 @@
 
 /**
  * The directory paths that are entered using this function
- * are added a prefix to any filename that is opened.
+ * are added as a prefix to any filename that is opened.
  *
  * For example:
  *
@@ -39,7 +39,10 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room);
  */
 bool load_room_list_from_datafile_with_filename(const char *filename, ROOM_LIST *room_list);
 
-/* Print a room data structure to stdout */
+/**
+ * Print a room data structure to stdout,
+ * for debugging purposes.
+ */
 void print_room(ROOM *room, bool is_data_file_form);
 
 #endif
