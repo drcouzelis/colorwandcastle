@@ -64,11 +64,7 @@ static int get_max_display_scale(int window_w, int window_h, bool fullscreen)
     scale_x = monitor_w / (float) window_w;
     scale_y = monitor_h / (float) window_h;
   
-    if (scale_x < scale_y) {
-        scale = (int) scale_x;
-    } else {
-        scale = (int) scale_y;
-    }
+    scale = scale_x < scale_y ? (int) scale_x : (int) scale_y;
 
     if (fullscreen) {
         return scale;
@@ -107,6 +103,7 @@ static void set_display_transform(int scale, float offset_x, float offset_y, boo
     al_identity_transform(&trans);
     al_scale_transform(&trans, scale, scale);
     if (fullscreen) {
+        /* Center the game display on the fullscreen window, using black borders */
         al_translate_transform(&trans, offset_x, offset_y);
     }
     al_use_transform(&trans);

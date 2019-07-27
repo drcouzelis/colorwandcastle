@@ -268,9 +268,6 @@ typedef struct
     /* Same as above, but this stores the original state of the room blocks */
     int block_map_orig[MAX_ROOM_SIZE];
 
-    /* Enemies */
-    ENEMY enemies[MAX_ENEMIES];
-
     /* This info is used to create the enemies when the level starts */
     ENEMY_DEFINITION enemy_definitions[MAX_ENEMIES];
 

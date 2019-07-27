@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     }
 
     /* Create a display that will be used to draw the game on */
-    init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, false);
+    assert(init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, false));
 
     /* So animations know how fast to go */
     set_animation_fps(GAME_TICKER);
@@ -63,6 +63,7 @@ int main(int argc, char **argv)
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
 
+    /* TEMP */
     /* Print some basic controls to stdout */
     printf("\n");
     printf("CONTROLS:\n");
@@ -114,4 +115,3 @@ int main(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
-

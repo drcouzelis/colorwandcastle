@@ -113,9 +113,8 @@ void init_room(ROOM *room)
     }
     room->num_textures = 0;
 
-    /* Enemy list */
+    /* Enemy definitions */
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        init_enemy(&room->enemies[i]);
         init_enemy_definition(&room->enemy_definitions[i]);
     }
 

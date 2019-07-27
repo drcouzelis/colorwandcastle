@@ -53,9 +53,10 @@ static ROOM_LIST room_list;
 static int curr_room = 0;
 
 /* The primary gameplay characters! */
-static HERO hero;
-static BULLET hero_bullets[MAX_BULLETS];
 static ROOM room;
+static HERO hero;
+static ENEMY enemies[MAX_ENEMIES];
+static BULLET bullets[MAX_BULLETS];
 static EFFECT effects[MAX_EFFECTS];
 static ACTOR powerups[MAX_POWERUPS];
 
@@ -427,10 +428,10 @@ static void init_powerups()
     }
 }
 
-static void init_hero_bullets()
+static void init_bullets()
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
-        hero_bullets[i].is_active = false;
+        bullets[i].is_active = false;
     }
 }
 
@@ -447,16 +448,26 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
     add_frame(&screenshot->sprite, IMG(name));
 }
 
+static void init_enemies()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        init_enemy(&enemies[i]);
+    }
+}
+
 void init_gameplay()
 {
+    /* Room */
+    init_room(&room);
+
     /* Hero */
     init_hero(&hero);
 
     /* Hero bullets */
-    init_hero_bullets();
+    init_bullets();
 
-    /* Room */
-    init_room(&room);
+    /* Enemies */
+    init_enemies();
 
     /* Effects */
     init_effects();
@@ -727,7 +738,7 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
 static void load_enemies_from_definitions()
 {
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        load_enemy_from_definition(&room.enemies[i], &room.enemy_definitions[i]);
+        load_enemy_from_definition(&enemies[i], &room.enemy_definitions[i]);
     }
 }
 
@@ -789,7 +800,7 @@ static void to_gameplay_state_starting_after_dying()
     clear_hero_input();
 
     /* Get rid of any shooting bullets */
-    init_hero_bullets();
+    init_bullets();
 
     /* Load enemies */
     load_enemies_from_definitions();
@@ -830,6 +841,9 @@ static void start_next_room()
 {
     /* Clear the old room */
     init_room(&room);
+
+    /* Clear any remaining enemies */
+    init_enemies();
 
     /* Load the next room */
     load_gameplay_room_from_num(curr_room + 1);
@@ -1125,7 +1139,7 @@ static void shoot_bullet(int texture, float x, float y)
     /* Find the next available bullet slot */
     int i = 0;
     while (i < MAX_BULLETS) {
-        if (!hero_bullets[i].is_active) {
+        if (!bullets[i].is_active) {
             break;
         }
         i++;
@@ -1137,7 +1151,7 @@ static void shoot_bullet(int texture, float x, float y)
     }
 
     /* Found an available bullet slot to use to setup this new bullet */
-    BULLET *bullet = &hero_bullets[i];
+    BULLET *bullet = &bullets[i];
 
     /* Create the bullet! */
     load_hero_bullet_sprite(&bullet->sprite, texture, hero.type);
@@ -1253,7 +1267,7 @@ static void update_hero_player_control()
     /* Count the number of active bullets */
     int num_active_bullets = 0;
     for (int i = 0; i < MAX_BULLETS; i++) {
-        if (hero_bullets[i].is_active) {
+        if (bullets[i].is_active) {
             num_active_bullets++;
         }
     }
@@ -1291,17 +1305,17 @@ static void update_hero()
     animate(&hero.bullet);
 }
 
-static void update_hero_bullets()
+static void update_bullets()
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
 
         /* Only update active bullets */
-        if (!hero_bullets[i].is_active) {
+        if (!bullets[i].is_active) {
             continue;
         }
 
         /* Update the individual bullet */
-        BULLET *bullet = &hero_bullets[i];
+        BULLET *bullet = &bullets[i];
 
         /* Move */
         move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->body.dx), bullet->body.y + convert_pps_to_fps(bullet->body.dy));
@@ -1418,11 +1432,11 @@ static bool update_gameplay_playing()
     update_hero();
 
     /* Bullets */
-    update_hero_bullets();
+    update_bullets();
 
     /* Enemies */
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        ENEMY *enemy = &room.enemies[i];
+        ENEMY *enemy = &enemies[i];
         if (enemy->is_active && enemy->update != NULL) {
             enemy->update(enemy, NULL);
         }
@@ -1452,12 +1466,12 @@ static bool update_gameplay_playing()
 
     /* ...from bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
-        if (hero_bullets[i].is_active) {
+        if (bullets[i].is_active) {
             BODY *b1 = &hero.body;
-            BODY *b2 = &hero_bullets[i].body;
+            BODY *b2 = &bullets[i].body;
             if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
                 /* Destroy the bullet that hit the hero */
-                hero_bullets[i].is_active = false;
+                bullets[i].is_active = false;
                 to_gameplay_state_dying();
                 /* If you're dead, you can't complete the level, so quit here! */
                 return true;
@@ -1467,7 +1481,7 @@ static bool update_gameplay_playing()
 
     /* ...from enemies */
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        ENEMY *enemy = &room.enemies[i];
+        ENEMY *enemy = &enemies[i];
         if (enemy->is_active) {
             BODY *b1 = &hero.body;
             BODY *b2 = &enemy->body;
@@ -1499,7 +1513,7 @@ static bool update_gameplay_playing()
 
         /* Get rid of those nasty enemies */
         for (int i = 0; i < MAX_ENEMIES; i++) {
-            ENEMY *enemy = &room.enemies[i];
+            ENEMY *enemy = &enemies[i];
             if (enemy->is_active) {
                 enemy->is_active = false;
                 load_poof_effect(enemy->body.x - 5, enemy->body.y - 5);
@@ -1617,9 +1631,9 @@ static void draw_gameplay_playing()
         draw_sprite(&room.door_sprite, room.door_x, room.door_y);
     }
 
-    /* Draw hero bullets */
+    /* Draw bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
-        BULLET *bullet = &hero_bullets[i];
+        BULLET *bullet = &bullets[i];
         if (bullet->is_active) {
             draw_sprite(&bullet->sprite, bullet->body.x, bullet->body.y);
         }
@@ -1627,7 +1641,7 @@ static void draw_gameplay_playing()
 
     /* Draw enemies */
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        ENEMY *enemy = &room.enemies[i];
+        ENEMY *enemy = &enemies[i];
         if (enemy->is_active) {
             draw_sprite(&enemy->sprite, enemy->body.x, enemy->body.y);
         }
