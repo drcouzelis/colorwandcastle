@@ -1,18 +1,4 @@
 #include <stdbool.h>
-#include <stdlib.h>
-#include <time.h>
-
-static int init_random_numbers = 0;
-
-int random_number(int low, int high)
-{
-    if (!init_random_numbers) {
-        srand(time(NULL));
-        init_random_numbers = 1;
-    }
-    
-    return (rand() % (high - low + 1)) + low;
-}
 
 bool is_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {

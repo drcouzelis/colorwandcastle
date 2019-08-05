@@ -2,6 +2,8 @@
 bin_PROGRAMS = colorwandcastle
 colorwandcastle_CPPFLAGS = -std=c99 -Wall -DPKGDATADIR='"$(pkgdatadir)"'
 colorwandcastle_SOURCES = \
+  src/collision.c \
+  src/collision.h \
   src/datafile.c \
   src/datafile.h \
   src/direction.c \
@@ -22,6 +24,8 @@ colorwandcastle_SOURCES = \
   src/menu.h \
   src/path.c \
   src/path.h \
+  src/random.c \
+  src/random.h \
   src/resources.c \
   src/resources.h \
   src/run.c \
@@ -29,9 +33,7 @@ colorwandcastle_SOURCES = \
   src/sound.c \
   src/sound.h \
   src/sprite.c \
-  src/sprite.h \
-  src/utilities.c \
-  src/utilities.h
+  src/sprite.h
 
 # Data - Images
 imagesdatadir = $(pkgdatadir)/images

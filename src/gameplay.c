@@ -1,13 +1,14 @@
 #include <stdio.h>
+#include "collision.h"
 #include "datafile.h"
 #include "display.h"
 #include "gameplay.h"
 #include "main.h"
 #include "mask.h"
 #include "path.h"
+#include "random.h"
 #include "sound.h"
 #include "sprite.h"
-#include "utilities.h"
 
 #define HERO_SPEED (TILE_SIZE * 4)
 

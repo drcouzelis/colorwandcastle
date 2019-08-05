@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include "datafile.h"
 #include "mask.h"
+#include "random.h"
 #include "resources.h"
-#include "utilities.h"
 
 #define MAX_DATAFILE_PATHS 4
 #define MAX_DATAFILE_FILENAME_SIZE 256
