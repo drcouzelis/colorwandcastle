@@ -5,7 +5,6 @@
 
 #define MAX_RESOURCES 256
 #define MAX_RESOURCE_PATHS 4
-#define GAME_VOLUME 192
 
 typedef enum
 {
