@@ -68,12 +68,6 @@ typedef enum
     GAMEPLAY_DIFFICULTY_NORMAL
 } GAMEPLAY_DIFFICULTY;
 
-typedef enum
-{
-    GAMEPLAY_STATE_PLAY = 0,
-    GAMEPLAY_STATE_DEATH
-} GAMEPLAY_STATE;
-
 typedef struct
 {
     float x; /* X position */

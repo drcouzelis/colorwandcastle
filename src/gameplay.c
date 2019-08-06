@@ -10,7 +10,7 @@
 #include "sound.h"
 #include "sprite.h"
 
-#define HERO_SPEED (TILE_SIZE * 4)
+static const int HERO_SPEED = TILE_SIZE * 4;
 
 static void to_gameplay_state_starting_new_game();
 static void to_gameplay_state_starting_after_dying();
@@ -72,7 +72,7 @@ static SCREENSHOT screenshot1;
 static SCREENSHOT screenshot2;
 
 /* The number of blocks the hero needs to destroy before a powerup appears */
-#define RESET_POWERUP_COUNTER -1
+static const int RESET_POWERUP_COUNTER = -1;
 static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
 
 /**
