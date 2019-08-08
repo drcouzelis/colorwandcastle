@@ -157,15 +157,6 @@ void init_screenshot(SCREENSHOT *screenshot)
     screenshot->direction = NO_DIRECTION;
 }
 
-void init_effect(EFFECT *effect)
-{
-    effect->is_active = false;
-    effect->update = NULL;
-    init_sprite(&effect->sprite, false, 0);
-    effect->x = 0;
-    effect->y = 0;
-}
-
 void init_actor(ACTOR *actor)
 {
     actor->is_active = false;

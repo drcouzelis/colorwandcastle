@@ -10,6 +10,8 @@ colorwandcastle_SOURCES = \
   src/direction.h \
   src/display.c \
   src/display.h \
+  src/effects.c \
+  src/effects.h \
   src/gamedata.c \
   src/gamedata.h \
   src/gameplay.c \

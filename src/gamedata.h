@@ -24,7 +24,6 @@
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 64
 #define MAX_EXITS 8
-#define MAX_EFFECTS 64
 #define MAX_POWERUPS 8
 #define MAX_TILES 128
 #define MAX_TEXTURES 128
@@ -77,17 +76,6 @@ typedef struct
     int dx;  /* Horizontal velocity, in pixels per second */
     int dy;  /* Vertical velocity */
 } BODY;
-
-typedef struct EFFECT
-{
-    bool is_active;
-
-    SPRITE sprite;
-    float x;
-    float y;
-
-    void (*update)(struct EFFECT *effect, void *data);
-} EFFECT;
 
 typedef struct ACTOR
 {
@@ -293,8 +281,6 @@ void init_enemy(ENEMY *enemy);
 void init_room(ROOM *room);
 
 void init_room_list(ROOM_LIST *room_list);
-
-void init_effect(EFFECT *effect);
 
 void init_screenshot(SCREENSHOT *screenshot);
 

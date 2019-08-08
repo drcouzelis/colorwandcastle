@@ -2,6 +2,7 @@
 #include "collision.h"
 #include "datafile.h"
 #include "display.h"
+#include "effects.h"
 #include "gameplay.h"
 #include "main.h"
 #include "mask.h"
@@ -58,7 +59,6 @@ static ROOM room;
 static HERO hero;
 static ENEMY enemies[MAX_ENEMIES];
 static BULLET bullets[MAX_BULLETS];
-static EFFECT effects[MAX_EFFECTS];
 static ACTOR powerups[MAX_POWERUPS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
@@ -87,15 +87,6 @@ static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
 static float convert_pps_to_fps(int pps)
 {
     return pps / (float)(GAME_TICKER);
-}
-
-static void update_effect_until_done_animating(EFFECT *effect, void *data)
-{
-    animate(&effect->sprite);
-
-    if (effect->sprite.done) {
-        effect->is_active = false;
-    }
 }
 
 static void update_powerup(ACTOR *powerup, void *data)
@@ -259,39 +250,6 @@ static void load_hero_sprite()
     }
 }
 
-static EFFECT *find_available_effect()
-{
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        if (!effects[i].is_active) {
-            return &effects[i];
-        }
-    }
-
-    return NULL;
-}
-
-static void load_poof_effect(float x, float y)
-{
-    EFFECT *effect = find_available_effect();
-
-    if (effect == NULL) {
-        fprintf(stderr, "Failed to find available effect.\n");
-        return;
-    }
-
-    init_sprite(&effect->sprite, false, 15);
-    add_frame(&effect->sprite, IMG("effect-poof-1.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-2.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-3.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-4.png"));
-    effect->sprite.x_offset = -10;
-    effect->sprite.y_offset = -10;
-    effect->x = x;
-    effect->y = y;
-    effect->update = update_effect_until_done_animating;
-    effect->is_active = true;
-}
-
 static ACTOR *find_available_powerup()
 {
     for (int i = 0; i < MAX_POWERUPS; i++) {
@@ -415,13 +373,6 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
     }
 }
 
-static void init_effects()
-{
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        init_effect(&effects[i]);
-    }
-}
-
 static void init_powerups()
 {
     for (int i = 0; i < MAX_POWERUPS; i++) {
@@ -469,9 +420,6 @@ void init_gameplay()
 
     /* Enemies */
     init_enemies();
-
-    /* Effects */
-    init_effects();
 
     /* Powerups */
     init_powerups();
@@ -1573,12 +1521,7 @@ bool update_gameplay(void *data)
 
     update();
 
-    /* Effects */
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        if (effects[i].is_active && effects[i].update != NULL) {
-            effects[i].update(&effects[i], NULL);
-        }
-    }
+    update_effects();
 
     return !end_gameplay;
 }
@@ -1663,12 +1606,7 @@ static void draw_gameplay_playing()
         draw_sprite(&hero.bullet, hero.bullet_x, hero.bullet_y);
     }
 
-    /* Draw effects */
-    for (int i = 0; i < MAX_EFFECTS; i++) {
-        if (effects[i].is_active) {
-            draw_sprite(&effects[i].sprite, effects[i].x, effects[i].y);
-        }
-    }
+    draw_effects();
 }
 
 bool load_gameplay_room_list_from_filename(const char *filename)
