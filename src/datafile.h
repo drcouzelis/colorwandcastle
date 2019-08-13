@@ -2,6 +2,7 @@
 #define DATAFILE_HEADER
 
 #include "gamedata.h"
+#include "roomlist.h"
 
 /**
  * The directory paths that are entered using this function

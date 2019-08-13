@@ -136,17 +136,6 @@ void init_room(ROOM *room)
     room->used_exit_num = -1;
 }
 
-void init_room_list(ROOM_LIST *list)
-{
-    assert(list != NULL);
-
-    for (int i = 0; i < MAX_ROOMS; i++) {
-        list->filenames[i][0] = '\0';
-    }
-
-    list->size = 0;
-}
-
 void init_screenshot(SCREENSHOT *screenshot)
 {
     init_sprite(&screenshot->sprite, false, 0);

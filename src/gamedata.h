@@ -266,11 +266,6 @@ typedef struct
     int used_exit_num;
 } ROOM;
 
-typedef struct {
-    char filenames[MAX_ROOMS][MAX_FILENAME_LEN];
-    int size;
-} ROOM_LIST;
-
 /* Initialize a hero to its default state, ready to be drawn */
 void init_hero(HERO *hero);
 
@@ -279,8 +274,6 @@ void init_enemy(ENEMY *enemy);
 
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
-
-void init_room_list(ROOM_LIST *room_list);
 
 void init_screenshot(SCREENSHOT *screenshot);
 

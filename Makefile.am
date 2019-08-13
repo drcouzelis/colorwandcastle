@@ -30,6 +30,8 @@ colorwandcastle_SOURCES = \
   src/random.h \
   src/resources.c \
   src/resources.h \
+  src/roomlist.c \
+  src/roomlist.h \
   src/run.c \
   src/run.h \
   src/sound.c \
