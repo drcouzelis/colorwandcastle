@@ -1,0 +1,9 @@
+# 001 - Dark
+TILE
+  IMAGE tile-general.png:20x20:0,0
+END
+
+# 002 - Light
+TILE
+  IMAGE tile-general.png:20x20:0,1
+END

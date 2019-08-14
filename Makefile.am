@@ -87,23 +87,26 @@ dist_imagesdata_DATA = \
   data/images/texture-red.png \
   data/images/texture-yellow.png \
   data/images/tile-castle.png \
-  data/images/tile-door.png
+  data/images/tile-door.png \
+  data/images/tile-general.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels
 dist_levelsdata_DATA = \
+  data/levels/list-demo.dat \
+  data/levels/room-demo-001.dat \
+  data/levels/room-demo-002.dat \
+  data/levels/room-demo-003.dat \
+  data/levels/room-demo-004.dat \
+  data/levels/room-demo-005.dat \
+  data/levels/room-demo-006.dat \
+  data/levels/room-demo-007.dat \
+  data/levels/room-demo-008.dat \
+  data/levels/room-demo-009.dat \
+  data/levels/room-demo-010.dat \
+  data/levels/room-demo-011.dat \
   data/levels/list-story.dat \
   data/levels/room-story-001.dat \
-  data/levels/room-story-002.dat \
-  data/levels/room-story-003.dat \
-  data/levels/room-story-004.dat \
-  data/levels/room-story-005.dat \
-  data/levels/room-story-006.dat \
-  data/levels/room-story-007.dat \
-  data/levels/room-story-008.dat \
-  data/levels/room-story-009.dat \
-  data/levels/room-story-010.dat \
-  data/levels/room-story-011.dat \
   data/levels/room-makayla.dat \
   data/levels/room-rawson.dat \
   data/levels/room-rawson-2.dat \
@@ -112,7 +115,8 @@ dist_levelsdata_DATA = \
   data/levels/texture-colored.dat \
   data/levels/texture-colored-2.dat \
   data/levels/texture-colored-3.dat \
-  data/levels/tile-castle.dat
+  data/levels/tile-castle.dat \
+  data/levels/tile-general.dat
 
 # Data - Sounds
 soundsdatadir = $(pkgdatadir)/sounds
