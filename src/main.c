@@ -91,7 +91,8 @@ int main(int argc, char **argv)
     if (argc > 1 && sscanf(argv[1], "%d", &room_num) != 1) {
         /* ...otherwise add all command line arguments as level filenames */
         for (int i = 1; i < argc; i++) {
-            add_gameplay_room_filename_to_room_list(argv[i]);
+            /*add_gameplay_room_filename_to_room_list(argv[i]);*/
+            load_gameplay_room_list_from_filename(argv[i]);
         }
     } else {
         /* No command line arguments given, just load the default level set! */
