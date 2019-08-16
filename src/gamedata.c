@@ -93,6 +93,8 @@ void init_room(ROOM *room)
     }
     room->num_tiles = 0;
 
+    init_sprite(&room->farground, false, 0);
+
     /* Background map */
     /* Foreground map */
     /* Collision map */

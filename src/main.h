@@ -16,6 +16,8 @@
  * NOTE: The game window can (and probably will) be larger
  * than this, but the game logic will still treat the game
  * as this size internally.
+ *
+ * 320 x 240
  */
 #define DISPLAY_WIDTH (16 * 20)
 #define DISPLAY_HEIGHT (12 * 20)

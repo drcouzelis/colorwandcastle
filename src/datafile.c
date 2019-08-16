@@ -365,6 +365,13 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             continue;
         }
 
+        /* Fargound (sprite) */
+        if (strncmp(string, "FARGROUND", MAX_STRING_SIZE) == 0) {
+            init_sprite(&room->farground, false, 0);
+            load_sprite_from_datafile(&room->farground, file);
+            continue;
+        }
+
         /* Background map */
         if (strncmp(string, "BACKGROUND", MAX_STRING_SIZE) == 0) {
             load_map_from_datafile(room->background_map, room->rows, room->cols, file);

@@ -62,6 +62,7 @@ dist_imagesdata_DATA = \
   data/images/enemy-spider-5.png \
   data/images/enemy-spider-6.png \
   data/images/enemy-spider-7.png \
+  data/images/farground-forest.png \
   data/images/hero-makayla-1.png \
   data/images/hero-makayla-2.png \
   data/images/hero-makayla-hurt-1.png \

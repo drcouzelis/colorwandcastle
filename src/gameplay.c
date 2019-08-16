@@ -1543,6 +1543,10 @@ static void draw_gameplay_scrolling_rooms()
 
 static void draw_gameplay_playing()
 {
+    /* Draw the farground */
+    /* TODO: Do not scroll the farground during a room transition! */
+    draw_sprite(&room.farground, 0, 0);
+
     /* Draw the room (backgrounds, blocks...) */
     for (int r = 0; r < room.rows; r++) {
         for (int c = 0; c < room.cols; c++) {
