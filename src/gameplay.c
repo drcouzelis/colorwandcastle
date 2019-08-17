@@ -840,9 +840,11 @@ static void to_gameplay_state_scroll_rooms()
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 
+    /* Erase the farground from the current room so it doesn't get drawn anymore */
+    init_sprite(&room.farground, false, 0);
+
     /* Take a screenshot of the current room */
     al_set_target_bitmap(get_frame(&screenshot1.sprite));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
     draw_gameplay_playing();
 
     /* Clear all resources before loading the new room */
@@ -889,12 +891,21 @@ static void to_gameplay_state_scroll_rooms()
     room.start_x = hero.body.x;
     room.start_y = hero.body.y;
 
+    /* Here's a little trick... */
+    /* Erase the farground from the new room so it doesn't get drawn anymore... */
+    /* Then restore the farground afterwards */
+    SPRITE farground_copy;
+    copy_sprite(&farground_copy, &room.farground);
+    init_sprite(&room.farground, false, 0);
+
     /* Take a screenshot of the next room */
     al_set_target_bitmap(get_frame(&screenshot2.sprite));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
     draw_gameplay_playing();
 
     al_restore_state(&state);
+
+    /* Restore the farground (see above) */
+    copy_sprite(&room.farground, &farground_copy);
 
     update = update_gameplay_scroll_rooms;
     control = control_gameplay_playing;
@@ -1537,6 +1548,11 @@ void draw_gameplay(void *data)
 
 static void draw_gameplay_scrolling_rooms()
 {
+    /* Draw the farground */
+    /* This will draw the farground from the NEXT room */
+    /* The farground never scrolls! */
+    draw_sprite(&room.farground, 0, 0);
+
     draw_sprite(&screenshot1.sprite, screenshot1.x, screenshot1.y);
     draw_sprite(&screenshot2.sprite, screenshot2.x, screenshot2.y);
 }
@@ -1544,7 +1560,6 @@ static void draw_gameplay_scrolling_rooms()
 static void draw_gameplay_playing()
 {
     /* Draw the farground */
-    /* TODO: Do not scroll the farground during a room transition! */
     draw_sprite(&room.farground, 0, 0);
 
     /* Draw the room (backgrounds, blocks...) */

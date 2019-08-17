@@ -87,6 +87,7 @@ dist_imagesdata_DATA = \
   data/images/texture-purple.png \
   data/images/texture-red.png \
   data/images/texture-yellow.png \
+  data/images/tile-bricks.png \
   data/images/tile-castle.png \
   data/images/tile-door.png \
   data/images/tile-general.png
@@ -108,6 +109,7 @@ dist_levelsdata_DATA = \
   data/levels/room-demo-011.dat \
   data/levels/list-story.dat \
   data/levels/room-story-001.dat \
+  data/levels/room-story-002.dat \
   data/levels/room-makayla.dat \
   data/levels/room-rawson.dat \
   data/levels/room-rawson-2.dat \
@@ -116,6 +118,7 @@ dist_levelsdata_DATA = \
   data/levels/texture-colored.dat \
   data/levels/texture-colored-2.dat \
   data/levels/texture-colored-3.dat \
+  data/levels/tile-bricks.dat \
   data/levels/tile-castle.dat \
   data/levels/tile-general.dat
 
