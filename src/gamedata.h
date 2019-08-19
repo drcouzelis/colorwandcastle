@@ -219,9 +219,10 @@ typedef struct
     int num_tiles;
 
     /* The farground is drawn below everything else, and never "scrolls" */
-    SPRITE farground;
+    /* Each entry is an index number for the list of tiles */
+    int farground_map[MAX_ROOM_SIZE];
 
-    /* The background is drawn behind everything else */
+    /* The background is drawn behind the foreground */
     /* Each entry is an index number for the list of tiles */
     int background_map[MAX_ROOM_SIZE];
 

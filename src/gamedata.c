@@ -93,13 +93,12 @@ void init_room(ROOM *room)
     }
     room->num_tiles = 0;
 
-    init_sprite(&room->farground, false, 0);
-
     /* Background map */
     /* Foreground map */
     /* Collision map */
     /* Block map */
     for (int i = 0; i < MAX_ROOM_SIZE; i++) {
+        room->farground_map[i] = NO_TILE;
         room->background_map[i] = NO_TILE;
         room->foreground_map[i] = NO_TILE;
         room->collision_map[i] = NO_COLLISION;
