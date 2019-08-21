@@ -1,6 +1,6 @@
 START 9 4
 
-IMPORT tile-bricks.dat
+IMPORT tile-wood.dat
 IMPORT tile-castle.dat
 
 TILE

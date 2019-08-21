@@ -1,0 +1,79 @@
+# Wood
+TILE
+  IMAGE tile-wood.png:20x20:0,0
+END
+
+# Wood, all edges open
+TILE
+  IMAGE tile-wood.png:20x20:0,1
+END
+
+# Wood, left + right edges open
+TILE
+  IMAGE tile-wood.png:20x20:0,2
+END
+
+# Wood, top + bottom edges open
+TILE
+  IMAGE tile-wood.png:20x20:0,3
+END
+
+# Wood, right edge open
+TILE
+  IMAGE tile-wood.png:20x20:1,0
+END
+
+# Wood, left edge open
+TILE
+  IMAGE tile-wood.png:20x20:1,1
+END
+
+# Wood, top edge open
+TILE
+  IMAGE tile-wood.png:20x20:1,2
+END
+
+# Wood, bottom edge open
+TILE
+  IMAGE tile-wood.png:20x20:1,3
+END
+
+# Wood, top + right edge open
+TILE
+  IMAGE tile-wood.png:20x20:2,0
+END
+
+# Wood, right + bottom edge open
+TILE
+  IMAGE tile-wood.png:20x20:2,1
+END
+
+# Wood, bottom + left edge open
+TILE
+  IMAGE tile-wood.png:20x20:2,2
+END
+
+# Wood, left + top edge open
+TILE
+  IMAGE tile-wood.png:20x20:2,3
+END
+
+# Wood, top + right + bottom edge open
+TILE
+  IMAGE tile-wood.png:20x20:3,0
+END
+
+# Wood, right + bottom + left edge open
+TILE
+  IMAGE tile-wood.png:20x20:3,1
+END
+
+# Wood, bottom + left + top edge open
+TILE
+  IMAGE tile-wood.png:20x20:3,2
+END
+
+# Wood, left + top + right edge open
+TILE
+  IMAGE tile-wood.png:20x20:3,3
+END
