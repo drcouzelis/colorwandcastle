@@ -1,9 +1,19 @@
 # Sources
 bin_PROGRAMS = colorwandcastle
-colorwandcastle_CPPFLAGS = -std=c99 -Wall -DPKGDATADIR='"$(pkgdatadir)"'
+
+# -std=c18 - C version to use
+# -O2 - Optimization level, 2 is common, 3 is more extreme
+# -Os - Cache efficiency
+# -Wall - Report all warnings
+# -Wextra - Reprort extra warnings
+# -Wpedantic - Report all stupid little warnings
+# -march=native - Compile using the full feature set of the CPU
+colorwandcastle_CPPFLAGS = -std=c18 -O2 -Os -Wall -Wextra -Wpedantic -march=native -DPKGDATADIR='"$(pkgdatadir)"'
+
 colorwandcastle_SOURCES = \
   src/collision.c \
   src/collision.h \
+  src/compiler.h \
   src/datafile.c \
   src/datafile.h \
   src/direction.c \

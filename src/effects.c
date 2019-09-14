@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "compiler.h"
 #include "effects.h"
 #include "sprite.h"
 
@@ -74,6 +75,8 @@ static EFFECT *find_available_effect()
 
 static void update_effect_until_done_animating(EFFECT *effect, void *data)
 {
+    UNUSED(data);
+
     animate(&effect->sprite);
 
     if (effect->sprite.done) {

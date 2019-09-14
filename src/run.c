@@ -10,11 +10,6 @@ void set_fps(int fps)
     run_fps = fps;
 }
 
-void set_display(ALLEGRO_DISPLAY *display)
-{
-    fprintf(stderr, "WARNING: set_display is empty.\n");
-}
-
 void run(void (*control)(void *data, ALLEGRO_EVENT *event),
         bool (*update)(void *data), void (*draw)(void *data), void *data)
 {

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "collision.h"
+#include "compiler.h"
 #include "datafile.h"
 #include "display.h"
 #include "effects.h"
@@ -91,6 +92,7 @@ static float convert_pps_to_fps(int pps)
 
 static void update_powerup(ACTOR *powerup, void *data)
 {
+    UNUSED(data);
     /* Powerup moves accross the screen */
     powerup->body.x += convert_pps_to_fps(powerup->body.dx);
     powerup->body.y += convert_pps_to_fps(powerup->body.dy);
@@ -263,6 +265,7 @@ static ACTOR *find_available_powerup()
 
 static void draw_powerup(ACTOR *powerup, void *data)
 {
+    UNUSED(data);
     draw_sprite(get_actor_sprite(powerup), powerup->body.x, powerup->body.y);
 }
 
@@ -580,6 +583,7 @@ static bool is_block_collision(BODY *body)
 
 static void update_enemy_animation(ENEMY *enemy, void *data)
 {
+    UNUSED(data);
     animate(&enemy->sprite);
 }
 
@@ -963,6 +967,8 @@ static bool update_gameplay_starting_new_game()
 
 void control_gameplay(void *data, ALLEGRO_EVENT *event)
 {
+    UNUSED(data);
+
     assert(is_gameplay_init);
 
     if (control != NULL) {
@@ -1534,6 +1540,8 @@ static bool update_gameplay_playing()
 
 bool update_gameplay(void *data)
 {
+    UNUSED(data);
+
     assert(is_gameplay_init);
 
     update();
@@ -1545,6 +1553,8 @@ bool update_gameplay(void *data)
 
 void draw_gameplay(void *data)
 {
+    UNUSED(data);
+
     assert(is_gameplay_init);
 
     if (draw != NULL) {
