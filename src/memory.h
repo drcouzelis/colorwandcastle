@@ -1,5 +1,4 @@
-#ifndef MEMORY_HEADER
-#define MEMORY_HEADER
+#pragma once
 
 #include <malloc.h>
 
@@ -29,5 +28,3 @@ void *free_memory(const char *label, void *ptr);
  * matches the number of frees.
  */
 void check_memory(void);
-
-#endif

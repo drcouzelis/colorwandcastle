@@ -1,5 +1,4 @@
-#ifndef GAMEDATA_HEADER
-#define GAMEDATA_HEADER
+#pragma once
 
 #include <stdio.h>
 #include "direction.h"
@@ -283,5 +282,3 @@ void init_screenshot(SCREENSHOT *screenshot);
 
 void init_actor(ACTOR *actor);
 SPRITE *get_actor_sprite(ACTOR *actor);
-
-#endif

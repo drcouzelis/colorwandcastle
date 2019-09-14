@@ -1,5 +1,4 @@
-#ifndef GAMEPLAY_HEADER
-#define GAMEPLAY_HEADER
+#pragma once
 
 #include <allegro5/allegro.h>
 #include "gamedata.h"
@@ -19,5 +18,3 @@ void reset_gameplay();
 void control_gameplay(void *data, ALLEGRO_EVENT *event);
 bool update_gameplay(void *data);
 void draw_gameplay(void *data);
-
-#endif

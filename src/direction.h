@@ -1,5 +1,4 @@
-#ifndef DIRECTION_HEADER
-#define DIRECTION_HEADER
+#pragma once
 
 /**
  * You can loop through the directions by going
@@ -48,5 +47,3 @@ DIRECTION string_to_direction(char *string);
 
 /* Print the text string of the direction to STDOUT */
 void print_direction(DIRECTION direction);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef DISPLAY_HEADER
-#define DISPLAY_HEADER
+#pragma once
 
 #include <allegro5/allegro.h>
 
@@ -32,5 +31,3 @@ void clear_frame(void);
  * mode and fullscreen mode.
  */
 bool toggle_fullscreen(void);
-
-#endif

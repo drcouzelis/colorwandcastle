@@ -1,5 +1,4 @@
-#ifndef SOUND_HEADER
-#define SOUND_HEADER
+#pragma once
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
@@ -11,5 +10,3 @@ void play_sound(ALLEGRO_SAMPLE *snd);
 
 /* Toggle audio on and off, audio is on by default */
 void toggle_audio();
-
-#endif

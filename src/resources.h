@@ -1,5 +1,4 @@
-#ifndef RESOURCES_HEADER
-#define RESOURCES_HEADER
+#pragma once
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_acodec.h>
@@ -64,5 +63,3 @@ IMAGE *get_locked_image(const char *name);
  * It can be retrieved by calling "get_image" with the given name.
  */
 void insert_image_resource(const char *name, IMAGE *image);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef COLLISION_HEADER
-#define COLLISION_HEADER
+#pragma once
 
 #include <stdbool.h>
 
@@ -11,5 +10,3 @@ bool is_inside(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
 /* Returns true if the point is completely inside the rectangle */
 bool is_point_in(int x, int y, int x1, int y1, int w1, int h1);
-
-#endif

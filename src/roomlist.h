@@ -1,5 +1,4 @@
-#ifndef ROOMLIST_HEADER
-#define ROOMLIST_HEADER
+#pragma once
 
 #include <stdio.h>
 #include "gamedata.h"
@@ -11,5 +10,3 @@ typedef struct
 } ROOM_LIST;
 
 void init_room_list(ROOM_LIST *room_list);
-
-#endif

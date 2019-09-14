@@ -1,5 +1,4 @@
-#ifndef MASK_HEADER
-#define MASK_HEADER
+#pragma once
 
 #include "resources.h"
 
@@ -19,5 +18,3 @@ IMAGE *get_masked_image(const char *name, const char *mask);
 
 /* For convenience */
 #define MASKED_IMG(name, mask) (get_masked_image(name, mask))
-
-#endif

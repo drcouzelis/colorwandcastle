@@ -1,5 +1,4 @@
-#ifndef RANDOM_HEADER
-#define RANDOM_HEADER
+#pragma once
 
 /**
  * Generate a random number between low and high, inclusively.
@@ -7,5 +6,3 @@
  * The upper bound is "high".
  */
 int random_number(int low, int high);
-
-#endif

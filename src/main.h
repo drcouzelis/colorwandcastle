@@ -1,5 +1,4 @@
-#ifndef MAIN_HEADER
-#define MAIN_HEADER
+#pragma once
 
 /**
  * Number of times the game will update per second.
@@ -21,5 +20,3 @@
  */
 #define DISPLAY_WIDTH (16 * 20)
 #define DISPLAY_HEIGHT (12 * 20)
-
-#endif

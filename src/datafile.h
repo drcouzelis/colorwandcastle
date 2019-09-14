@@ -1,5 +1,4 @@
-#ifndef DATAFILE_HEADER
-#define DATAFILE_HEADER
+#pragma once
 
 #include "gamedata.h"
 #include "roomlist.h"
@@ -45,5 +44,3 @@ bool load_room_list_from_datafile_with_filename(const char *filename, ROOM_LIST 
  * for debugging purposes.
  */
 void print_room(ROOM *room, bool is_data_file_form);
-
-#endif

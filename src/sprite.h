@@ -1,5 +1,4 @@
-#ifndef SPRITE_HEADER
-#define SPRITE_HEADER
+#pragma once
 
 #include "resources.h"
 
@@ -82,5 +81,3 @@ void draw_sprite(SPRITE *sprite, float x, float y);
  */
 int get_sprite_width(SPRITE *sprite);
 int get_sprite_height(SPRITE *sprite);
-
-#endif
