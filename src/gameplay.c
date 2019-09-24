@@ -197,7 +197,7 @@ static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame
 
 static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
 {
-    if (texture == MULTI_TEXTURE) {
+    if (hero.powerup_type == POWERUP_TYPE_MULTI) {
         /* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
         init_sprite(sprite, true, 16);
         /* Keep track of which "rotation" of the bullet you're on */
@@ -1040,7 +1040,8 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
     /* If the bullet hits a block... */
     if (block_collision) {
 
-        if (bullet->texture == room.block_map[(r * room.cols) + c]) {
+        if (bullet->texture == room.block_map[(r * room.cols) + c] ||
+                hero.powerup_type == POWERUP_TYPE_MULTI) {
 
             /* Matching textures! */
             /* Remove the bullet and the block */
@@ -1143,6 +1144,15 @@ static void shoot_bullet(int texture, float x, float y)
     bullet->body.dy = speed * directions[room.direction].y_offset;
 
     bullet->is_active = true;
+
+    /* Are you using a powerup? */
+    /* Don't let the hero keep the powerup forever */
+    if (hero.powerup_remaining > 0) {
+        hero.powerup_remaining--;
+        if (hero.powerup_remaining == 0) {
+            hero.powerup_type = POWERUP_TYPE_NONE;
+        }
+    }
 
     play_sound(SND("bullet-shoot.wav"));
 
@@ -1267,11 +1277,6 @@ static void update_hero()
 {
     update_hero_player_control();
 
-    /* Powerups */
-    if (hero.powerup_type == POWERUP_TYPE_MULTI) {
-        
-    }
-
     /* Graphics */
     animate(hero.sprite);
     animate(&hero.bullet);
@@ -1391,8 +1396,11 @@ static void collect_powerup(ACTOR *powerup)
     printf("Pretending to collect powerup...\n");
 
     // YOU LEFT OFF HERE!!
-    //hero.powerup_type = POWERUP_TYPE_MULTI;
-    //hero.powerup_remaining = 3;
+    hero.powerup_type = POWERUP_TYPE_MULTI;
+    hero.powerup_remaining = 3;
+
+    /* Give the hero a sparkly new bullet */
+    load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
 
     /* Clear the powerup */
     init_actor(powerup);
@@ -1491,6 +1499,15 @@ static bool update_gameplay_playing()
                 load_poof_effect(enemy->body.x - 5, enemy->body.y - 5);
             }
         }
+
+        ///* Remove any remaining powerups onscreen, we don't need them anymore */
+        //for (int i = 0; i < MAX_POWERUPS; i++) {
+        //    ACTOR *powerup = &powerups[i];
+        //    if (powerup->is_active) {
+        //        load_poof_effect(powerup->body.x, powerup->body.y);
+        //        init_actor(powerup);
+        //    }
+        //}
     }
 
     /* Give the player a powerup? */
