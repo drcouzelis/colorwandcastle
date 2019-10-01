@@ -60,7 +60,7 @@ static ROOM room;
 static HERO hero;
 static ENEMY enemies[MAX_ENEMIES];
 static BULLET bullets[MAX_BULLETS];
-static ACTOR powerups[MAX_POWERUPS];
+static POWERUP powerups[MAX_POWERUPS];
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
@@ -90,14 +90,13 @@ static float convert_pps_to_fps(int pps)
     return pps / (float)(GAME_TICKER);
 }
 
-static void update_powerup(ACTOR *powerup, void *data)
+static void update_powerup(POWERUP *powerup)
 {
-    UNUSED(data);
     /* Powerup moves accross the screen */
     powerup->body.x += convert_pps_to_fps(powerup->body.dx);
     powerup->body.y += convert_pps_to_fps(powerup->body.dy);
 
-    animate(get_actor_sprite(powerup));
+    animate(&powerup->sprite);
 }
 
 static int random_front_texture()
@@ -252,7 +251,7 @@ static void load_hero_sprite()
     }
 }
 
-static ACTOR *find_available_powerup()
+static POWERUP *find_available_powerup()
 {
     for (int i = 0; i < MAX_POWERUPS; i++) {
         if (!powerups[i].is_active) {
@@ -263,27 +262,23 @@ static ACTOR *find_available_powerup()
     return NULL;
 }
 
-static void draw_powerup(ACTOR *powerup, void *data)
+static void draw_powerup(POWERUP *powerup)
 {
-    UNUSED(data);
-    draw_sprite(get_actor_sprite(powerup), powerup->body.x, powerup->body.y);
+    draw_sprite(&powerup->sprite, powerup->body.x, powerup->body.y);
 }
 
 static void load_powerup(float x, float y)
 {
-    printf("Pretending to load a powerup...\n");
-
-    ACTOR *powerup = find_available_powerup();
+    POWERUP *powerup = find_available_powerup();
 
     if (powerup == NULL) {
         fprintf(stderr, "Failed to find available powerup.\n");
         return;
     }
 
-    SPRITE *sprite = get_actor_sprite(powerup);
-    init_sprite(sprite, true, 6);
-    add_frame(sprite, IMG("powerup-rainbow-1.png"));
-    add_frame(sprite, IMG("powerup-rainbow-2.png"));
+    init_sprite(&powerup->sprite, true, 6);
+    add_frame(&powerup->sprite, IMG("powerup-rainbow-1.png"));
+    add_frame(&powerup->sprite, IMG("powerup-rainbow-2.png"));
     powerup->body.x = x;
     powerup->body.y = y;
     powerup->body.w = 20;
@@ -379,7 +374,7 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
 static void init_powerups()
 {
     for (int i = 0; i < MAX_POWERUPS; i++) {
-        init_actor(&powerups[i]);
+        init_powerup(&powerups[i]);
     }
 }
 
@@ -1391,7 +1386,7 @@ static bool is_hero_in_exit(EXIT *exit)
     return true;
 }
 
-static void collect_powerup(ACTOR *powerup)
+static void collect_powerup(POWERUP *powerup)
 {
     printf("Pretending to collect powerup...\n");
 
@@ -1403,7 +1398,7 @@ static void collect_powerup(ACTOR *powerup)
     load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
 
     /* Clear the powerup */
-    init_actor(powerup);
+    init_powerup(powerup);
 }
 
 static bool update_gameplay_playing()
@@ -1425,7 +1420,7 @@ static bool update_gameplay_playing()
     /* Powerups */
     for (int i = 0; i < MAX_POWERUPS; i++) {
         if (powerups[i].is_active && powerups[i].update != NULL) {
-            powerups[i].update(&powerups[i], NULL);
+            powerups[i].update(&powerups[i]);
         }
     }
 
@@ -1502,10 +1497,10 @@ static bool update_gameplay_playing()
 
         ///* Remove any remaining powerups onscreen, we don't need them anymore */
         //for (int i = 0; i < MAX_POWERUPS; i++) {
-        //    ACTOR *powerup = &powerups[i];
+        //    POWERUP *powerup = &powerups[i];
         //    if (powerup->is_active) {
         //        load_poof_effect(powerup->body.x, powerup->body.y);
-        //        init_actor(powerup);
+        //        init_powerup(powerup);
         //    }
         //}
     }
@@ -1660,7 +1655,7 @@ static void draw_gameplay_playing()
     /* Draw powerups */
     for (int i = 0; i < MAX_POWERUPS; i++) {
         if (powerups[i].is_active && powerups[i].draw != NULL) {
-            powerups[i].draw(&powerups[i], NULL);
+            powerups[i].draw(&powerups[i]);
         }
     }
 

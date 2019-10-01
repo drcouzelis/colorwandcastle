@@ -60,12 +60,18 @@ typedef enum
     POWERUP_TYPE_MULTI
 } POWERUP_TYPE;
 
+/* To be used */
+/**
+ * Normal - Room resets after death
+ * Easy - Blocks remain cleared even after death
+ */
 typedef enum
 {
     GAMEPLAY_DIFFICULTY_EASY = 0,
     GAMEPLAY_DIFFICULTY_NORMAL
 } GAMEPLAY_DIFFICULTY;
 
+/* Represents a rectangular object, with a position and speed */
 typedef struct
 {
     float x; /* X position */
@@ -76,22 +82,24 @@ typedef struct
     int dy;  /* Vertical velocity */
 } BODY;
 
-typedef struct ACTOR
+/**
+ * A powerup is simply the "icon" that floats accross the screen,
+ * to be collected by the player.
+ */
+typedef struct POWERUP
 {
     bool is_active;
 
-    SPRITE sprites[MAX_SPRITES];
-    int curr_sprite;
+    SPRITE sprite;
 
     BODY body;
 
     TYPE type;
     SUBTYPE subtype;
 
-    void (*control)(struct ACTOR *actor, void *data);
-    void (*update)(struct ACTOR *actor, void *data);
-    void (*draw)(struct ACTOR *actor, void *data);
-} ACTOR;
+    void (*update)(struct POWERUP *powerup);
+    void (*draw)(struct POWERUP *powerup);
+} POWERUP;
 
 typedef struct
 {
@@ -278,7 +286,7 @@ void init_enemy(ENEMY *enemy);
 /* Initialize a room to its default, empty state */
 void init_room(ROOM *room);
 
-void init_screenshot(SCREENSHOT *screenshot);
+/* Initialize a powerup to its default state */
+void init_powerup(POWERUP *powerup);
 
-void init_actor(ACTOR *actor);
-SPRITE *get_actor_sprite(ACTOR *actor);
+void init_screenshot(SCREENSHOT *screenshot);

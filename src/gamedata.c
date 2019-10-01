@@ -147,31 +147,22 @@ void init_screenshot(SCREENSHOT *screenshot)
     screenshot->direction = NO_DIRECTION;
 }
 
-void init_actor(ACTOR *actor)
+void init_powerup(POWERUP *powerup)
 {
-    actor->is_active = false;
+    powerup->is_active = false;
 
-    for (int i = 0; i < MAX_SPRITES; i++) {
-        init_sprite(&actor->sprites[i], false, 0);
-    }
-    actor->curr_sprite = 0;
+    init_sprite(&powerup->sprite, false, 0);
 
-    actor->body.x = 0;
-    actor->body.y = 0;
-    actor->body.w = 0;
-    actor->body.h = 0;
-    actor->body.dx = 0;
-    actor->body.dy = 0;
+    powerup->body.x = 0;
+    powerup->body.y = 0;
+    powerup->body.w = 0;
+    powerup->body.h = 0;
+    powerup->body.dx = 0;
+    powerup->body.dy = 0;
 
-    actor->type = UNDEFINED_TYPE;
-    actor->subtype = UNDEFINED_TYPE;
+    powerup->type = UNDEFINED_TYPE;
+    powerup->subtype = UNDEFINED_TYPE;
 
-    actor->control = NULL;
-    actor->update = NULL;
-    actor->draw = NULL;
-}
-
-SPRITE *get_actor_sprite(ACTOR *actor)
-{
-    return &actor->sprites[actor->curr_sprite];
+    powerup->update = NULL;
+    powerup->draw = NULL;
 }
