@@ -99,7 +99,7 @@ static void update_powerup(POWERUP *powerup)
     animate(&powerup->sprite);
 }
 
-static int random_front_texture()
+static int get_next_bullet_texture()
 {
     /**
      * Returns a texture from the "front" of the pile of blocks.
@@ -166,6 +166,12 @@ static int random_front_texture()
     /* Randomly select a color from the list of available textures to hit */
     if (num_textures == 0) {
         return NO_TEXTURE;
+    } else if (hero.powerup_type == POWERUP_TYPE_FLASHING) {
+        /**
+         * If a flashing powerup is in use, return a bullet that
+         * can destroy any texture.
+         */
+        return ANY_TEXTURE;
     } else {
         return textures[random_number(0, num_textures - 1)];
     }
@@ -196,7 +202,7 @@ static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame
 
 static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
 {
-    if (hero.powerup_type == POWERUP_TYPE_MULTI) {
+    if (hero.powerup_type == POWERUP_TYPE_FLASHING) {
         /* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
         init_sprite(sprite, true, 16);
         /* Keep track of which "rotation" of the bullet you're on */
@@ -464,6 +470,9 @@ static void reset_hero(int x, int y)
 
     /* Allow the hero to be controlled by the player */
     hero.control = control_hero_from_keyboard;
+
+    /* Clear any powerup */
+    hero.powerup_type = POWERUP_TYPE_NONE;
 }
 
 static bool is_offscreen(BODY *body, SPRITE *sprite)
@@ -747,6 +756,9 @@ static void to_gameplay_state_starting_after_dying()
     reset_hero(room.start_x, room.start_y);
     clear_hero_input();
 
+    /* Clear any existing powerups */
+    init_powerups();
+
     /* Get rid of any shooting bullets */
     init_bullets();
 
@@ -792,6 +804,9 @@ static void start_next_room()
 
     /* Clear any remaining enemies */
     init_enemies();
+
+    /* Clear any existing powerups */
+    init_powerups();
 
     /* Load the next room */
     load_gameplay_room_from_num(curr_room + 1);
@@ -1036,7 +1051,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
     if (block_collision) {
 
         if (bullet->texture == room.block_map[(r * room.cols) + c] ||
-                hero.powerup_type == POWERUP_TYPE_MULTI) {
+                bullet->texture == ANY_TEXTURE) {
 
             /* Matching textures! */
             /* Remove the bullet and the block */
@@ -1254,7 +1269,7 @@ static void update_hero_player_control()
 
         /* The hero doesn't have a bullet and there are no more on screen */
         /* The hero needs a new bullet to shoot! */
-        hero.texture = random_front_texture();
+        hero.texture = get_next_bullet_texture();
 
         if (hero.texture != NO_TEXTURE) {
             load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
@@ -1391,11 +1406,12 @@ static void collect_powerup(POWERUP *powerup)
     printf("Pretending to collect powerup...\n");
 
     // YOU LEFT OFF HERE!!
-    hero.powerup_type = POWERUP_TYPE_MULTI;
+    hero.powerup_type = POWERUP_TYPE_FLASHING;
     hero.powerup_remaining = 3;
 
     /* Give the hero a sparkly new bullet */
     load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
+    hero.texture = ANY_TEXTURE;
 
     /* Clear the powerup */
     init_powerup(powerup);
@@ -1495,14 +1511,14 @@ static bool update_gameplay_playing()
             }
         }
 
-        ///* Remove any remaining powerups onscreen, we don't need them anymore */
-        //for (int i = 0; i < MAX_POWERUPS; i++) {
-        //    POWERUP *powerup = &powerups[i];
-        //    if (powerup->is_active) {
-        //        load_poof_effect(powerup->body.x, powerup->body.y);
-        //        init_powerup(powerup);
-        //    }
-        //}
+        /* Remove any remaining powerups onscreen, we don't need them anymore */
+        for (int i = 0; i < MAX_POWERUPS; i++) {
+            POWERUP *powerup = &powerups[i];
+            if (powerup->is_active) {
+                load_poof_effect(powerup->body.x, powerup->body.y);
+                init_powerup(powerup);
+            }
+        }
     }
 
     /* Give the player a powerup? */
