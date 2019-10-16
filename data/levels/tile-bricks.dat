@@ -1,79 +1,94 @@
-# Bricks
+# 001 Bricks
 TILE
   IMAGE tile-bricks.png:20x20:0,0
 END
 
-# Bricks, all edges open
+# 002 Bricks, all edges open
 TILE
   IMAGE tile-bricks.png:20x20:0,1
 END
 
-# Bricks, left + right edges open
+# 003 Bricks, left + right edges open
 TILE
   IMAGE tile-bricks.png:20x20:0,2
 END
 
-# Bricks, top + bottom edges open
+# 004 Bricks, top + bottom edges open
 TILE
   IMAGE tile-bricks.png:20x20:0,3
 END
 
-# Bricks, right edge open
+# 005 Bricks, right edge open
 TILE
   IMAGE tile-bricks.png:20x20:1,0
 END
 
-# Bricks, left edge open
+# 006 Bricks, left edge open
 TILE
   IMAGE tile-bricks.png:20x20:1,1
 END
 
-# Bricks, top edge open
+# 007 Bricks, top edge open
 TILE
   IMAGE tile-bricks.png:20x20:1,2
 END
 
-# Bricks, bottom edge open
+# 008 Bricks, bottom edge open
 TILE
   IMAGE tile-bricks.png:20x20:1,3
 END
 
-# Bricks, top + right edge open
+# 009 Bricks, top + right edge open
 TILE
   IMAGE tile-bricks.png:20x20:2,0
 END
 
-# Bricks, right + bottom edge open
+# 010 Bricks, right + bottom edge open
 TILE
   IMAGE tile-bricks.png:20x20:2,1
 END
 
-# Bricks, bottom + left edge open
+# 011 Bricks, bottom + left edge open
 TILE
   IMAGE tile-bricks.png:20x20:2,2
 END
 
-# Bricks, left + top edge open
+# 012 Bricks, left + top edge open
 TILE
   IMAGE tile-bricks.png:20x20:2,3
 END
 
-# Bricks, top + right + bottom edge open
+# 013 Bricks, top + right + bottom edge open
 TILE
   IMAGE tile-bricks.png:20x20:3,0
 END
 
-# Bricks, right + bottom + left edge open
+# 014 Bricks, right + bottom + left edge open
 TILE
   IMAGE tile-bricks.png:20x20:3,1
 END
 
-# Bricks, bottom + left + top edge open
+# 015 Bricks, bottom + left + top edge open
 TILE
   IMAGE tile-bricks.png:20x20:3,2
 END
 
-# Bricks, left + top + right edge open
+# 016 Bricks, left + top + right edge open
 TILE
   IMAGE tile-bricks.png:20x20:3,3
+END
+
+# Background bricks
+TILE
+  IMAGE tile-bricks.png:20x20:4,0
+END
+
+# Background bricks, worn
+TILE
+  IMAGE tile-bricks.png:20x20:4,1
+END
+
+# Dark unseen bricks
+TILE
+  IMAGE tile-bricks.png:20x20:4,2
 END

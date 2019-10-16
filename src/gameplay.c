@@ -814,6 +814,15 @@ static void start_next_room()
     /* Reset the hero */
     reset_hero(room.start_x, room.start_y);
 
+    int n = 0;
+    for (int i = 0; i < MAX_POWERUPS; i++) {
+        if (powerups[i].is_active) {
+            n++;
+        }
+    }
+    if (n > 0) {
+        printf("Starting a new room with %d number of powerups.\n", n);
+    }
 }
 
 static void to_gameplay_state_starting_next_room()
