@@ -1,7 +1,7 @@
 #include <allegro5/allegro.h>
 #include <stdio.h>
 #include "datafile.h"
-#include "display.h"
+#include "dgl_display.h"
 #include "gameplay.h"
 #include "main.h"
 #include "memory.h"
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     }
 
     /* Create a display that will be used to draw the game on */
-    assert(init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, false));
+    assert(dgl_display_init(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
 
     /* So animations know how fast to go */
     set_animation_fps(GAME_TICKER);
@@ -57,8 +57,8 @@ int main(int argc, char **argv)
     add_datafile_path("");
   
     /* Set window properties */
-    al_set_window_title(get_display(), "Colorwand Castle");
-    al_set_display_icon(get_display(), IMGL("icon.png"));
+    al_set_window_title(dgl_display_get_display(), "Colorwand Castle");
+    al_set_display_icon(dgl_display_get_display(), IMGL("icon.png"));
 
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     /* DONE, clean up */
     unlock_resources();
     free_resources();
-    free_display();
+    dgl_display_free();
 
     /* See if we have any naughty memory leaks */
     check_memory();

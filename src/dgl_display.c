@@ -1,15 +1,18 @@
 #include <stdio.h>
-#include "display.h"
+#include "dgl_display.h"
 
-static ALLEGRO_DISPLAY *display = NULL;
-static int display_width = 0;
-static int display_height = 0;
-static bool display_fullscreen = false;
+
+static ALLEGRO_DISPLAY *dgl_display = NULL;
+static int dgl_display_width = 0;
+static int dgl_display_height = 0;
+static bool dgl_display_fullscreen = false;
+static bool dgl_display_scale = DGL_DISPLAY_MAX_SCALE;
+
 
 /**
  * Returns the maximum resolution available on the screen.
  */
-static void get_max_desktop_resolution(int *w, int *h)
+static void dgl_display_get_max_desktop_resolution(int *w, int *h)
 {
     ALLEGRO_DISPLAY_MODE mode;
   
@@ -26,10 +29,11 @@ static void get_max_desktop_resolution(int *w, int *h)
     }
 }
 
+
 /**
  * Returns the current desktop resolution.
  */
-static void get_current_desktop_resolution(int *w, int *h)
+static void dgl_display_get_desktop_resolution(int *w, int *h)
 {
     ALLEGRO_MONITOR_INFO info;
 
@@ -46,11 +50,12 @@ static void get_current_desktop_resolution(int *w, int *h)
     }
 }
 
+
 /**
  * Returns the maximum size the window can be scaled (integer)
  * without being bigger than the screen.
  */
-static int get_max_display_scale(int window_w, int window_h, bool fullscreen)
+static int dgl_display_get_max_scale(int window_w, int window_h, bool fullscreen)
 {
     int scale = 1;
     int scale_x = 1;
@@ -58,7 +63,7 @@ static int get_max_display_scale(int window_w, int window_h, bool fullscreen)
     int monitor_w = 0;
     int monitor_h = 0;
 
-    get_max_desktop_resolution(&monitor_w, &monitor_h);
+    dgl_display_get_max_desktop_resolution(&monitor_w, &monitor_h);
 
     /* Find the largest size the screen can be */
     scale_x = monitor_w / (float) window_w;
@@ -83,13 +88,14 @@ static int get_max_display_scale(int window_w, int window_h, bool fullscreen)
     return scale;
 }
 
+
 /**
  * Scale (integer) the display.
  *
  * This allows the internal game logic to use the game's native window size,
  * while the visual size of the window is much bigger.
  */
-static void set_display_transform(int scale, float offset_x, float offset_y, bool fullscreen)
+static void dgl_display_set_transform(int scale, float offset_x, float offset_y, bool fullscreen)
 {
     ALLEGRO_TRANSFORM trans;
 
@@ -109,12 +115,14 @@ static void set_display_transform(int scale, float offset_x, float offset_y, boo
     al_use_transform(&trans);
 }
 
-ALLEGRO_DISPLAY *get_display(void)
+
+ALLEGRO_DISPLAY *dgl_display_get_display(void)
 {
-    return display;
+    return dgl_display;
 }
 
-void clear_frame(void)
+
+void dgl_display_clear(void)
 {
     int x = 0;
     int y = 0;
@@ -126,38 +134,41 @@ void clear_frame(void)
      * is cleared, not just the part that's being used as a display.
      */
     al_get_clipping_rectangle(&x, &y, &w, &h);
-    al_set_clipping_rectangle(0, 0, al_get_display_width(display), al_get_display_height(display));
+    al_set_clipping_rectangle(0, 0, al_get_display_width(dgl_display), al_get_display_height(dgl_display));
     al_clear_to_color(al_map_rgb(0, 0, 0));
     al_set_clipping_rectangle(x, y, w, h);
 }
 
-static void set_display_clipping()
+
+static void dgl_display_set_clipping()
 {
-    int scale = get_max_display_scale(display_width, display_height, display_fullscreen);
+    int scale = dgl_display_get_max_scale(dgl_display_width, dgl_display_height, dgl_display_fullscreen);
 
     int offset_x = 0;
     int offset_y = 0;
     
-    if (display_fullscreen) {
+    if (dgl_display_fullscreen) {
         int current_w = 0;
         int current_h = 0;
-        get_current_desktop_resolution(&current_w, &current_h);
-        offset_x = (int)(current_w - (display_width * scale)) / 2;
-        offset_y = (int)(current_h - (display_height * scale)) / 2;
+        dgl_display_get_desktop_resolution(&current_w, &current_h);
+        offset_x = (int)(current_w - (dgl_display_width * scale)) / 2;
+        offset_y = (int)(current_h - (dgl_display_height * scale)) / 2;
     }
 
     /* Scale and center the display as big as possible on this screen */
-    set_display_transform(scale, offset_x, offset_y, display_fullscreen);
+    dgl_display_set_transform(scale, offset_x, offset_y, dgl_display_fullscreen);
 
     /* Crop the drawing area, to not accidentally draw in the black borders */
-    al_set_clipping_rectangle(offset_x, offset_y, display_width * scale, display_height * scale);
+    al_set_clipping_rectangle(offset_x, offset_y, dgl_display_width * scale, dgl_display_height * scale);
 }
 
-bool init_display(int width, int height, bool fullscreen)
+
+bool dgl_display_init(int width, int height, int scale, bool fullscreen)
 {
-    display_fullscreen = fullscreen;
-    display_width = width;
-    display_height = height;
+    dgl_display_fullscreen = fullscreen;
+    dgl_display_scale = scale;
+    dgl_display_width = width;
+    dgl_display_height = height;
   
     if (fullscreen) {
         al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
@@ -168,12 +179,18 @@ bool init_display(int width, int height, bool fullscreen)
     /**
      * Find out how many times we can scale the window and still fit
      * the resolution of the monitor.
+     *
+     * Anything less than 1 (including "ALLEGRO_DISPLAY_CONTROL_MAX_SCALE")
+     * means we should calculate the maximum scale possible with the
+     * current screen resolution.
      */
-    int scale = get_max_display_scale(width, height, fullscreen);
+    if (scale <= 0) {
+        scale = dgl_display_get_max_scale(width, height, fullscreen);
+    }
 
     /* Initialize the one and only global display for the game */
-    display = al_create_display(width * scale, height * scale);
-    if (display == NULL) {
+    dgl_display = al_create_display(width * scale, height * scale);
+    if (dgl_display == NULL) {
         fprintf(stderr, "Failed to create display.\n");
         return false;
     }
@@ -183,32 +200,38 @@ bool init_display(int width, int height, bool fullscreen)
     al_flip_display();
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
-    set_display_clipping();
+    dgl_display_set_clipping();
   
     /* Hide the mouse cursor */
-    al_hide_mouse_cursor(display);
+    al_hide_mouse_cursor(dgl_display);
 
     return true;
 }
 
-bool toggle_fullscreen(void)
+
+bool dgl_display_set_fullscreen(bool fullscreen)
 {
-    display_fullscreen = display_fullscreen ? false : true;
+    if (dgl_display_fullscreen == fullscreen) {
+        return true;
+    }
+
+    dgl_display_fullscreen = fullscreen;
 
     /* Toggle the ALLEGRO_FULLSCREEN_WINDOW flag */
-    if (!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, display_fullscreen)) {
+    if (!al_set_display_flag(dgl_display, ALLEGRO_FULLSCREEN_WINDOW, dgl_display_fullscreen)) {
         fprintf(stderr, "WARNING: Fullscreen toggle failed.\n");
         return false;
     }
 
-    set_display_clipping();
+    dgl_display_set_clipping();
   
     return true;
 }
 
-void free_display()
+
+void dgl_display_free()
 {
     al_reset_clipping_rectangle();
-    al_destroy_display(display);
-    display = NULL;
+    al_destroy_display(dgl_display);
+    dgl_display = NULL;
 }

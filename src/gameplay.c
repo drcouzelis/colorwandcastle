@@ -2,7 +2,7 @@
 #include "collision.h"
 #include "compiler.h"
 #include "datafile.h"
-#include "display.h"
+#include "dgl_display.h"
 #include "effects.h"
 #include "gameplay.h"
 #include "main.h"
@@ -995,6 +995,8 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 }
 
+static bool fullscreen = false;
+
 static void control_gameplay_options(ALLEGRO_EVENT *event)
 {
     /* General application control */
@@ -1007,9 +1009,11 @@ static void control_gameplay_options(ALLEGRO_EVENT *event)
         } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_O) {
             /* S : Toggle audio */
             toggle_audio();
-        } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_Y) {
+        } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_U) {
             /* F : Toggle fullscreen */
-            toggle_fullscreen();
+            if (dgl_display_set_fullscreen(!fullscreen)) {
+                fullscreen = !fullscreen;
+            }
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
             /* Toggle the hero */
             toggle_hero();

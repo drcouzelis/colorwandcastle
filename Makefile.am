@@ -16,10 +16,10 @@ colorwandcastle_SOURCES = \
   src/compiler.h \
   src/datafile.c \
   src/datafile.h \
+  src/dgl_display.c \
+  src/dgl_display.h \
   src/direction.c \
   src/direction.h \
-  src/display.c \
-  src/display.h \
   src/effects.c \
   src/effects.h \
   src/gamedata.c \
