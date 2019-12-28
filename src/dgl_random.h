@@ -5,4 +5,4 @@
  * The lower bound is "low".
  * The upper bound is "high".
  */
-int random_number(int low, int high);
+int dgl_random_number(int low, int high);

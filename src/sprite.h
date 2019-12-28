@@ -1,12 +1,12 @@
 #pragma once
 
-#include "resources.h"
+#include "dgl_resources.h"
 
 #define MAX_FRAMES 32
 
 typedef struct
 {
-    IMAGE *frames[MAX_FRAMES];
+    ALLEGRO_BITMAP *frames[MAX_FRAMES];
     int len;
     int pos;
     int speed;
@@ -52,12 +52,12 @@ void animate(SPRITE *sprite);
 /**
  * Returns a pointer to the current frame of animation.
  */
-IMAGE *get_frame(SPRITE *sprite);
+ALLEGRO_BITMAP *get_frame(SPRITE *sprite);
 
 /**
  * Add a frame to the sprite.
  */
-void add_frame(SPRITE *sprite, IMAGE *frame);
+void add_frame(SPRITE *sprite, ALLEGRO_BITMAP *frame);
 
 /**
  * Delete all frames.

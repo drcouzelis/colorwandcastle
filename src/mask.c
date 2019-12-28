@@ -4,7 +4,7 @@
 #include "main.h"
 #include "mask.h"
 
-IMAGE *get_masked_image(const char *name, const char *mask)
+ALLEGRO_BITMAP *get_masked_image(const char *name, const char *mask)
 {
     char complete_name[MAX_FILENAME_LEN];
     complete_name[0] = '\0';
@@ -12,21 +12,21 @@ IMAGE *get_masked_image(const char *name, const char *mask)
     strncat(complete_name, mask, MAX_FILENAME_LEN - 1);
 
     /* If the image has already been added, just return it */
-    IMAGE *masked_img = IMG(complete_name);
+    ALLEGRO_BITMAP *masked_img = DGL_IMG(complete_name);
     if (masked_img != NULL) {
         return masked_img;
     }
 
     /* Load the image */
-    IMAGE *orig_img = IMG(name);
+    ALLEGRO_BITMAP *orig_img = DGL_IMG(name);
     assert(orig_img);
 
     /* Load the mask */
-    IMAGE *mask_img = IMG(mask);
+    ALLEGRO_BITMAP *mask_img = DGL_IMG(mask);
     assert(mask_img);
 
     /* Create a canvas to draw the newly created image to */
-    IMAGE *canvas = al_create_bitmap(al_get_bitmap_width(orig_img), al_get_bitmap_height(orig_img));
+    ALLEGRO_BITMAP *canvas = al_create_bitmap(al_get_bitmap_width(orig_img), al_get_bitmap_height(orig_img));
     assert(canvas);
 
     /* STORE Allegro state */
@@ -47,7 +47,7 @@ IMAGE *get_masked_image(const char *name, const char *mask)
     al_restore_state(&state);
 
     /* Add it to the collection of resources */
-    insert_image_resource(complete_name, canvas);
+    dgl_insert_image_resource(complete_name, canvas);
 
     return canvas;
 }

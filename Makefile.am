@@ -11,13 +11,19 @@ bin_PROGRAMS = colorwandcastle
 colorwandcastle_CPPFLAGS = -std=c11 -O2 -Os -Wall -Wextra -Wpedantic -march=native -DPKGDATADIR='"$(pkgdatadir)"'
 
 colorwandcastle_SOURCES = \
-  src/collision.c \
-  src/collision.h \
   src/compiler.h \
   src/datafile.c \
   src/datafile.h \
+  src/dgl_collision.c \
+  src/dgl_collision.h \
   src/dgl_display.c \
   src/dgl_display.h \
+  src/dgl_memory.c \
+  src/dgl_memory.h \
+  src/dgl_random.c \
+  src/dgl_random.h \
+  src/dgl_resources.c \
+  src/dgl_resources.h \
   src/direction.c \
   src/direction.h \
   src/effects.c \
@@ -30,16 +36,10 @@ colorwandcastle_SOURCES = \
   src/main.h \
   src/mask.c \
   src/mask.h \
-  src/memory.c \
-  src/memory.h \
   src/menu.c \
   src/menu.h \
   src/path.c \
   src/path.h \
-  src/random.c \
-  src/random.h \
-  src/resources.c \
-  src/resources.h \
   src/roomlist.c \
   src/roomlist.h \
   src/run.c \

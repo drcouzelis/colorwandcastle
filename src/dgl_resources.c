@@ -1,17 +1,17 @@
 #include <stdio.h>
 #include <string.h>
-#include "memory.h"
-#include "resources.h"
+#include "dgl_memory.h"
+#include "dgl_resources.h"
 
 #define MAX_RESOURCES 256
 #define MAX_RESOURCE_PATHS 4
 
 typedef enum
 {
-    RESOURCE_TYPE_NONE = 0,
-    RESOURCE_TYPE_IMAGE,
-    RESOURCE_TYPE_SOUND,
-} RESOURCE_TYPE;
+    DGL_RESOURCE_TYPE_NONE = 0,
+    DGL_RESOURCE_TYPE_IMAGE,
+    DGL_RESOURCE_TYPE_SOUND,
+} DGL_RESOURCE_TYPE;
 
 typedef struct
 {
@@ -25,59 +25,59 @@ typedef struct
     char name[MAX_FILENAME_LEN];
 
     /* Resource type */
-    RESOURCE_TYPE type;
+    DGL_RESOURCE_TYPE type;
 
     /* Pointer to the data */
     void *data;
 
-} RESOURCE;
+} DGL_RESOURCE;
 
 /* List of resources */
-static RESOURCE *resources[MAX_RESOURCES];
+static DGL_RESOURCE *dgl_resources[MAX_RESOURCES];
 
 /* List of resource paths */
-static char resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
-static int num_resource_paths = 0;
+static char dgl_resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
+static int dgl_num_resource_paths = 0;
 
-void free_resources()
+void dgl_free_resources()
 {
     for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i] && !resources[i]->locked) {
-            if (resources[i]->type == RESOURCE_TYPE_IMAGE) {
-                al_destroy_bitmap((IMAGE *)resources[i]->data);
-            } else if (resources[i]->type == RESOURCE_TYPE_SOUND) {
-                al_destroy_sample((SOUND *)resources[i]->data);
+        if (dgl_resources[i] && !dgl_resources[i]->locked) {
+            if (dgl_resources[i]->type == DGL_RESOURCE_TYPE_IMAGE) {
+                al_destroy_bitmap((ALLEGRO_BITMAP *)dgl_resources[i]->data);
+            } else if (dgl_resources[i]->type == DGL_RESOURCE_TYPE_SOUND) {
+                al_destroy_sample((ALLEGRO_SAMPLE *)dgl_resources[i]->data);
             }
-            free_memory("RESOURCE", resources[i]);
-            resources[i] = NULL;
+            dgl_free_memory("DGL_RESOURCE", dgl_resources[i]);
+            dgl_resources[i] = NULL;
         }
     }
 }
 
-void lock_resource(const char *name)
+void dgl_lock_resource(const char *name)
 {
     for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i] != NULL) {
-            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
-                resources[i]->locked = true;
+        if (dgl_resources[i] != NULL) {
+            if (strncmp(dgl_resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
+                dgl_resources[i]->locked = true;
                 return;
             }
         }
     }
 }
 
-void unlock_resources()
+void dgl_unlock_resources()
 {
     for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i] != NULL) {
-            resources[i]->locked = false;
+        if (dgl_resources[i] != NULL) {
+            dgl_resources[i]->locked = false;
         }
     }
 }
 
-void add_resource_path(const char *path)
+void dgl_add_resource_path(const char *path)
 {
-    if (num_resource_paths >= MAX_RESOURCE_PATHS) {
+    if (dgl_num_resource_paths >= MAX_RESOURCE_PATHS) {
         fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_RESOURCE_PATHS.\n");
         return;
     }
@@ -85,18 +85,18 @@ void add_resource_path(const char *path)
     /**
      * Add the new path to the list of resource paths.
      */
-    strncpy(resource_paths[num_resource_paths], path, MAX_FILEPATH_LEN);
+    strncpy(dgl_resource_paths[dgl_num_resource_paths], path, MAX_FILEPATH_LEN);
 
-    num_resource_paths++;
+    dgl_num_resource_paths++;
 }
 
 /**
  * Load a bitmap and set magic pink to transparent.
  */
-static IMAGE *load_bitmap_with_magic_pink(const char *filename)
+static ALLEGRO_BITMAP *dgl_load_bitmap_with_magic_pink(const char *filename)
 {
     /* Try loading an image from the filename you've been given */
-    IMAGE *bitmap = al_load_bitmap(filename);
+    ALLEGRO_BITMAP *bitmap = al_load_bitmap(filename);
 
     if (bitmap == NULL) {
 
@@ -142,7 +142,7 @@ static IMAGE *load_bitmap_with_magic_pink(const char *filename)
         //printf("\"%s\", %d, %d, %d, %d\n", actual_filename, w, h, r, c);
 
         /* Load the image from a section of the tilemap */
-        IMAGE *tilemap = al_load_bitmap(actual_filename);
+        ALLEGRO_BITMAP *tilemap = al_load_bitmap(actual_filename);
         if (tilemap == NULL) {
             return NULL;
         }
@@ -169,11 +169,11 @@ static IMAGE *load_bitmap_with_magic_pink(const char *filename)
 }
 
 /**
- * Create a RESOURCE structure.
+ * Create a DGL_RESOURCE structure.
  */
-static RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *data)
+static DGL_RESOURCE *dgl_create_resource(const char *name, DGL_RESOURCE_TYPE type, void *data)
 {
-    RESOURCE *resource = alloc_memory("RESOURCE", sizeof(RESOURCE));
+    DGL_RESOURCE *resource = dgl_alloc_memory("DGL_RESOURCE", sizeof(DGL_RESOURCE));
 
     if (resource) {
         strncpy(resource->name, name, MAX_FILENAME_LEN - 1);
@@ -186,10 +186,10 @@ static RESOURCE *create_resource(const char *name, RESOURCE_TYPE type, void *dat
     return resource;
 }
 
-static int next_available_resource_index()
+static int dgl_next_available_resource_index()
 {
     for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i] == NULL) {
+        if (dgl_resources[i] == NULL) {
             return i;
         }
     }
@@ -197,16 +197,16 @@ static int next_available_resource_index()
     return -1;
 }
 
-static void add_resource_to_list(RESOURCE *resource)
+static void dgl_add_resource_to_list(DGL_RESOURCE *resource)
 {
-    int n = next_available_resource_index();
+    int n = dgl_next_available_resource_index();
 
     if (n >= 0) {
-        resources[n] = resource;
+        dgl_resources[n] = resource;
     }
 }
 
-static void *get_resource(const char *name, RESOURCE_TYPE type)
+static void *dgl_get_resource(const char *name, DGL_RESOURCE_TYPE type)
 {
     void *data = NULL;
     char fullpath[MAX_FILEPATH_LEN];
@@ -216,10 +216,10 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
      * Check the resources that have already been loaded
      */
     for (i = 0; i < MAX_RESOURCES; i++) {
-        if (resources[i] != NULL) {
-            if (strncmp(resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
+        if (dgl_resources[i] != NULL) {
+            if (strncmp(dgl_resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
                 /* The resource has been found! Return it */
-                return resources[i]->data;
+                return dgl_resources[i]->data;
             }
         }
     }
@@ -228,7 +228,7 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
      * Uh oh. The resource WASN'T found.
      */
 
-    if (next_available_resource_index() < 0) {
+    if (dgl_next_available_resource_index() < 0) {
         return NULL;
     }
 
@@ -238,22 +238,22 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
      *
      * If found, return it!
      */
-    for (i = 0; i < num_resource_paths; i++) {
+    for (i = 0; i < dgl_num_resource_paths; i++) {
 
         fullpath[0] = '\0';
-        strncat(fullpath, resource_paths[i], MAX_FILEPATH_LEN - 1);
+        strncat(fullpath, dgl_resource_paths[i], MAX_FILEPATH_LEN - 1);
         strncat(fullpath, name, MAX_FILEPATH_LEN - 1);
 
         /* Load the resource, based on the filetype */
-        if (type == RESOURCE_TYPE_IMAGE) {
-            data = load_bitmap_with_magic_pink(fullpath);
-        } else if (type == RESOURCE_TYPE_SOUND) {
+        if (type == DGL_RESOURCE_TYPE_IMAGE) {
+            data = dgl_load_bitmap_with_magic_pink(fullpath);
+        } else if (type == DGL_RESOURCE_TYPE_SOUND) {
             data = al_load_sample(fullpath);
         }
 
         /* The resource has been created! Return it */
         if (data != NULL) {
-            add_resource_to_list(create_resource(name, type, data));
+            dgl_add_resource_to_list(dgl_create_resource(name, type, data));
             return data;
         }
     }
@@ -262,31 +262,31 @@ static void *get_resource(const char *name, RESOURCE_TYPE type)
     return NULL;
 }
 
-IMAGE *get_image(const char *name)
+ALLEGRO_BITMAP *dgl_get_image(const char *name)
 {
-    return (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
+    return (ALLEGRO_BITMAP *)dgl_get_resource(name, DGL_RESOURCE_TYPE_IMAGE);
 }
 
-IMAGE *get_locked_image(const char *name)
+ALLEGRO_BITMAP *dgl_get_locked_image(const char *name)
 {
-    IMAGE *image = (IMAGE *)get_resource(name, RESOURCE_TYPE_IMAGE);
-    lock_resource(name);
+    ALLEGRO_BITMAP *image = (ALLEGRO_BITMAP *)dgl_get_resource(name, DGL_RESOURCE_TYPE_IMAGE);
+    dgl_lock_resource(name);
     return image;
 }
 
-SOUND *get_sound(const char *name)
+ALLEGRO_SAMPLE *dgl_get_sound(const char *name)
 {
-    return (SOUND *)get_resource(name, RESOURCE_TYPE_SOUND);
+    return (ALLEGRO_SAMPLE *)dgl_get_resource(name, DGL_RESOURCE_TYPE_SOUND);
 }
 
-void insert_image_resource(const char *name, IMAGE *image)
+void dgl_insert_image_resource(const char *name, ALLEGRO_BITMAP *image)
 {
     assert(image);
 
     /* Check if the image has already been added */
-    if (get_image(name) != NULL) {
+    if (dgl_get_image(name) != NULL) {
         return;
     }
 
-    add_resource_to_list(create_resource(name, RESOURCE_TYPE_IMAGE, image));
+    dgl_add_resource_to_list(dgl_create_resource(name, DGL_RESOURCE_TYPE_IMAGE, image));
 }

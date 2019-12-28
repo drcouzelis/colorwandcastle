@@ -1,6 +1,6 @@
 #pragma once
 
-#include "resources.h"
+#include "dgl_resources.h"
 
 /**
  * Returns a newly created image, made from the two
@@ -14,7 +14,7 @@
  * If a masked image has already been created with these two images
  * then it will not be created again, but the original will be returned.
  */
-IMAGE *get_masked_image(const char *name, const char *mask);
+ALLEGRO_BITMAP *get_masked_image(const char *name, const char *mask);
 
 /* For convenience */
 #define MASKED_IMG(name, mask) (get_masked_image(name, mask))

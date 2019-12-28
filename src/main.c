@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include "datafile.h"
 #include "dgl_display.h"
+#include "dgl_memory.h"
+#include "dgl_resources.h"
 #include "gameplay.h"
 #include "main.h"
-#include "memory.h"
 #include "run.h"
 #include "sound.h"
 #include "sprite.h"
-#include "resources.h"
 
 int main(int argc, char **argv)
 {
@@ -48,8 +48,8 @@ int main(int argc, char **argv)
     set_animation_fps(GAME_TICKER);
 
     /* So we know where to look for image and sound files... */
-    add_resource_path( PKGDATADIR "/images/");
-    add_resource_path( PKGDATADIR "/sounds/");
+    dgl_add_resource_path( PKGDATADIR "/images/");
+    dgl_add_resource_path( PKGDATADIR "/sounds/");
 
     /* So we know where to look for data / level files... */
     add_datafile_path( PKGDATADIR "/levels/");
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
   
     /* Set window properties */
     al_set_window_title(dgl_display_get_display(), "Colorwand Castle");
-    al_set_display_icon(dgl_display_get_display(), IMGL("icon.png"));
+    al_set_display_icon(dgl_display_get_display(), DGL_IMGL("icon.png"));
 
     /* So the game knows how fast to run */
     set_fps(GAME_TICKER);
@@ -107,12 +107,12 @@ int main(int argc, char **argv)
     run(control_gameplay, update_gameplay, draw_gameplay, NULL);
  
     /* DONE, clean up */
-    unlock_resources();
-    free_resources();
+    dgl_unlock_resources();
+    dgl_free_resources();
     dgl_display_free();
 
     /* See if we have any naughty memory leaks */
-    check_memory();
+    dgl_check_memory();
 
     return EXIT_SUCCESS;
 }

@@ -64,7 +64,7 @@ void reset_sprite(SPRITE *sprite)
     sprite->fudge = 0;
 }
 
-IMAGE *get_frame(SPRITE *sprite)
+ALLEGRO_BITMAP *get_frame(SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return NULL;
@@ -73,7 +73,7 @@ IMAGE *get_frame(SPRITE *sprite)
     return sprite->frames[sprite->pos];
 }
 
-void add_frame(SPRITE *sprite, IMAGE *frame)
+void add_frame(SPRITE *sprite, ALLEGRO_BITMAP *frame)
 {
     assert(sprite != NULL);
     assert(frame != NULL);

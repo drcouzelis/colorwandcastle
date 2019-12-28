@@ -94,10 +94,10 @@ void load_poof_effect(float x, float y)
     }
 
     init_sprite(&effect->sprite, false, 15);
-    add_frame(&effect->sprite, IMG("effect-poof-1.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-2.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-3.png"));
-    add_frame(&effect->sprite, IMG("effect-poof-4.png"));
+    add_frame(&effect->sprite, DGL_IMG("effect-poof-1.png"));
+    add_frame(&effect->sprite, DGL_IMG("effect-poof-2.png"));
+    add_frame(&effect->sprite, DGL_IMG("effect-poof-3.png"));
+    add_frame(&effect->sprite, DGL_IMG("effect-poof-4.png"));
     effect->sprite.x_offset = -10;
     effect->sprite.y_offset = -10;
     effect->x = x;

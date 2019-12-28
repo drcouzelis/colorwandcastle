@@ -123,7 +123,7 @@ void init_room(ROOM *room)
 
     /* Exits */
     init_sprite(&room->door_sprite, false, 0);
-    add_frame(&room->door_sprite, IMG("tile-door.png"));
+    add_frame(&room->door_sprite, DGL_IMG("tile-door.png"));
     room->door_x = 0;
     room->door_y = 0;
 

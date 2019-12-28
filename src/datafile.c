@@ -1,9 +1,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include "datafile.h"
+#include "dgl_random.h"
+#include "dgl_resources.h"
 #include "mask.h"
-#include "random.h"
-#include "resources.h"
 
 #define MAX_DATAFILE_PATHS 4
 #define MAX_DATAFILE_FILENAME_SIZE 256
@@ -73,7 +73,7 @@ static void load_sprite_from_datafile(SPRITE *sprite, FILE *file)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
-            add_frame(sprite, IMG(string));
+            add_frame(sprite, DGL_IMG(string));
             continue;
         }
 
@@ -480,7 +480,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     for (int i = 0; i < room->rows * room->cols; i++) {
         if (room->block_map_orig[i] == RANDOM_BLOCK) {
             /* Set the block to a random texture */
-            room->block_map_orig[i] = random_number(0, room->num_textures - 1);
+            room->block_map_orig[i] = dgl_random_number(0, room->num_textures - 1);
         }
     }
 

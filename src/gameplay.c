@@ -1,14 +1,14 @@
 #include <stdio.h>
-#include "collision.h"
 #include "compiler.h"
 #include "datafile.h"
+#include "dgl_collision.h"
 #include "dgl_display.h"
+#include "dgl_random.h"
 #include "effects.h"
 #include "gameplay.h"
 #include "main.h"
 #include "mask.h"
 #include "path.h"
-#include "random.h"
 #include "sound.h"
 #include "sprite.h"
 
@@ -173,7 +173,7 @@ static int get_next_bullet_texture()
          */
         return ANY_TEXTURE;
     } else {
-        return textures[random_number(0, num_textures - 1)];
+        return textures[dgl_random_number(0, num_textures - 1)];
     }
 }
 
@@ -186,7 +186,7 @@ static bool room_has_exits()
     return false;
 }
 
-static IMAGE *get_hero_bullet_image(char *texture_name, int hero_type, int frame)
+static ALLEGRO_BITMAP *get_hero_bullet_image(char *texture_name, int hero_type, int frame)
 {
     /**
      * Return an image of the hero's bullet based on
@@ -245,15 +245,15 @@ static void load_hero_sprite()
     }
 
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero.sprite_flying, IMGL("hero-makayla-1.png"));
-        add_frame(&hero.sprite_flying, IMGL("hero-makayla-2.png"));
-        add_frame(&hero.sprite_hurting, IMGL("hero-makayla-hurt-1.png"));
-        add_frame(&hero.sprite_hurting, IMGL("hero-makayla-hurt-2.png"));
+        add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-1.png"));
+        add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-2.png"));
+        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-1.png"));
+        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-2.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        add_frame(&hero.sprite_flying, IMGL("hero-rawson-1.png"));
-        add_frame(&hero.sprite_flying, IMGL("hero-rawson-2.png"));
-        add_frame(&hero.sprite_hurting, IMGL("hero-rawson-hurt-1.png"));
-        add_frame(&hero.sprite_hurting, IMGL("hero-rawson-hurt-2.png"));
+        add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-1.png"));
+        add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-2.png"));
+        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-1.png"));
+        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-2.png"));
     }
 }
 
@@ -283,8 +283,8 @@ static void load_powerup(float x, float y)
     }
 
     init_sprite(&powerup->sprite, true, 6);
-    add_frame(&powerup->sprite, IMG("powerup-rainbow-1.png"));
-    add_frame(&powerup->sprite, IMG("powerup-rainbow-2.png"));
+    add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
+    add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
     powerup->body.x = x;
     powerup->body.y = y;
     powerup->body.w = 20;
@@ -310,7 +310,7 @@ static void toggle_hero()
     }
 
     load_poof_effect(hero.body.x - 5, hero.body.y - 5);
-    play_sound(SND("hero-toggle.wav"));
+    play_sound(DGL_SND("hero-toggle.wav"));
 }
 
 static void control_hero_from_keyboard(HERO *hero, void *data)
@@ -395,13 +395,13 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
 {
     init_screenshot(screenshot);
 
-    IMAGE *canvas = al_create_bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    ALLEGRO_BITMAP *canvas = al_create_bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT);
     assert(canvas);
 
-    insert_image_resource(name, canvas);
-    lock_resource(name);
+    dgl_insert_image_resource(name, canvas);
+    dgl_lock_resource(name);
 
-    add_frame(&screenshot->sprite, IMG(name));
+    add_frame(&screenshot->sprite, DGL_IMG(name));
 }
 
 static void init_enemies()
@@ -632,11 +632,11 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
 
     if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
         init_sprite(&enemy->sprite, true, 20);
-        add_frame(&enemy->sprite, IMG("enemy-bat-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-1.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -647,14 +647,14 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
         init_sprite(&enemy->sprite, true, 8);
-        add_frame(&enemy->sprite, IMG("enemy-spider-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-4.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-5.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-6.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-spider-7.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-1.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-2.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-4.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-5.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-6.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-7.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -665,10 +665,10 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
         init_sprite(&enemy->sprite, true, 10);
-        add_frame(&enemy->sprite, IMG("enemy-ghost-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-ghost-2.png"));
-        add_frame(&enemy->sprite, IMG("enemy-ghost-3.png"));
-        add_frame(&enemy->sprite, IMG("enemy-ghost-4.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-1.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-2.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-3.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-4.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -680,8 +680,8 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
         init_sprite(&enemy->sprite, true, 1);
-        add_frame(&enemy->sprite, IMG("enemy-blocker-1.png"));
-        add_frame(&enemy->sprite, IMG("enemy-blocker-2.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-1.png"));
+        add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-2.png"));
         enemy->body.w = 20;
         enemy->body.h = 20;
         enemy->update = update_enemy_animation;
@@ -1069,7 +1069,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
-            play_sound(SND("block-destroyed.wav"));
+            play_sound(DGL_SND("block-destroyed.wav"));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
@@ -1088,7 +1088,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Bounce */
             bullet->body.dx *= -1;
             bullet->body.dy *= -1;
-            play_sound(SND("bullet-bounce.wav"));
+            play_sound(DGL_SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1104,12 +1104,12 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         /* Just bounce */
         bullet->hits--;
         if (bullet->hits <= 0) {
-            play_sound(SND("bullet-disolve.wav"));
+            play_sound(DGL_SND("bullet-disolve.wav"));
         } else {
             /* Bounce */
             bullet->body.dx *= -1;
             bullet->body.dy *= -1;
-            play_sound(SND("bullet-bounce.wav"));
+            play_sound(DGL_SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1177,7 +1177,7 @@ static void shoot_bullet(int texture, float x, float y)
         }
     }
 
-    play_sound(SND("bullet-shoot.wav"));
+    play_sound(DGL_SND("bullet-shoot.wav"));
 
     /**
      * Do some fancy footwork to find out if this bullet
@@ -1341,7 +1341,7 @@ static void set_hero_death()
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
 
-    play_sound(SND("hero-die.wav"));
+    play_sound(DGL_SND("hero-die.wav"));
 
     hero.control = NULL;
 }
@@ -1388,22 +1388,22 @@ static bool is_hero_in_exit(EXIT *exit)
     /* If more than one corner is in the exit, return true */
 
     /* Upper left */
-    if (is_point_in(b->x, b->y, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+    if (dgl_is_point_in(b->x, b->y, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
         num_corners++;
     }
 
     /* Upper right */
-    if (is_point_in(b->x + b->w, b->y, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+    if (dgl_is_point_in(b->x + b->w, b->y, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
         num_corners++;
     }
 
     /* Lower left */
-    if (is_point_in(b->x, b->y + b->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+    if (dgl_is_point_in(b->x, b->y + b->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
         num_corners++;
     }
 
     /* Lower right */
-    if (is_point_in(b->x + b->w, b->y + b->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
+    if (dgl_is_point_in(b->x + b->w, b->y + b->h, exit->col * TILE_SIZE, exit->row * TILE_SIZE, TILE_SIZE, TILE_SIZE)) {
         num_corners++;
     }
 
@@ -1460,7 +1460,7 @@ static bool update_gameplay_playing()
         if (powerups[i].is_active) {
             BODY *b1 = &hero.body;
             BODY *b2 = &powerups[i].body;
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+            if (dgl_is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
                 /* Destroy the powerup, because it was collected */
                 powerups[i].is_active = false;
                 collect_powerup(&powerups[i]);
@@ -1473,7 +1473,7 @@ static bool update_gameplay_playing()
         if (bullets[i].is_active) {
             BODY *b1 = &hero.body;
             BODY *b2 = &bullets[i].body;
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+            if (dgl_is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
                 /* Destroy the bullet that hit the hero */
                 bullets[i].is_active = false;
                 to_gameplay_state_dying();
@@ -1489,7 +1489,7 @@ static bool update_gameplay_playing()
         if (enemy->is_active) {
             BODY *b1 = &hero.body;
             BODY *b2 = &enemy->body;
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
+            if (dgl_is_collision(b1->x, b1->y, b1->w, b1->h, b2->x, b2->y, b2->w, b2->h)) {
                 to_gameplay_state_dying();
                 return true;
             }
@@ -1507,7 +1507,7 @@ static bool update_gameplay_playing()
             for (int c = 0; c < room.cols; c++) {
                 if (room.block_map_orig[(r * room.cols) + c] >= 0) {
                     /* At least one block has been found! */
-                    play_sound(SND("room-cleared.wav"));
+                    play_sound(DGL_SND("room-cleared.wav"));
                     /* Break out of the loop */
                     r = room.rows;
                     c = room.cols;
@@ -1543,7 +1543,7 @@ static bool update_gameplay_playing()
 
     /* Set the number of blocks needed to be cleared until a new powerup appears */
     if (blocks_until_powerup_appears == RESET_POWERUP_COUNTER) {
-        blocks_until_powerup_appears = random_number(5, 8);
+        blocks_until_powerup_appears = dgl_random_number(5, 8);
         printf("Next powerup will appear after %d blocks cleared.\n", blocks_until_powerup_appears);
     }
 
@@ -1570,7 +1570,7 @@ static bool update_gameplay_playing()
 
         /* There are no declared exits, use a door instead */
         if (!room_has_exits()) {
-            if (is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
+            if (dgl_is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
                 to_gameplay_state_door_entered();
             }
         }
