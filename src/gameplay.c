@@ -874,7 +874,7 @@ static void to_gameplay_state_scroll_rooms()
 
     /* Clear all resources before loading the new room */
     /* ONLY DO THIS WHEN NEEDED */
-    //free_resources();
+    //dgl_free_resources();
     
     /* Grab a copy of the hero position */
     float old_hero_pos_x = hero.body.x;

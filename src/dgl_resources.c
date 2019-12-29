@@ -3,26 +3,25 @@
 #include "dgl_memory.h"
 #include "dgl_resources.h"
 
-#define MAX_RESOURCES 256
 #define MAX_RESOURCE_PATHS 4
 
 typedef enum
 {
-    DGL_RESOURCE_TYPE_NONE = 0,
-    DGL_RESOURCE_TYPE_IMAGE,
+    DGL_RESOURCE_TYPE_IMAGE = 0,
     DGL_RESOURCE_TYPE_SOUND,
 } DGL_RESOURCE_TYPE;
 
-typedef struct
+typedef struct DGL_RESOURCE
 {
-    /* If the resource is in use */
-    bool active;
-
     /* A locked resource will not be deleted (unless specifically told) */
     bool locked;
 
     /* The name / filename used to reference the resource */
-    char name[MAX_FILENAME_LEN];
+    char *name;
+
+    /* Left and right branches, used in creating the binary tree of resources */
+    struct DGL_RESOURCE *left;
+    struct DGL_RESOURCE *right;
 
     /* Resource type */
     DGL_RESOURCE_TYPE type;
@@ -32,47 +31,208 @@ typedef struct
 
 } DGL_RESOURCE;
 
-/* List of resources */
-static DGL_RESOURCE *dgl_resources[MAX_RESOURCES];
+/* The collection of resources, stored as a binary tree */
+static DGL_RESOURCE *dgl_resource_tree = NULL;
+
+/**
+ * A temporary resource tree, used when deleting the main collection.
+ * When deleting all resources, any resource that is locked is
+ * temporarily saved here, then moved into the primary tree.
+ */
+static DGL_RESOURCE *dgl_temp_resource_tree = NULL;
 
 /* List of resource paths */
 static char dgl_resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
 static int dgl_num_resource_paths = 0;
 
+/*
+static void dgl_print_resource_tree(DGL_RESOURCE *resource, int level)
+{
+    if (resource == NULL) {
+        printf("NULL\n");
+        return;
+    }
+
+    printf("%s\n", resource->name);
+
+    for (int i = 0; i < level; i++) {
+        printf(" ");
+    }
+    printf("LEFT : ");
+    dgl_print_resource_tree(resource->left, level + 2);
+
+    for (int i = 0; i < level; i++) {
+        printf(" ");
+    }
+    printf("RIGHT: ");
+    dgl_print_resource_tree(resource->right, level + 2);
+}
+*/
+
+/**
+ * Create a DGL_RESOURCE structure.
+ */
+static DGL_RESOURCE *dgl_create_resource(const char *name, DGL_RESOURCE_TYPE type, void *data)
+{
+    assert(name != NULL);
+    assert(data != NULL);
+    assert(type == DGL_RESOURCE_TYPE_IMAGE || type == DGL_RESOURCE_TYPE_SOUND);
+
+    DGL_RESOURCE *resource = dgl_alloc_memory("DGL_RESOURCE", sizeof(DGL_RESOURCE));
+    assert(resource != NULL);
+
+    int new_strlen = strlen(name) + 1; // Length of the string, plus one more for the terminating '\0'
+    resource->name = dgl_alloc_memory("DGL_RESOURCE->name", new_strlen * sizeof(char));
+    assert(resource->name != NULL);
+    strcpy(resource->name, name);
+
+    resource->type = type;
+    resource->data = data;
+    resource->locked = false;
+
+    resource->left = NULL;
+    resource->right = NULL;
+
+    return resource;
+}
+
+static DGL_RESOURCE *dgl_add_resource_to_tree(DGL_RESOURCE *tree, DGL_RESOURCE *resource)
+{
+    assert(resource != NULL);
+    assert(resource->name != NULL);
+
+    if (tree == NULL) {
+        return resource;
+    }
+
+    int result = strcmp(resource->name, tree->name);
+    assert(result != 0);
+
+    if (result < 0) {
+        tree->left = dgl_add_resource_to_tree(tree->left, resource);
+    }
+
+    if (result > 0) {
+        tree->right =  dgl_add_resource_to_tree(tree->right, resource);
+    }
+
+    return tree;
+}
+
+static void dgl_add_resource(DGL_RESOURCE *resource)
+{
+    dgl_resource_tree = dgl_add_resource_to_tree(dgl_resource_tree, resource);
+}
+
+static DGL_RESOURCE *dgl_free_resource_tree(DGL_RESOURCE *resource)
+{
+    if (resource == NULL) {
+        return NULL;
+    }
+
+    if (resource->left != NULL) {
+        resource->left = dgl_free_resource_tree(resource->left);
+    }
+
+    if (resource->right != NULL) {
+        resource->right = dgl_free_resource_tree(resource->right);
+    }
+
+    if (resource->locked) {
+
+        /* Make a copy of a locked resource and save it in another collection */
+        DGL_RESOURCE *resource_copy = dgl_create_resource(resource->name, resource->type, resource->data);
+        resource_copy->locked = true;
+
+        dgl_temp_resource_tree = dgl_add_resource_to_tree(dgl_temp_resource_tree, resource_copy);
+
+        /* Now that we have a copy, we can get rid of the original */
+        resource->data = NULL;
+        resource->locked = false;
+    }
+
+    /* Free the resource data */
+    if (resource->type == DGL_RESOURCE_TYPE_IMAGE) {
+        al_destroy_bitmap((ALLEGRO_BITMAP *)resource->data);
+    } else if (resource->type == DGL_RESOURCE_TYPE_SOUND) {
+        al_destroy_sample((ALLEGRO_SAMPLE *)resource->data);
+    }
+    dgl_free_memory("DGL_RESOURCE->name", resource->name);
+    dgl_free_memory("DGL_RESOURCE", resource);
+    resource = NULL;
+
+    return resource;
+}
+
 void dgl_free_resources()
 {
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (dgl_resources[i] && !dgl_resources[i]->locked) {
-            if (dgl_resources[i]->type == DGL_RESOURCE_TYPE_IMAGE) {
-                al_destroy_bitmap((ALLEGRO_BITMAP *)dgl_resources[i]->data);
-            } else if (dgl_resources[i]->type == DGL_RESOURCE_TYPE_SOUND) {
-                al_destroy_sample((ALLEGRO_SAMPLE *)dgl_resources[i]->data);
-            }
-            dgl_free_memory("DGL_RESOURCE", dgl_resources[i]);
-            dgl_resources[i] = NULL;
-        }
+    /* Free resources, recursively */
+    dgl_free_resource_tree(dgl_resource_tree);
+
+    /**
+     * Any locked resources are now saved in a temporary tree.
+     * Move our temporary collection of (locked) resources to
+     * our primary tree.
+     */
+    dgl_resource_tree = dgl_temp_resource_tree;
+    dgl_temp_resource_tree = NULL;
+}
+
+static DGL_RESOURCE *dgl_find_resource(DGL_RESOURCE *tree, const char *name)
+{
+    if (tree == NULL) {
+        return NULL;
     }
+
+    /* Is this the resource you're looking for? */
+    if (strcmp(tree->name, name) == 0) {
+        return tree;
+    }
+
+    DGL_RESOURCE *resource = NULL;
+
+    /* Check the left tree...*/
+    resource = dgl_find_resource(tree->left, name);
+    if (resource != NULL) {
+        return resource;
+    }
+
+    /* Check the right tree...*/
+    resource = dgl_find_resource(tree->right, name);
+    if (resource != NULL) {
+        return resource;
+    }
+
+    /**
+     * At this point, it's not in the left tree, it's not in the right tree
+     * and it's not THIS resource. Give up!
+     */
+    return NULL;
 }
 
 void dgl_lock_resource(const char *name)
 {
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (dgl_resources[i] != NULL) {
-            if (strncmp(dgl_resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
-                dgl_resources[i]->locked = true;
-                return;
-            }
-        }
+    DGL_RESOURCE *resource = dgl_find_resource(dgl_resource_tree, name);
+    assert(resource != NULL);
+
+    resource->locked = true;
+}
+
+static void dgl_unlock_resource_tree(DGL_RESOURCE *tree)
+{
+    if (tree == NULL) {
+        return;
     }
+
+    dgl_unlock_resource_tree(tree->left);
+    dgl_unlock_resource_tree(tree->right);
+
+    tree->locked = false;
 }
 
 void dgl_unlock_resources()
 {
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (dgl_resources[i] != NULL) {
-            dgl_resources[i]->locked = false;
-        }
-    }
+    dgl_unlock_resource_tree(dgl_resource_tree);
 }
 
 void dgl_add_resource_path(const char *path)
@@ -168,81 +328,32 @@ static ALLEGRO_BITMAP *dgl_load_bitmap_with_magic_pink(const char *filename)
     return bitmap;
 }
 
-/**
- * Create a DGL_RESOURCE structure.
- */
-static DGL_RESOURCE *dgl_create_resource(const char *name, DGL_RESOURCE_TYPE type, void *data)
-{
-    DGL_RESOURCE *resource = dgl_alloc_memory("DGL_RESOURCE", sizeof(DGL_RESOURCE));
-
-    if (resource) {
-        strncpy(resource->name, name, MAX_FILENAME_LEN - 1);
-        resource->type = type;
-        resource->data = data;
-        resource->locked = false;
-        resource->active = true;
-    }
-
-    return resource;
-}
-
-static int dgl_next_available_resource_index()
-{
-    for (int i = 0; i < MAX_RESOURCES; i++) {
-        if (dgl_resources[i] == NULL) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-static void dgl_add_resource_to_list(DGL_RESOURCE *resource)
-{
-    int n = dgl_next_available_resource_index();
-
-    if (n >= 0) {
-        dgl_resources[n] = resource;
-    }
-}
-
 static void *dgl_get_resource(const char *name, DGL_RESOURCE_TYPE type)
 {
-    void *data = NULL;
-    char fullpath[MAX_FILEPATH_LEN];
-    int i;
-
     /**
      * Check the resources that have already been loaded
      */
-    for (i = 0; i < MAX_RESOURCES; i++) {
-        if (dgl_resources[i] != NULL) {
-            if (strncmp(dgl_resources[i]->name, name, MAX_FILENAME_LEN - 1) == 0) {
-                /* The resource has been found! Return it */
-                return dgl_resources[i]->data;
-            }
-        }
+    DGL_RESOURCE *resource = dgl_find_resource(dgl_resource_tree, name);
+    if (resource != NULL) {
+        return resource->data;
     }
 
     /**
-     * Uh oh. The resource WASN'T found.
-     */
-
-    if (dgl_next_available_resource_index() < 0) {
-        return NULL;
-    }
-
-    /**
+     * Uh oh. The resource WASN'T found...
+     *
      * Next, try finding a file with the given filename in
      * the list of resource paths.
      *
      * If found, return it!
      */
-    for (i = 0; i < dgl_num_resource_paths; i++) {
+    for (int i = 0; i < dgl_num_resource_paths; i++) {
 
+        char fullpath[MAX_FILEPATH_LEN];
         fullpath[0] = '\0';
         strncat(fullpath, dgl_resource_paths[i], MAX_FILEPATH_LEN - 1);
         strncat(fullpath, name, MAX_FILEPATH_LEN - 1);
+
+        void *data = NULL;
 
         /* Load the resource, based on the filetype */
         if (type == DGL_RESOURCE_TYPE_IMAGE) {
@@ -253,7 +364,7 @@ static void *dgl_get_resource(const char *name, DGL_RESOURCE_TYPE type)
 
         /* The resource has been created! Return it */
         if (data != NULL) {
-            dgl_add_resource_to_list(dgl_create_resource(name, type, data));
+            dgl_add_resource(dgl_create_resource(name, type, data));
             return data;
         }
     }
@@ -288,5 +399,5 @@ void dgl_insert_image_resource(const char *name, ALLEGRO_BITMAP *image)
         return;
     }
 
-    dgl_add_resource_to_list(dgl_create_resource(name, DGL_RESOURCE_TYPE_IMAGE, image));
+    dgl_add_resource(dgl_create_resource(name, DGL_RESOURCE_TYPE_IMAGE, image));
 }
