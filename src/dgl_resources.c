@@ -41,9 +41,18 @@ static DGL_RESOURCE *dgl_resource_tree = NULL;
  */
 static DGL_RESOURCE *dgl_temp_resource_tree = NULL;
 
+typedef struct DGL_RESOURCE_PATH
+{
+    /* The path (AKA directory, AKA folder) name that contains resources */
+    char *path;
+
+    /* The next resource path in the linked list */
+    struct DGL_RESOURCE_PATH *next;
+
+} DGL_RESOURCE_PATH;
+
 /* List of resource paths */
-static char dgl_resource_paths[MAX_RESOURCE_PATHS][MAX_FILEPATH_LEN];
-static int dgl_num_resource_paths = 0;
+static DGL_RESOURCE_PATH *dgl_resource_path_list = NULL;
 
 /*
 static void dgl_print_resource_tree(DGL_RESOURCE *resource, int level)
@@ -68,6 +77,27 @@ static void dgl_print_resource_tree(DGL_RESOURCE *resource, int level)
     dgl_print_resource_tree(resource->right, level + 2);
 }
 */
+
+static DGL_RESOURCE_PATH *dgl_free_resource_path_list(DGL_RESOURCE_PATH *list)
+{
+    if (list == NULL) {
+        return NULL;
+    }
+
+    /* Delete the next path in the list */
+    list->next = dgl_free_resource_path_list(list->next);
+
+    /* Finish deleting this path */
+    list->path = dgl_free_memory("DGL_RESOURCE_PATH_LIST->path", list->path);
+    list = dgl_free_memory("DGL_RESOURCE_PATH_LIST", list);
+
+    return NULL;
+}
+
+void dgl_free_resource_paths()
+{
+    dgl_resource_path_list = dgl_free_resource_path_list(dgl_resource_path_list);
+}
 
 /**
  * Create a DGL_RESOURCE structure.
@@ -157,9 +187,8 @@ static DGL_RESOURCE *dgl_free_resource_tree(DGL_RESOURCE *resource)
     } else if (resource->type == DGL_RESOURCE_TYPE_SOUND) {
         al_destroy_sample((ALLEGRO_SAMPLE *)resource->data);
     }
-    dgl_free_memory("DGL_RESOURCE->name", resource->name);
-    dgl_free_memory("DGL_RESOURCE", resource);
-    resource = NULL;
+    resource->name = dgl_free_memory("DGL_RESOURCE->name", resource->name);
+    resource = dgl_free_memory("DGL_RESOURCE", resource);
 
     return resource;
 }
@@ -235,19 +264,50 @@ void dgl_unlock_resources()
     dgl_unlock_resource_tree(dgl_resource_tree);
 }
 
-void dgl_add_resource_path(const char *path)
+static DGL_RESOURCE_PATH *dgl_add_resource_path_to_list(DGL_RESOURCE_PATH *list, const char *path)
 {
-    if (dgl_num_resource_paths >= MAX_RESOURCE_PATHS) {
-        fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_RESOURCE_PATHS.\n");
-        return;
+    if (list == NULL) {
+
+        /* We're at the end of the list! Add the path here */
+        list = dgl_alloc_memory("DGL_RESOURCE_PATH", sizeof(DGL_RESOURCE_PATH));
+        assert(list != NULL);
+
+        int new_strlen = strlen(path) + 1; // Length of the string, plus one more for the terminating '\0'
+        list->path = dgl_alloc_memory("DGL_RESOURCE_PATH->path", new_strlen * sizeof(char));
+        assert(list->path != NULL);
+        strcpy(list->path, path);
+
+        list->next = NULL;
+
+        return list;
     }
 
-    /**
-     * Add the new path to the list of resource paths.
-     */
-    strncpy(dgl_resource_paths[dgl_num_resource_paths], path, MAX_FILEPATH_LEN);
+    if (strcmp(list->path, path) == 0) {
+        /* This path is already in the list! */
+        return list;
+    }
 
-    dgl_num_resource_paths++;
+    /* Otherwise, just continue down the list */
+    list->next = dgl_add_resource_path_to_list(list->next, path);
+
+    return list;
+}
+
+void dgl_add_resource_path(const char *path)
+{
+    dgl_resource_path_list = dgl_add_resource_path_to_list(dgl_resource_path_list, path);
+
+    //if (dgl_num_resource_paths >= MAX_RESOURCE_PATHS) {
+    //    fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_RESOURCE_PATHS.\n");
+    //    return;
+    //}
+
+    ///**
+    // * Add the new path to the list of resource paths.
+    // */
+    //strncpy(dgl_resource_paths[dgl_num_resource_paths], path, MAX_FILEPATH_LEN);
+
+    //dgl_num_resource_paths++;
 }
 
 /**
@@ -346,11 +406,12 @@ static void *dgl_get_resource(const char *name, DGL_RESOURCE_TYPE type)
      *
      * If found, return it!
      */
-    for (int i = 0; i < dgl_num_resource_paths; i++) {
+    DGL_RESOURCE_PATH *list = dgl_resource_path_list;
+    while (list != NULL) {
 
         char fullpath[MAX_FILEPATH_LEN];
         fullpath[0] = '\0';
-        strncat(fullpath, dgl_resource_paths[i], MAX_FILEPATH_LEN - 1);
+        strncat(fullpath, list->path, MAX_FILEPATH_LEN - 1);
         strncat(fullpath, name, MAX_FILEPATH_LEN - 1);
 
         void *data = NULL;
@@ -367,6 +428,9 @@ static void *dgl_get_resource(const char *name, DGL_RESOURCE_TYPE type)
             dgl_add_resource(dgl_create_resource(name, type, data));
             return data;
         }
+
+        /* ...the resource hasn't been found yet, try the next path */
+        list = list->next;
     }
 
     /*fprintf(stderr, "RESOURCES: Failed to load resource: \"%s\".\n", name);*/

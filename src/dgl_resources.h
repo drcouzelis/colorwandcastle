@@ -38,6 +38,11 @@ void dgl_lock_resource(const char *name);
 void dgl_add_resource_path(const char *path);
 
 /**
+ * Erase all of the resource paths.
+ */
+void dgl_free_resource_paths();
+
+/**
  * Search the resource paths for the filename.
  * It will return the first instance of the filename
  * in order of the paths that you added. If the

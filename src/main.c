@@ -109,6 +109,7 @@ int main(int argc, char **argv)
     /* DONE, clean up */
     dgl_unlock_resources();
     dgl_free_resources();
+    dgl_free_resource_paths();
     dgl_display_free();
 
     /* See if we have any naughty memory leaks */
