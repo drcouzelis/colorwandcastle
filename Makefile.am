@@ -24,6 +24,12 @@ colorwandcastle_SOURCES = \
   src/dgl_random.h \
   src/dgl_resources.c \
   src/dgl_resources.h \
+  src/dgl_run.c \
+  src/dgl_run.h \
+  src/dgl_sound.c \
+  src/dgl_sound.h \
+  src/dgl_sprite.c \
+  src/dgl_sprite.h \
   src/direction.c \
   src/direction.h \
   src/effects.c \
@@ -41,13 +47,7 @@ colorwandcastle_SOURCES = \
   src/path.c \
   src/path.h \
   src/roomlist.c \
-  src/roomlist.h \
-  src/run.c \
-  src/run.h \
-  src/sound.c \
-  src/sound.h \
-  src/sprite.c \
-  src/sprite.h
+  src/roomlist.h
 
 # Data - Images
 imagesdatadir = $(pkgdatadir)/images

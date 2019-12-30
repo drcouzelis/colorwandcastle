@@ -1,17 +1,17 @@
 #include <stdio.h>
-#include "sprite.h"
+#include "dgl_sprite.h"
 
-static int sprite_fps = -1;
+static int dgl_sprite_fps = -1;
 
-void set_animation_fps(int fps)
+void dgl_set_animation_fps(int fps)
 {
     assert(fps > 0);
-    sprite_fps = fps;
+    dgl_sprite_fps = fps;
 }
 
-void init_sprite(SPRITE *sprite, bool loop, int speed)
+void dgl_init_sprite(DGL_SPRITE *sprite, bool loop, int speed)
 {
-    assert(sprite_fps > 0);
+    assert(dgl_sprite_fps > 0);
     assert(sprite != NULL);
     
     for (int i = 0; i < MAX_FRAMES; i++) {
@@ -32,16 +32,16 @@ void init_sprite(SPRITE *sprite, bool loop, int speed)
     sprite->flip = false;
 }
 
-void copy_sprite(SPRITE *copy, SPRITE *orig)
+void dgl_copy_sprite(DGL_SPRITE *copy, DGL_SPRITE *orig)
 {
     /* We can't copy without some sprites */
     assert(copy != NULL);
     assert(orig != NULL);
 
-    init_sprite(copy, orig->loop, orig->speed);
+    dgl_init_sprite(copy, orig->loop, orig->speed);
     
     for (int i = 0; i < orig->len; i++) {
-        add_frame(copy, orig->frames[i]);
+        dgl_add_frame(copy, orig->frames[i]);
     }
     
     copy->x_offset = orig->x_offset;
@@ -50,10 +50,10 @@ void copy_sprite(SPRITE *copy, SPRITE *orig)
     copy->mirror = orig->mirror;
     copy->flip = orig->flip;
   
-    reset_sprite(copy);
+    dgl_reset_sprite(copy);
 }
 
-void reset_sprite(SPRITE *sprite)
+void dgl_reset_sprite(DGL_SPRITE *sprite)
 {
     if (sprite == NULL) {
         return;
@@ -64,7 +64,7 @@ void reset_sprite(SPRITE *sprite)
     sprite->fudge = 0;
 }
 
-ALLEGRO_BITMAP *get_frame(SPRITE *sprite)
+ALLEGRO_BITMAP *dgl_get_frame(DGL_SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return NULL;
@@ -73,7 +73,7 @@ ALLEGRO_BITMAP *get_frame(SPRITE *sprite)
     return sprite->frames[sprite->pos];
 }
 
-void add_frame(SPRITE *sprite, ALLEGRO_BITMAP *frame)
+void dgl_add_frame(DGL_SPRITE *sprite, ALLEGRO_BITMAP *frame)
 {
     assert(sprite != NULL);
     assert(frame != NULL);
@@ -83,10 +83,10 @@ void add_frame(SPRITE *sprite, ALLEGRO_BITMAP *frame)
     sprite->len++;
 }
 
-void delete_frames(SPRITE *sprite)
+void delete_frames(DGL_SPRITE *sprite)
 {
     assert(sprite != NULL);
-    reset_sprite(sprite);
+    dgl_reset_sprite(sprite);
 
     /**
      * Just set the length to zero. The images will be handled
@@ -126,7 +126,7 @@ static void draw_image(ALLEGRO_BITMAP *img, float x, float y, bool rotate, bool 
     }
 }
 
-void draw_sprite(SPRITE *sprite, float x, float y)
+void dgl_draw_sprite(DGL_SPRITE *sprite, float x, float y)
 {
     if (sprite == NULL || sprite->len == 0) {
         return;
@@ -136,11 +136,11 @@ void draw_sprite(SPRITE *sprite, float x, float y)
     x += sprite->x_offset;
     y += sprite->y_offset;
     
-    draw_image(get_frame(sprite), x, y, sprite->rotate, sprite->mirror, sprite->flip);
+    draw_image(dgl_get_frame(sprite), x, y, sprite->rotate, sprite->mirror, sprite->flip);
 }
 
 /* Animate the sprite */
-void animate(SPRITE *sprite)
+void dgl_animate(DGL_SPRITE *sprite)
 {
     if (sprite == NULL) {
         return;
@@ -155,7 +155,7 @@ void animate(SPRITE *sprite)
          * Cycle through as many frames as necessary for the
          * amount of time that has passed.
          */
-        while (sprite->fudge >= sprite_fps) {
+        while (sprite->fudge >= dgl_sprite_fps) {
             sprite->pos++;
             if (sprite->pos == sprite->len) {
                 if (sprite->loop) {
@@ -165,7 +165,7 @@ void animate(SPRITE *sprite)
                     sprite->done = true;
                 }
             }
-            sprite->fudge -= sprite_fps;
+            sprite->fudge -= dgl_sprite_fps;
         }
       
     } else {
@@ -173,20 +173,20 @@ void animate(SPRITE *sprite)
     }
 }
 
-int get_sprite_width(SPRITE *sprite)
+int dgl_get_sprite_width(DGL_SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return 0;
     }
 
-    return al_get_bitmap_width(get_frame(sprite));
+    return al_get_bitmap_width(dgl_get_frame(sprite));
 }
 
-int get_sprite_height(SPRITE *sprite)
+int dgl_get_sprite_height(DGL_SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return 0;
     }
 
-    return al_get_bitmap_height(get_frame(sprite));
+    return al_get_bitmap_height(dgl_get_frame(sprite));
 }

@@ -4,13 +4,13 @@
 #include "dgl_collision.h"
 #include "dgl_display.h"
 #include "dgl_random.h"
+#include "dgl_sound.h"
+#include "dgl_sprite.h"
 #include "effects.h"
 #include "gameplay.h"
 #include "main.h"
 #include "mask.h"
 #include "path.h"
-#include "sound.h"
-#include "sprite.h"
 
 static const int HERO_SPEED = TILE_SIZE * 4;
 
@@ -96,7 +96,7 @@ static void update_powerup(POWERUP *powerup)
     powerup->body.x += convert_pps_to_fps(powerup->body.dx);
     powerup->body.y += convert_pps_to_fps(powerup->body.dy);
 
-    animate(&powerup->sprite);
+    dgl_animate(&powerup->sprite);
 }
 
 static int get_next_bullet_texture()
@@ -200,11 +200,11 @@ static ALLEGRO_BITMAP *get_hero_bullet_image(char *texture_name, int hero_type, 
     return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
 }
 
-static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
+static void load_hero_bullet_sprite(DGL_SPRITE *sprite, int texture, int hero_type)
 {
     if (hero.powerup_type == POWERUP_TYPE_FLASHING) {
         /* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
-        init_sprite(sprite, true, 16);
+        dgl_init_sprite(sprite, true, 16);
         /* Keep track of which "rotation" of the bullet you're on */
         int next_frame = 0;
         /* Keep track of when to change to the next "rotation" of the bullet */
@@ -212,7 +212,7 @@ static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
         /* (If there's only one texture in the room, the bullet won't animate...) */
         int num_textures = (room.num_textures == 1 ? 8 : room.num_textures * 4);
         for (int i = 0; i < num_textures; i++) {
-            add_frame(sprite, get_hero_bullet_image(room.textures[i % room.num_textures], hero_type, next_frame));
+            dgl_add_frame(sprite, get_hero_bullet_image(room.textures[i % room.num_textures], hero_type, next_frame));
             next_frame_count++;
             if (next_frame_count >= 4) {
                 next_frame = (next_frame == 1 ? 0 : 1);
@@ -220,9 +220,9 @@ static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
             }
         }
     } else {
-        init_sprite(sprite, true, 4);
-        add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 0));
-        add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 1));
+        dgl_init_sprite(sprite, true, 4);
+        dgl_add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 0));
+        dgl_add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 1));
     }
 
     sprite->x_offset = -5;
@@ -231,11 +231,11 @@ static void load_hero_bullet_sprite(SPRITE *sprite, int texture, int hero_type)
 
 static void load_hero_sprite()
 {
-    init_sprite(&hero.sprite_flying, true, 10);
+    dgl_init_sprite(&hero.sprite_flying, true, 10);
     hero.sprite_flying.x_offset = -10;
     hero.sprite_flying.y_offset = -10;
 
-    init_sprite(&hero.sprite_hurting, true, 6);
+    dgl_init_sprite(&hero.sprite_hurting, true, 6);
     hero.sprite_hurting.x_offset = -10;
     hero.sprite_hurting.y_offset = -10;
 
@@ -245,15 +245,15 @@ static void load_hero_sprite()
     }
 
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-1.png"));
-        add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-2.png"));
-        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-1.png"));
-        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-2.png"));
+        dgl_add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-1.png"));
+        dgl_add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-2.png"));
+        dgl_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-1.png"));
+        dgl_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-2.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-1.png"));
-        add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-2.png"));
-        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-1.png"));
-        add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-2.png"));
+        dgl_add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-1.png"));
+        dgl_add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-2.png"));
+        dgl_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-1.png"));
+        dgl_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-2.png"));
     }
 }
 
@@ -270,7 +270,7 @@ static POWERUP *find_available_powerup()
 
 static void draw_powerup(POWERUP *powerup)
 {
-    draw_sprite(&powerup->sprite, powerup->body.x, powerup->body.y);
+    dgl_draw_sprite(&powerup->sprite, powerup->body.x, powerup->body.y);
 }
 
 static void load_powerup(float x, float y)
@@ -282,9 +282,9 @@ static void load_powerup(float x, float y)
         return;
     }
 
-    init_sprite(&powerup->sprite, true, 6);
-    add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
-    add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
+    dgl_init_sprite(&powerup->sprite, true, 6);
+    dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
+    dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
     powerup->body.x = x;
     powerup->body.y = y;
     powerup->body.w = 20;
@@ -310,7 +310,7 @@ static void toggle_hero()
     }
 
     load_poof_effect(hero.body.x - 5, hero.body.y - 5);
-    play_sound(DGL_SND("hero-toggle.wav"));
+    dgl_play_sound(DGL_SND("hero-toggle.wav"));
 }
 
 static void control_hero_from_keyboard(HERO *hero, void *data)
@@ -401,7 +401,7 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
     dgl_insert_image_resource(name, canvas);
     dgl_lock_resource(name);
 
-    add_frame(&screenshot->sprite, DGL_IMG(name));
+    dgl_add_frame(&screenshot->sprite, DGL_IMG(name));
 }
 
 static void init_enemies()
@@ -475,15 +475,15 @@ static void reset_hero(int x, int y)
     hero.powerup_type = POWERUP_TYPE_NONE;
 }
 
-static bool is_offscreen(BODY *body, SPRITE *sprite)
+static bool is_offscreen(BODY *body, DGL_SPRITE *sprite)
 {
     int room_w = room.cols * TILE_SIZE;
     int room_h = room.rows * TILE_SIZE;
 
     int body_u = body->y + sprite->y_offset;
     int body_l = body->x + sprite->x_offset;
-    int body_d = body_u + get_sprite_height(sprite);
-    int body_r = body_l + get_sprite_width(sprite);
+    int body_d = body_u + dgl_get_sprite_height(sprite);
+    int body_r = body_l + dgl_get_sprite_width(sprite);
 
     if (body_d < 0 || body_r < 0 || body_u >= room_h || body_l >= room_w) {
         return true;
@@ -588,7 +588,7 @@ static bool is_block_collision(BODY *body)
 static void update_enemy_animation(ENEMY *enemy, void *data)
 {
     UNUSED(data);
-    animate(&enemy->sprite);
+    dgl_animate(&enemy->sprite);
 }
 
 static void update_enemy_movement(ENEMY *enemy, void *data)
@@ -631,12 +631,12 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
     enemy->type = definition->type;
 
     if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
-        init_sprite(&enemy->sprite, true, 20);
-        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-1.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
+        dgl_init_sprite(&enemy->sprite, true, 20);
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-1.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -646,15 +646,15 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.dx = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
-        init_sprite(&enemy->sprite, true, 8);
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-1.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-2.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-4.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-5.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-6.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-spider-7.png"));
+        dgl_init_sprite(&enemy->sprite, true, 8);
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-1.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-2.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-4.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-5.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-6.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-7.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -664,11 +664,11 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
-        init_sprite(&enemy->sprite, true, 10);
-        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-1.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-2.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-3.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-4.png"));
+        dgl_init_sprite(&enemy->sprite, true, 10);
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-1.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-2.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-3.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-4.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -679,9 +679,9 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.dy = -definition->speed;
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
-        init_sprite(&enemy->sprite, true, 1);
-        add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-1.png"));
-        add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-2.png"));
+        dgl_init_sprite(&enemy->sprite, true, 1);
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-1.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-2.png"));
         enemy->body.w = 20;
         enemy->body.h = 20;
         enemy->update = update_enemy_animation;
@@ -845,7 +845,7 @@ static bool update_gameplay_leaving_room()
 {
     hero.body.x += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].x_offset * HERO_SPEED);
     hero.body.y += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].y_offset * HERO_SPEED);
-    animate(hero.sprite);
+    dgl_animate(hero.sprite);
 
     if (is_offscreen(&hero.body, hero.sprite)) {
         to_gameplay_state_scroll_rooms();
@@ -869,7 +869,7 @@ static void to_gameplay_state_scroll_rooms()
     }
 
     /* Take a screenshot of the current room */
-    al_set_target_bitmap(get_frame(&screenshot1.sprite));
+    al_set_target_bitmap(dgl_get_frame(&screenshot1.sprite));
     draw_gameplay_playing();
 
     /* Clear all resources before loading the new room */
@@ -926,7 +926,7 @@ static void to_gameplay_state_scroll_rooms()
     }
     
     /* Take a screenshot of the next room */
-    al_set_target_bitmap(get_frame(&screenshot2.sprite));
+    al_set_target_bitmap(dgl_get_frame(&screenshot2.sprite));
     draw_gameplay_playing();
 
     al_restore_state(&state);
@@ -995,8 +995,6 @@ void control_gameplay(void *data, ALLEGRO_EVENT *event)
     }
 }
 
-static bool fullscreen = false;
-
 static void control_gameplay_options(ALLEGRO_EVENT *event)
 {
     /* General application control */
@@ -1008,12 +1006,10 @@ static void control_gameplay_options(ALLEGRO_EVENT *event)
             end_gameplay = true;
         } else if (key == ALLEGRO_KEY_S || key == ALLEGRO_KEY_O) {
             /* S : Toggle audio */
-            toggle_audio();
+            dgl_toggle_audio();
         } else if (key == ALLEGRO_KEY_F || key == ALLEGRO_KEY_U) {
             /* F : Toggle fullscreen */
-            if (dgl_display_set_fullscreen(!fullscreen)) {
-                fullscreen = !fullscreen;
-            }
+            dgl_toggle_fullscreen();
         } else if (key == ALLEGRO_KEY_J || key == ALLEGRO_KEY_C) {
             /* Toggle the hero */
             toggle_hero();
@@ -1069,7 +1065,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
-            play_sound(DGL_SND("block-destroyed.wav"));
+            dgl_play_sound(DGL_SND("block-destroyed.wav"));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
@@ -1088,7 +1084,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Bounce */
             bullet->body.dx *= -1;
             bullet->body.dy *= -1;
-            play_sound(DGL_SND("bullet-bounce.wav"));
+            dgl_play_sound(DGL_SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1104,12 +1100,12 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         /* Just bounce */
         bullet->hits--;
         if (bullet->hits <= 0) {
-            play_sound(DGL_SND("bullet-disolve.wav"));
+            dgl_play_sound(DGL_SND("bullet-disolve.wav"));
         } else {
             /* Bounce */
             bullet->body.dx *= -1;
             bullet->body.dy *= -1;
-            play_sound(DGL_SND("bullet-bounce.wav"));
+            dgl_play_sound(DGL_SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1177,7 +1173,7 @@ static void shoot_bullet(int texture, float x, float y)
         }
     }
 
-    play_sound(DGL_SND("bullet-shoot.wav"));
+    dgl_play_sound(DGL_SND("bullet-shoot.wav"));
 
     /**
      * Do some fancy footwork to find out if this bullet
@@ -1301,8 +1297,8 @@ static void update_hero()
     update_hero_player_control();
 
     /* Graphics */
-    animate(hero.sprite);
-    animate(&hero.bullet);
+    dgl_animate(hero.sprite);
+    dgl_animate(&hero.bullet);
 }
 
 static void update_bullets()
@@ -1321,7 +1317,7 @@ static void update_bullets()
         move_bullet(bullet, bullet->body.x + convert_pps_to_fps(bullet->body.dx), bullet->body.y + convert_pps_to_fps(bullet->body.dy));
 
         /* Animate */
-        animate(&bullet->sprite);
+        dgl_animate(&bullet->sprite);
 
         /* Remove bullets that have no hits left */
         if (bullet->hits <= 0) {
@@ -1341,7 +1337,7 @@ static void set_hero_death()
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
 
-    play_sound(DGL_SND("hero-die.wav"));
+    dgl_play_sound(DGL_SND("hero-die.wav"));
 
     hero.control = NULL;
 }
@@ -1354,7 +1350,7 @@ static bool update_gameplay_dying()
     hero.body.dy += 10;
     hero.body.y += convert_pps_to_fps(hero.body.dy);
 
-    animate(hero.sprite);
+    dgl_animate(hero.sprite);
 
     /* Check if the hero has finished FLYING off the bottom of the screen, dead */
     if (hero.body.y > (room.rows * TILE_SIZE) + (8 * TILE_SIZE)) {
@@ -1507,7 +1503,7 @@ static bool update_gameplay_playing()
             for (int c = 0; c < room.cols; c++) {
                 if (room.block_map_orig[(r * room.cols) + c] >= 0) {
                     /* At least one block has been found! */
-                    play_sound(DGL_SND("room-cleared.wav"));
+                    dgl_play_sound(DGL_SND("room-cleared.wav"));
                     /* Break out of the loop */
                     r = room.rows;
                     c = room.cols;
@@ -1616,13 +1612,13 @@ static void draw_gameplay_scrolling_rooms()
             /* Farground */
             n = room.farground_map[(r * room.cols) + c];
             if (n >= 0 && n < room.num_tiles) {
-                draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
+                dgl_draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
             }
         }
     }
 
-    draw_sprite(&screenshot1.sprite, screenshot1.x, screenshot1.y);
-    draw_sprite(&screenshot2.sprite, screenshot2.x, screenshot2.y);
+    dgl_draw_sprite(&screenshot1.sprite, screenshot1.x, screenshot1.y);
+    dgl_draw_sprite(&screenshot2.sprite, screenshot2.x, screenshot2.y);
 }
 
 static void draw_gameplay_playing()
@@ -1636,25 +1632,25 @@ static void draw_gameplay_playing()
             /* Farground */
             n = room.farground_map[(r * room.cols) + c];
             if (n >= 0 && n < room.num_tiles) {
-                draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
+                dgl_draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
             }
 
             /* Background */
             n = room.background_map[(r * room.cols) + c];
             if (n >= 0 && n < room.num_tiles) {
-                draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
+                dgl_draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
             }
 
             /* Foreground */
             n = room.foreground_map[(r * room.cols) + c];
             if (n >= 0 && n < room.num_tiles) {
-                draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
+                dgl_draw_sprite(&room.tiles[n], c * TILE_SIZE, r * TILE_SIZE);
             }
 
             /* Blocks */
             n = room.block_map[(r * room.cols) + c];
             if (n >= 0 && n < room.num_textures) {
-                draw_sprite(&room.blocks[n], c * TILE_SIZE, r * TILE_SIZE);
+                dgl_draw_sprite(&room.blocks[n], c * TILE_SIZE, r * TILE_SIZE);
             }
         }
     }
@@ -1662,14 +1658,14 @@ static void draw_gameplay_playing()
     /* If the room is cleared and there's no other exits... */
     if (room.cleared && !room_has_exits()) {
         /* ...then draw a door */
-        draw_sprite(&room.door_sprite, room.door_x, room.door_y);
+        dgl_draw_sprite(&room.door_sprite, room.door_x, room.door_y);
     }
 
     /* Draw bullets */
     for (int i = 0; i < MAX_BULLETS; i++) {
         BULLET *bullet = &bullets[i];
         if (bullet->is_active) {
-            draw_sprite(&bullet->sprite, bullet->body.x, bullet->body.y);
+            dgl_draw_sprite(&bullet->sprite, bullet->body.x, bullet->body.y);
         }
     }
 
@@ -1677,7 +1673,7 @@ static void draw_gameplay_playing()
     for (int i = 0; i < MAX_ENEMIES; i++) {
         ENEMY *enemy = &enemies[i];
         if (enemy->is_active) {
-            draw_sprite(&enemy->sprite, enemy->body.x, enemy->body.y);
+            dgl_draw_sprite(&enemy->sprite, enemy->body.x, enemy->body.y);
         }
     }
 
@@ -1689,11 +1685,11 @@ static void draw_gameplay_playing()
     }
 
     /* Draw the hero */
-    draw_sprite(hero.sprite, hero.body.x, hero.body.y);
+    dgl_draw_sprite(hero.sprite, hero.body.x, hero.body.y);
     
     /* Draw the hero's bullet */
     if (hero.has_bullet) {
-        draw_sprite(&hero.bullet, hero.bullet_x, hero.bullet_y);
+        dgl_draw_sprite(&hero.bullet, hero.bullet_x, hero.bullet_y);
     }
 
     draw_effects();

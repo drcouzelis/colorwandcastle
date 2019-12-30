@@ -3,8 +3,6 @@
 #include "dgl_memory.h"
 #include "dgl_resources.h"
 
-#define MAX_RESOURCE_PATHS 4
-
 typedef enum
 {
     DGL_RESOURCE_TYPE_IMAGE = 0,
@@ -296,18 +294,6 @@ static DGL_RESOURCE_PATH *dgl_add_resource_path_to_list(DGL_RESOURCE_PATH *list,
 void dgl_add_resource_path(const char *path)
 {
     dgl_resource_path_list = dgl_add_resource_path_to_list(dgl_resource_path_list, path);
-
-    //if (dgl_num_resource_paths >= MAX_RESOURCE_PATHS) {
-    //    fprintf(stderr, "RESOURCES: Failed to add path, try increasing MAX_RESOURCE_PATHS.\n");
-    //    return;
-    //}
-
-    ///**
-    // * Add the new path to the list of resource paths.
-    // */
-    //strncpy(dgl_resource_paths[dgl_num_resource_paths], path, MAX_FILEPATH_LEN);
-
-    //dgl_num_resource_paths++;
 }
 
 /**

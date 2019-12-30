@@ -4,11 +4,11 @@
 #include "dgl_display.h"
 #include "dgl_memory.h"
 #include "dgl_resources.h"
+#include "dgl_run.h"
+#include "dgl_sound.h"
+#include "dgl_sprite.h"
 #include "gameplay.h"
 #include "main.h"
-#include "run.h"
-#include "sound.h"
-#include "sprite.h"
 
 int main(int argc, char **argv)
 {
@@ -42,10 +42,10 @@ int main(int argc, char **argv)
     }
 
     /* Create a display that will be used to draw the game on */
-    assert(dgl_display_init(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
+    assert(dgl_init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
 
     /* So animations know how fast to go */
-    set_animation_fps(GAME_TICKER);
+    dgl_set_animation_fps(GAME_TICKER);
 
     /* So we know where to look for image and sound files... */
     dgl_add_resource_path( PKGDATADIR "/images/");
@@ -57,11 +57,11 @@ int main(int argc, char **argv)
     add_datafile_path("");
   
     /* Set window properties */
-    al_set_window_title(dgl_display_get_display(), "Colorwand Castle");
-    al_set_display_icon(dgl_display_get_display(), DGL_IMGL("icon.png"));
+    al_set_window_title(dgl_get_display(), "Colorwand Castle");
+    al_set_display_icon(dgl_get_display(), DGL_IMGL("icon.png"));
 
     /* So the game knows how fast to run */
-    set_fps(GAME_TICKER);
+    dgl_set_fps(GAME_TICKER);
 
     /* TEMP */
     /* Print some basic controls to stdout */
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
     /* TEMP */
     /* Turn off audio, I don't want to hear it during development */
-    toggle_audio();
+    dgl_toggle_audio();
     printf("TEMP: Audio is off.\n");
 
     /* INIT THE GAME */
@@ -104,13 +104,13 @@ int main(int argc, char **argv)
     set_curr_room(room_num - 1);
 
     /* RUN THE GAME */
-    run(control_gameplay, update_gameplay, draw_gameplay, NULL);
+    dgl_run(control_gameplay, update_gameplay, draw_gameplay, NULL);
  
     /* DONE, clean up */
     dgl_unlock_resources();
     dgl_free_resources();
     dgl_free_resource_paths();
-    dgl_display_free();
+    dgl_free_display();
 
     /* See if we have any naughty memory leaks */
     dgl_check_memory();

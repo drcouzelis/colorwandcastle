@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdio.h>
+#include "dgl_sprite.h"
 #include "direction.h"
-#include "sprite.h"
 
 #define TILE_SIZE 20
 #define COLS 16
@@ -94,7 +94,7 @@ typedef struct POWERUP
 {
     bool is_active;
 
-    SPRITE sprite;
+    DGL_SPRITE sprite;
 
     BODY body;
 
@@ -107,7 +107,7 @@ typedef struct POWERUP
 
 typedef struct
 {
-    SPRITE sprite;
+    DGL_SPRITE sprite;
     float x;
     float y;
 
@@ -123,7 +123,7 @@ typedef struct
     /* If false, this bullet data is not used */
     bool is_active;
 
-    SPRITE sprite;
+    DGL_SPRITE sprite;
     int texture;
 
     /* If this bullet has no more hits, get rid of it */
@@ -136,9 +136,9 @@ typedef struct HERO
 {
     HERO_TYPE type;
 
-    SPRITE sprite_flying;
-    SPRITE sprite_hurting;
-    SPRITE *sprite; /* The current active sprite */
+    DGL_SPRITE sprite_flying;
+    DGL_SPRITE sprite_hurting;
+    DGL_SPRITE *sprite; /* The current active sprite */
 
     BODY body;
 
@@ -154,7 +154,7 @@ typedef struct HERO
 
     /* The picture of the bullet that follows the hero around */
     bool has_bullet;
-    SPRITE bullet;
+    DGL_SPRITE bullet;
     float bullet_x;
     float bullet_y;
     int texture;
@@ -174,7 +174,7 @@ typedef struct ENEMY
     /* Not sure if I'm actually going to use this variable... */
     ENEMY_TYPE type;
 
-    SPRITE sprite;
+    DGL_SPRITE sprite;
 
     BODY body;
 
@@ -226,7 +226,7 @@ typedef struct
 
     /* List of tiles used in the room */
     /* Tiles define the play area */
-    SPRITE tiles[MAX_TILES];
+    DGL_SPRITE tiles[MAX_TILES];
     int num_tiles;
 
     /* The farground is drawn below everything else, and never "scrolls" */
@@ -256,7 +256,7 @@ typedef struct
     int num_textures;
 
     /* Blocks, that can be destroyed by the hero */
-    SPRITE blocks[MAX_TEXTURES];
+    DGL_SPRITE blocks[MAX_TEXTURES];
 
     /* The position of blocks */
     /* Each entry is an index number for the list of blocks */
@@ -272,7 +272,7 @@ typedef struct
     bool cleared;
 
     /* The door representing the exit, appears when all blocks are gone AND there are no other exits */
-    SPRITE door_sprite;
+    DGL_SPRITE door_sprite;
     int door_x;
     int door_y;
 

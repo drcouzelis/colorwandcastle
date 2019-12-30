@@ -3,10 +3,8 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 
-#define GAME_VOLUME 192
-
 /* Play a sound, won't do anything if audio is toggled off */
-void play_sound(ALLEGRO_SAMPLE *snd);
+void dgl_play_sound(ALLEGRO_SAMPLE *snd);
 
 /* Toggle audio on and off, audio is on by default */
-void toggle_audio();
+void dgl_toggle_audio();

@@ -16,17 +16,17 @@
  * fitting entirely on the screen. This scale is
  * used for both windowed and fullscreen modes.
  */
-bool dgl_display_init(int width, int height, int scale, bool fullscreen);
+bool dgl_init_display(int width, int height, int scale, bool fullscreen);
 
 /**
  * Cleanup. Use this before quitting the application.
  */
-void dgl_display_free();
+void dgl_free_display();
 
 /**
  * Returns a copy of the display, to be used to draw on.
  */
-ALLEGRO_DISPLAY *dgl_display_get_display(void);
+ALLEGRO_DISPLAY *dgl_get_display();
 
 /**
  * Clear the entire display, not just the part that is
@@ -35,9 +35,10 @@ ALLEGRO_DISPLAY *dgl_display_get_display(void);
  * The part that is not being drawn on includes any black
  * borders or "letterbox" to fill in the screen.
  */
-void dgl_display_clear(void);
+void dgl_clear_display();
 
 /**
  * Toggle between windowed mode and fullscreen mode.
+ * Returns true on success.
  */
-bool dgl_display_set_fullscreen(bool fullscreen);
+bool dgl_toggle_fullscreen();
