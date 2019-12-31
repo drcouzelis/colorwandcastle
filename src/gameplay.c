@@ -99,7 +99,7 @@ static void update_powerup(POWERUP *powerup)
     dgl_animate(&powerup->sprite);
 }
 
-static int get_next_bullet_texture()
+static int get_next_bullet_texture(void)
 {
     /**
      * Returns a texture from the "front" of the pile of blocks.
@@ -177,7 +177,7 @@ static int get_next_bullet_texture()
     }
 }
 
-static bool room_has_exits()
+static bool room_has_exits(void)
 {
     if (room.exits[0].active) {
         return true;
@@ -229,7 +229,7 @@ static void load_hero_bullet_sprite(DGL_SPRITE *sprite, int texture, int hero_ty
     sprite->y_offset = -5;
 }
 
-static void load_hero_sprite()
+static void load_hero_sprite(void)
 {
     dgl_init_sprite(&hero.sprite_flying, true, 10);
     hero.sprite_flying.x_offset = -10;
@@ -257,7 +257,7 @@ static void load_hero_sprite()
     }
 }
 
-static POWERUP *find_available_powerup()
+static POWERUP *find_available_powerup(void)
 {
     for (int i = 0; i < MAX_POWERUPS; i++) {
         if (!powerups[i].is_active) {
@@ -298,7 +298,7 @@ static void load_powerup(float x, float y)
     powerup->body.dy = POWERUP_SPEED * directions[room.direction].y_offset * -1;
 }
 
-static void toggle_hero()
+static void toggle_hero(void)
 {
     /* Toggle the hero type */
     hero.type = hero.type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
@@ -377,14 +377,14 @@ static void control_hero_from_keyboard(HERO *hero, void *data)
     }
 }
 
-static void init_powerups()
+static void init_powerups(void)
 {
     for (int i = 0; i < MAX_POWERUPS; i++) {
         init_powerup(&powerups[i]);
     }
 }
 
-static void init_bullets()
+static void init_bullets(void)
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
         bullets[i].is_active = false;
@@ -404,14 +404,14 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
     dgl_add_frame(&screenshot->sprite, DGL_IMG(name));
 }
 
-static void init_enemies()
+static void init_enemies(void)
 {
     for (int i = 0; i < MAX_ENEMIES; i++) {
         init_enemy(&enemies[i]);
     }
 }
 
-void init_gameplay()
+void init_gameplay(void)
 {
     /* Room */
     init_room(&room);
@@ -445,7 +445,7 @@ void init_gameplay()
     is_gameplay_init = true;
 }
 
-static void clear_hero_input()
+static void clear_hero_input(void)
 {
     /* Clear keyboard input */
     hero.u = false;
@@ -692,14 +692,14 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
     enemy->is_active = true;
 }
 
-static void load_enemies_from_definitions()
+static void load_enemies_from_definitions(void)
 {
     for (int i = 0; i < MAX_ENEMIES; i++) {
         load_enemy_from_definition(&enemies[i], &room.enemy_definitions[i]);
     }
 }
 
-static void load_blocks_from_orig()
+static void load_blocks_from_orig(void)
 {
     /* Reload the original layout of the room */
     for (int r = 0; r < room.rows; r++) {
@@ -709,19 +709,19 @@ static void load_blocks_from_orig()
     }
 }
 
-static void to_gameplay_state_starting_new_game()
+static void to_gameplay_state_starting_new_game(void)
 {
     update = update_gameplay_starting_new_game;
     control = control_gameplay_options;
     draw = NULL;
 }
 
-static void to_gameplay_state_win()
+static void to_gameplay_state_win(void)
 {
     end_gameplay = true;
 }
 
-static void to_gameplay_state_door_entered()
+static void to_gameplay_state_door_entered(void)
 {
     /* Go to the next level? */
     if (curr_room < room_list.size - 1) {
@@ -745,7 +745,7 @@ static void to_gameplay_state_door_entered()
     }
 }
 
-static void to_gameplay_state_starting_after_dying()
+static void to_gameplay_state_starting_after_dying(void)
 {
     if (gameplay_difficulty != GAMEPLAY_DIFFICULTY_EASY) {
         /* Load the original state of the blocks */
@@ -797,7 +797,7 @@ static bool load_gameplay_room_from_num(int room_num)
     return success;
 }
 
-static void start_next_room()
+static void start_next_room(void)
 {
     /* Clear the old room */
     init_room(&room);
@@ -825,7 +825,7 @@ static void start_next_room()
     }
 }
 
-static void to_gameplay_state_starting_next_room()
+static void to_gameplay_state_starting_next_room(void)
 {
     start_next_room();
 
@@ -834,14 +834,14 @@ static void to_gameplay_state_starting_next_room()
 
 }
 
-static void to_gameplay_state_leaving_room()
+static void to_gameplay_state_leaving_room(void)
 {
     update = update_gameplay_leaving_room;
     control = control_gameplay_playing;
     draw = draw_gameplay_playing;
 }
 
-static bool update_gameplay_leaving_room()
+static bool update_gameplay_leaving_room(void)
 {
     hero.body.x += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].x_offset * HERO_SPEED);
     hero.body.y += convert_pps_to_fps(directions[room.exits[room.used_exit_num].direction].y_offset * HERO_SPEED);
@@ -854,7 +854,7 @@ static bool update_gameplay_leaving_room()
     return true;
 }
 
-static void to_gameplay_state_scroll_rooms()
+static void to_gameplay_state_scroll_rooms(void)
 {
     /* Let the screen scrolling data know which direction to scroll */
     screenshot1.direction = room.exits[room.used_exit_num].direction;
@@ -941,7 +941,7 @@ static void to_gameplay_state_scroll_rooms()
     draw = draw_gameplay_scrolling_rooms;
 }
 
-static bool update_gameplay_scroll_rooms()
+static bool update_gameplay_scroll_rooms(void)
 {
     float change_x = convert_pps_to_fps(screenshot2.dx);
     float change_y = convert_pps_to_fps(screenshot2.dy);
@@ -968,7 +968,7 @@ static bool update_gameplay_scroll_rooms()
     return true;
 }
 
-static bool update_gameplay_starting_new_game()
+static bool update_gameplay_starting_new_game(void)
 {
     /* Load the current room */
     load_gameplay_room_from_num(curr_room);
@@ -1029,7 +1029,7 @@ static void control_gameplay_playing(ALLEGRO_EVENT *event)
     }
 }
 
-static int num_blocks()
+static int num_blocks(void)
 {
     int count = 0;
 
@@ -1212,7 +1212,7 @@ static void shoot_bullet(int texture, float x, float y)
     }
 }
 
-static void update_hero_bullet_position()
+static void update_hero_bullet_position(void)
 {
     /**
      * These calculations produce a neat effect where the bullet
@@ -1233,7 +1233,7 @@ static void update_hero_bullet_position()
     }
 }
 
-static void update_hero_player_control()
+static void update_hero_player_control(void)
 {
     float old_x = hero.body.x;
     float old_y = hero.body.y;
@@ -1292,7 +1292,7 @@ static void update_hero_player_control()
     }
 }
 
-static void update_hero()
+static void update_hero(void)
 {
     update_hero_player_control();
 
@@ -1301,7 +1301,7 @@ static void update_hero()
     dgl_animate(&hero.bullet);
 }
 
-static void update_bullets()
+static void update_bullets(void)
 {
     for (int i = 0; i < MAX_BULLETS; i++) {
 
@@ -1326,7 +1326,7 @@ static void update_bullets()
     }
 }
 
-static void set_hero_death()
+static void set_hero_death(void)
 {
     hero.sprite = &hero.sprite_hurting;
 
@@ -1342,7 +1342,7 @@ static void set_hero_death()
     hero.control = NULL;
 }
 
-static bool update_gameplay_dying()
+static bool update_gameplay_dying(void)
 {
     /* HERO IS DEAD */
 
@@ -1360,14 +1360,14 @@ static bool update_gameplay_dying()
     return true;
 }
 
-static void to_gameplay_state_playing()
+static void to_gameplay_state_playing(void)
 {
     update = update_gameplay_playing;
     control = control_gameplay_playing;
     draw = draw_gameplay_playing;
 }
 
-static void to_gameplay_state_dying()
+static void to_gameplay_state_dying(void)
 {
     /* Kill the hero :( */
     set_hero_death();
@@ -1426,7 +1426,7 @@ static void collect_powerup(POWERUP *powerup)
     init_powerup(powerup);
 }
 
-static bool update_gameplay_playing()
+static bool update_gameplay_playing(void)
 {
     /* Hero */
     update_hero();
@@ -1599,7 +1599,7 @@ void draw_gameplay(void *data)
     }
 }
 
-static void draw_gameplay_scrolling_rooms()
+static void draw_gameplay_scrolling_rooms(void)
 {
     /* Draw the farground */
     /* This will draw the farground from the NEXT room */
@@ -1621,7 +1621,7 @@ static void draw_gameplay_scrolling_rooms()
     dgl_draw_sprite(&screenshot2.sprite, screenshot2.x, screenshot2.y);
 }
 
-static void draw_gameplay_playing()
+static void draw_gameplay_playing(void)
 {
     /* Draw the room (backgrounds, blocks...) */
     for (int r = 0; r < room.rows; r++) {

@@ -21,12 +21,12 @@ bool dgl_init_display(int width, int height, int scale, bool fullscreen);
 /**
  * Cleanup. Use this before quitting the application.
  */
-void dgl_free_display();
+void dgl_free_display(void);
 
 /**
  * Returns a copy of the display, to be used to draw on.
  */
-ALLEGRO_DISPLAY *dgl_get_display();
+ALLEGRO_DISPLAY *dgl_get_display(void);
 
 /**
  * Clear the entire display, not just the part that is
@@ -35,10 +35,10 @@ ALLEGRO_DISPLAY *dgl_get_display();
  * The part that is not being drawn on includes any black
  * borders or "letterbox" to fill in the screen.
  */
-void dgl_clear_display();
+void dgl_clear_display(void);
 
 /**
  * Toggle between windowed mode and fullscreen mode.
  * Returns true on success.
  */
-bool dgl_toggle_fullscreen();
+bool dgl_toggle_fullscreen(void);

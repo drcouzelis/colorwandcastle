@@ -92,7 +92,7 @@ static DGL_RESOURCE_PATH *dgl_free_resource_path_list(DGL_RESOURCE_PATH *list)
     return NULL;
 }
 
-void dgl_free_resource_paths()
+void dgl_free_resource_paths(void)
 {
     dgl_resource_path_list = dgl_free_resource_path_list(dgl_resource_path_list);
 }
@@ -191,7 +191,7 @@ static DGL_RESOURCE *dgl_free_resource_tree(DGL_RESOURCE *resource)
     return resource;
 }
 
-void dgl_free_resources()
+void dgl_free_resources(void)
 {
     /* Free resources, recursively */
     dgl_free_resource_tree(dgl_resource_tree);
@@ -257,7 +257,7 @@ static void dgl_unlock_resource_tree(DGL_RESOURCE *tree)
     tree->locked = false;
 }
 
-void dgl_unlock_resources()
+void dgl_unlock_resources(void)
 {
     dgl_unlock_resource_tree(dgl_resource_tree);
 }

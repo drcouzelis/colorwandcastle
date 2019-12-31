@@ -133,7 +133,7 @@ void dgl_clear_display(void)
     al_set_clipping_rectangle(x, y, w, h);
 }
 
-static void dgl_set_clipping()
+static void dgl_set_clipping(void)
 {
     int scale = dgl_get_max_scale(dgl_display_width, dgl_display_height, dgl_display_fullscreen);
 
@@ -200,7 +200,7 @@ bool dgl_init_display(int width, int height, int scale, bool fullscreen)
     return true;
 }
 
-bool dgl_toggle_fullscreen()
+bool dgl_toggle_fullscreen(void)
 {
     dgl_display_fullscreen = dgl_display_fullscreen ? false : true;
 
@@ -216,7 +216,7 @@ bool dgl_toggle_fullscreen()
     return true;
 }
 
-void dgl_free_display()
+void dgl_free_display(void)
 {
     al_reset_clipping_rectangle();
     al_destroy_display(dgl_display);

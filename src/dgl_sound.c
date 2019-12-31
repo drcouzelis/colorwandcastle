@@ -10,7 +10,7 @@ void dgl_play_sound(ALLEGRO_SAMPLE *snd)
     }
 }
 
-void dgl_toggle_audio()
+void dgl_toggle_audio(void)
 {
     dgl_is_audio_on = dgl_is_audio_on ? false : true;
 }

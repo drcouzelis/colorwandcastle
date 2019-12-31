@@ -7,4 +7,4 @@
 void dgl_play_sound(ALLEGRO_SAMPLE *snd);
 
 /* Toggle audio on and off, audio is on by default */
-void dgl_toggle_audio();
+void dgl_toggle_audio(void);

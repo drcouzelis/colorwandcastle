@@ -28,7 +28,7 @@ static void init_effect(EFFECT *effect)
     effect->y = 0;
 }
 
-static void init_effects()
+static void init_effects(void)
 {
     if (is_effects_init) {
         return;
@@ -41,7 +41,7 @@ static void init_effects()
     is_effects_init = true;
 }
 
-void update_effects()
+void update_effects(void)
 {
     // TODO: Put this in a better, less used spot
     init_effects();
@@ -53,7 +53,7 @@ void update_effects()
     }
 }
 
-void draw_effects()
+void draw_effects(void)
 {
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (effects[i].is_active) {
@@ -62,7 +62,7 @@ void draw_effects()
     }
 }
 
-static EFFECT *find_available_effect()
+static EFFECT *find_available_effect(void)
 {
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (!effects[i].is_active) {

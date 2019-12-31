@@ -13,14 +13,14 @@
  *
  * This will NOT delete "locked" resources.
  */
-void dgl_free_resources();
+void dgl_free_resources(void);
 
 /**
  * Unlock all resources.
  *
  * This will NOT delete "locked" resources.
  */
-void dgl_unlock_resources();
+void dgl_unlock_resources(void);
 
 /**
  * A locked resource will persist, even
@@ -40,7 +40,7 @@ void dgl_add_resource_path(const char *path);
 /**
  * Erase all of the resource paths.
  */
-void dgl_free_resource_paths();
+void dgl_free_resource_paths(void);
 
 /**
  * Search the resource paths for the filename.
