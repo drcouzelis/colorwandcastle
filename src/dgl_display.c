@@ -222,3 +222,14 @@ void dgl_free_display(void)
     al_destroy_display(dgl_display);
     dgl_display = NULL;
 }
+
+int dgl_get_display_width(void)
+{
+    return dgl_display_width;
+}
+
+
+int dgl_get_display_height(void)
+{
+    return dgl_display_height;
+}

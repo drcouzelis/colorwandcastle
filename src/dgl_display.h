@@ -42,3 +42,12 @@ void dgl_clear_display(void);
  * Returns true on success.
  */
 bool dgl_toggle_fullscreen(void);
+
+/**
+ * Get info about the display.
+ *
+ * Note: This will give you the size of the display in "logic",
+ * not the actual size of the display.
+ */
+int dgl_get_display_width(void);
+int dgl_get_display_height(void);

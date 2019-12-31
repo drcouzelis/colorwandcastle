@@ -1,7 +1,6 @@
 #include <allegro5/allegro.h>
 #include <stdio.h>
 
-#include "main.h"
 #include "mask.h"
 
 ALLEGRO_BITMAP *get_masked_image(const char *name, const char *mask)

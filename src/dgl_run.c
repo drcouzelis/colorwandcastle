@@ -2,12 +2,17 @@
 #include "dgl_display.h"
 #include "dgl_run.h"
 
-static int dgl_run_fps = 60;
+static int dgl_run_fps = DGL_DEFAULT_FPS;
 
 void dgl_set_fps(int fps)
 {
     assert(fps > 0);
     dgl_run_fps = fps;
+}
+
+int dgl_get_fps(void)
+{
+    return dgl_run_fps;
 }
 
 void dgl_run(void (*control)(void *data, ALLEGRO_EVENT *event),

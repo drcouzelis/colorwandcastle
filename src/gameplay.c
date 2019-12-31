@@ -4,11 +4,11 @@
 #include "dgl_collision.h"
 #include "dgl_display.h"
 #include "dgl_random.h"
+#include "dgl_run.h"
 #include "dgl_sound.h"
 #include "dgl_sprite.h"
 #include "effects.h"
 #include "gameplay.h"
-#include "main.h"
 #include "mask.h"
 #include "path.h"
 
@@ -87,7 +87,7 @@ static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
  */
 static float convert_pps_to_fps(int pps)
 {
-    return pps / (float)(GAME_TICKER);
+    return pps / (float)(dgl_get_fps());
 }
 
 static void update_powerup(POWERUP *powerup)
@@ -395,7 +395,7 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
 {
     init_screenshot(screenshot);
 
-    ALLEGRO_BITMAP *canvas = al_create_bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    ALLEGRO_BITMAP *canvas = al_create_bitmap(dgl_get_display_width(), dgl_get_display_height());
     assert(canvas);
 
     dgl_insert_image_resource(name, canvas);
@@ -682,8 +682,8 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         dgl_init_sprite(&enemy->sprite, true, 1);
         dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-1.png"));
         dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-2.png"));
-        enemy->body.w = 20;
-        enemy->body.h = 20;
+        enemy->body.w = 19;
+        enemy->body.h = 19;
         enemy->update = update_enemy_animation;
     }
 
@@ -895,17 +895,17 @@ static void to_gameplay_state_scroll_rooms(void)
 
     /* Configure the screenshots to scroll, based on the direction of the exit used */
     if (screenshot1.direction == RIGHT) {
-        screenshot2.x = DISPLAY_WIDTH;
-        screenshot2.dx = -DISPLAY_WIDTH;
+        screenshot2.x = dgl_get_display_width();
+        screenshot2.dx = -dgl_get_display_width();
     } else if (screenshot1.direction == LEFT) {
-        screenshot2.x = -DISPLAY_WIDTH;
-        screenshot2.dx = DISPLAY_WIDTH;
+        screenshot2.x = -dgl_get_display_width();
+        screenshot2.dx = dgl_get_display_width();
     } else if (screenshot1.direction == UP) {
-        screenshot2.y = -DISPLAY_HEIGHT;
-        screenshot2.dy = DISPLAY_HEIGHT;
+        screenshot2.y = -dgl_get_display_height();
+        screenshot2.dy = dgl_get_display_height();
     } else if (screenshot1.direction == DOWN) {
-        screenshot2.y = DISPLAY_HEIGHT;
-        screenshot2.dy = -DISPLAY_HEIGHT;
+        screenshot2.y = dgl_get_display_height();
+        screenshot2.dy = -dgl_get_display_height();
     }
 
     /* Set the hero pos to match where they entered the room... */

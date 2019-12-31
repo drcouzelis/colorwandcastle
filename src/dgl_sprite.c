@@ -1,17 +1,9 @@
 #include <stdio.h>
+#include "dgl_run.h"
 #include "dgl_sprite.h"
-
-static int dgl_sprite_fps = -1;
-
-void dgl_set_animation_fps(int fps)
-{
-    assert(fps > 0);
-    dgl_sprite_fps = fps;
-}
 
 void dgl_init_sprite(DGL_SPRITE *sprite, bool loop, int speed)
 {
-    assert(dgl_sprite_fps > 0);
     assert(sprite != NULL);
     
     for (int i = 0; i < MAX_FRAMES; i++) {
@@ -155,7 +147,7 @@ void dgl_animate(DGL_SPRITE *sprite)
          * Cycle through as many frames as necessary for the
          * amount of time that has passed.
          */
-        while (sprite->fudge >= dgl_sprite_fps) {
+        while (sprite->fudge >= dgl_get_fps()) {
             sprite->pos++;
             if (sprite->pos == sprite->len) {
                 if (sprite->loop) {
@@ -165,7 +157,7 @@ void dgl_animate(DGL_SPRITE *sprite)
                     sprite->done = true;
                 }
             }
-            sprite->fudge -= dgl_sprite_fps;
+            sprite->fudge -= dgl_get_fps();
         }
       
     } else {

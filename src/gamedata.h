@@ -18,7 +18,7 @@
 
 #define MAX_ROOM_COLS 16
 #define MAX_ROOM_ROWS 12
-#define MAX_ROOM_SIZE (MAX_ROOM_COLS * MAX_ROOM_ROWS)
+#define MAX_ROOM_SIZE ((MAX_ROOM_COLS) * (MAX_ROOM_ROWS))
 #define MAX_SPRITES 4
 #define MAX_BULLETS 16
 #define MAX_ENEMIES 64
@@ -29,7 +29,7 @@
 #define MAX_ROOMS 64
 #define MAX_STRING_SIZE 128
 
-#define POWERUP_SPEED TILE_SIZE
+#define POWERUP_SPEED (TILE_SIZE)
 
 #define TYPE int
 #define SUBTYPE int

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "gamedata.h"
-#include "main.h"
 
 void init_hero(HERO *hero)
 {
