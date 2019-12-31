@@ -87,6 +87,8 @@ dist_imagesdata_DATA = \
   data/images/mask-plasma-2.png \
   data/images/mask-star-1.png \
   data/images/mask-star-2.png \
+  data/images/powerup-laser-1.png \
+  data/images/powerup-laser-2.png \
   data/images/powerup-rainbow-1.png \
   data/images/powerup-rainbow-2.png \
   data/images/powerup-speed-1.png \
