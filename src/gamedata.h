@@ -55,13 +55,15 @@ typedef enum
 typedef enum
 {
     POWERUP_TYPE_NONE = 0,
-    POWERUP_TYPE_FLASHING,
+    POWERUP_TYPE_FIRST = 1,
+    POWERUP_TYPE_FLASHING = 1,
     POWERUP_TYPE_LASER,
-    POWERUP_TYPE_BOOM,
-    POWERUP_TYPE_TIMESTOP,
-    POWERUP_TYPE_RANDOM,
-    POWERUP_TYPE_INVINCIBLE,
-    POWERUP_TYPE_FRAGILE
+    //POWERUP_TYPE_RANDOM,
+    //POWERUP_TYPE_BOOM,
+    //POWERUP_TYPE_TIMESTOP,
+    //POWERUP_TYPE_INVINCIBLE,
+    //POWERUP_TYPE_FRAGILE,
+    POWERUP_TYPE_MAX
 } POWERUP_TYPE;
 
 /* To be used */
@@ -273,8 +275,8 @@ typedef struct
 
     /* The door representing the exit, appears when all blocks are gone AND there are no other exits */
     DGL_SPRITE door_sprite;
-    int door_x;
-    int door_y;
+    int last_cleared_x;
+    int last_cleared_y;
 
     /* Exits */
     EXIT exits[MAX_EXITS];

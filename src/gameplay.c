@@ -75,6 +75,7 @@ static SCREENSHOT screenshot2;
 /* The number of blocks the hero needs to destroy before a powerup appears */
 static const int RESET_POWERUP_COUNTER = -1;
 static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
+static int next_powerup_type = POWERUP_TYPE_NONE;
 
 /**
  * ...ENDS HERE.
@@ -283,14 +284,20 @@ static void load_powerup(float x, float y)
     }
 
     dgl_init_sprite(&powerup->sprite, true, 6);
-    dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
-    dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
+    if (next_powerup_type == POWERUP_TYPE_FLASHING) {
+        dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
+        dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
+    } else if (next_powerup_type == POWERUP_TYPE_LASER) {
+        dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-1.png"));
+        dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-2.png"));
+    }
     powerup->body.x = x;
     powerup->body.y = y;
     powerup->body.w = 20;
     powerup->body.h = 20;
     powerup->draw = draw_powerup;
     powerup->update = update_powerup;
+    powerup->type = next_powerup_type;
     powerup->is_active = true;
 
     /* Set the powerup's velocity based on the direction of the room */
@@ -1059,8 +1066,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
     /* If the bullet hits a block... */
     if (block_collision) {
 
-        if (bullet->texture == room.block_map[(r * room.cols) + c] ||
-                bullet->texture == ANY_TEXTURE) {
+        if (bullet->texture == room.block_map[(r * room.cols) + c] || bullet->texture == ANY_TEXTURE) {
 
             /* Matching textures! */
             /* Remove the bullet and the block */
@@ -1070,8 +1076,8 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
             /* Save the location that was cleared, in case we need to draw a door */
-            room.door_x = c * TILE_SIZE;
-            room.door_y = r * TILE_SIZE;
+            room.last_cleared_x = c * TILE_SIZE;
+            room.last_cleared_y = r * TILE_SIZE;
 
             /* It could be time to give the player a powerup */
             if (blocks_until_powerup_appears > 0) {
@@ -1412,15 +1418,20 @@ static bool is_hero_in_exit(EXIT *exit)
 
 static void collect_powerup(POWERUP *powerup)
 {
-    printf("Pretending to collect powerup...\n");
+    if (powerup->type == POWERUP_TYPE_FLASHING) {
+        hero.powerup_type = POWERUP_TYPE_FLASHING;
+        hero.powerup_remaining = 3;
 
-    // YOU LEFT OFF HERE!!
-    hero.powerup_type = POWERUP_TYPE_FLASHING;
-    hero.powerup_remaining = 3;
-
-    /* Give the hero a sparkly new bullet */
-    load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
-    hero.texture = ANY_TEXTURE;
+        /* Give the hero a sparkly new bullet */
+        load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
+        hero.texture = ANY_TEXTURE;
+    } else if (powerup->type == POWERUP_TYPE_LASER) {
+        // YOU LEFT OFF HERE!!
+        hero.powerup_type = POWERUP_TYPE_FLASHING;
+        hero.powerup_remaining = 3;
+        load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
+        hero.texture = ANY_TEXTURE;
+    }
 
     /* Clear the powerup */
     init_powerup(powerup);
@@ -1528,19 +1539,24 @@ static bool update_gameplay_playing(void)
                 init_powerup(powerup);
             }
         }
+
+        /* Reset the powerup counter for the next room */
+        blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
     }
 
     /* Give the player a powerup? */
     if (blocks_until_powerup_appears == 0 && !room.cleared && num_blocks() > 0) {
         /* Create a dummy test powerup */
-        load_powerup(room.door_x, room.door_y);
+        load_powerup(room.last_cleared_x, room.last_cleared_y);
         blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
     }
 
     /* Set the number of blocks needed to be cleared until a new powerup appears */
     if (blocks_until_powerup_appears == RESET_POWERUP_COUNTER) {
+        printf("Reset powerup!\n");
         blocks_until_powerup_appears = dgl_random_number(5, 8);
-        printf("Next powerup will appear after %d blocks cleared.\n", blocks_until_powerup_appears);
+        next_powerup_type = dgl_random_number(POWERUP_TYPE_FIRST, POWERUP_TYPE_MAX - 1);
+        printf("Next powerup is type %d after %d blocks cleared.\n", next_powerup_type, blocks_until_powerup_appears);
     }
 
     /* Check for level completion */
@@ -1566,7 +1582,7 @@ static bool update_gameplay_playing(void)
 
         /* There are no declared exits, use a door instead */
         if (!room_has_exits()) {
-            if (dgl_is_collision(b1->x, b1->y, b1->w, b1->h, room.door_x, room.door_y, TILE_SIZE, TILE_SIZE)) {
+            if (dgl_is_collision(b1->x, b1->y, b1->w, b1->h, room.last_cleared_x, room.last_cleared_y, TILE_SIZE, TILE_SIZE)) {
                 to_gameplay_state_door_entered();
             }
         }
@@ -1658,7 +1674,7 @@ static void draw_gameplay_playing(void)
     /* If the room is cleared and there's no other exits... */
     if (room.cleared && !room_has_exits()) {
         /* ...then draw a door */
-        dgl_draw_sprite(&room.door_sprite, room.door_x, room.door_y);
+        dgl_draw_sprite(&room.door_sprite, room.last_cleared_x, room.last_cleared_y);
     }
 
     /* Draw bullets */

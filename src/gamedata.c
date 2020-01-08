@@ -123,8 +123,8 @@ void init_room(ROOM *room)
     /* Exits */
     dgl_init_sprite(&room->door_sprite, false, 0);
     dgl_add_frame(&room->door_sprite, DGL_IMG("tile-door.png"));
-    room->door_x = 0;
-    room->door_y = 0;
+    room->last_cleared_x = 0;
+    room->last_cleared_y = 0;
 
     for (int i = 0; i < MAX_EXITS; i++) {
         room->exits[i].active = false;
