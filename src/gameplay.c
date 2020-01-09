@@ -607,7 +607,7 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     enemy->body.y += convert_pps_to_fps(enemy->body.dy);
 
     /* Check for vertical collisions */
-    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body)) {
+    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
         enemy->body.y = old_y;
         enemy->body.dy *= -1;
     }
@@ -616,7 +616,7 @@ static void update_enemy_movement(ENEMY *enemy, void *data)
     enemy->body.x += convert_pps_to_fps(enemy->body.dx);
 
     /* Check for horizontal collisions */
-    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body)) {
+    if (is_out_of_bounds(&enemy->body) || is_board_collision(&enemy->body) || is_block_collision(&enemy->body)) {
         enemy->body.x = old_x;
         enemy->body.dx *= -1;
     }
