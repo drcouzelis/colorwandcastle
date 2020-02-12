@@ -103,3 +103,11 @@
 
 - Hit-points on blocks? (No.)
 - Rooms that you "come back" to, such as one hallway above another, or going down stairs that you saw previously
+
+## David Game Library
+- [ ] Resource management (directories)
+- [ ] Sound / music management
+- [ ] Image management
+- [ ] Animated sprites
+- [ ] Camera control
+- [ ] Maps (load, draw)
