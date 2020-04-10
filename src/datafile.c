@@ -240,6 +240,8 @@ static ENEMY_TYPE get_enemy_type(const char *type)
         return ENEMY_TYPE_DIAGONAL;
     } else if (strncmp(type, "BLOCKER", MAX_STRING_SIZE) == 0) {
         return ENEMY_TYPE_BLOCKER;
+    } else if (strncmp(type, "TRACER", MAX_STRING_SIZE) == 0) {
+        return ENEMY_TYPE_TRACER;
     }
 
     fprintf(stderr, "Failed to understand enemy type \"%s\".\n", type);

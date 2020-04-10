@@ -73,6 +73,14 @@ dist_imagesdata_DATA = \
   data/images/enemy-spider-5.png \
   data/images/enemy-spider-6.png \
   data/images/enemy-spider-7.png \
+  data/images/enemy-tracer-1.png \
+  data/images/enemy-tracer-2.png \
+  data/images/enemy-tracer-3.png \
+  data/images/enemy-tracer-4.png \
+  data/images/enemy-tracer-5.png \
+  data/images/enemy-tracer-6.png \
+  data/images/enemy-tracer-7.png \
+  data/images/enemy-tracer-8.png \
   data/images/farground-forest.png \
   data/images/hero-makayla-1.png \
   data/images/hero-makayla-2.png \

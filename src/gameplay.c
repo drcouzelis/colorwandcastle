@@ -598,6 +598,14 @@ static void update_enemy_animation(ENEMY *enemy, void *data)
     dgl_animate(&enemy->sprite);
 }
 
+static void update_enemy_tracer(ENEMY *enemy, void *data)
+{
+    /* YOU LEFT OFF HERE!!! */
+    /* Add code for the enemy to follow the walls */
+
+    update_enemy_animation(enemy, data);
+}
+
 static void update_enemy_movement(ENEMY *enemy, void *data)
 {
     float old_x = enemy->body.x;
@@ -692,6 +700,28 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.w = 19;
         enemy->body.h = 19;
         enemy->update = update_enemy_animation;
+    } else if (enemy->type == ENEMY_TYPE_TRACER) {
+        dgl_init_sprite(&enemy->sprite, true, 10);
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-1.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-2.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-3.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-4.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-6.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-7.png"));
+        dgl_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-8.png"));
+        enemy->sprite.x_offset = -10;
+        enemy->sprite.y_offset = -10;
+        enemy->body.x += 5; /* Fix the initial position */
+        enemy->body.y += 5;
+        enemy->body.w = 10;
+        enemy->body.h = 10;
+        enemy->body.dx = definition->speed;
+        enemy->body.dy = -definition->speed;
+        enemy->update = update_enemy_movement;
     }
 
     enemy->dist = definition->dist;
