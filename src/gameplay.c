@@ -721,7 +721,7 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->body.h = 10;
         enemy->body.dx = definition->speed;
         enemy->body.dy = -definition->speed;
-        enemy->update = update_enemy_movement;
+        enemy->update = update_enemy_tracer;
     }
 
     enemy->dist = definition->dist;
