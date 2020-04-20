@@ -73,7 +73,7 @@ static SCREENSHOT screenshot1;
 static SCREENSHOT screenshot2;
 
 /* The number of blocks the hero needs to destroy before a powerup appears */
-static const int RESET_POWERUP_COUNTER = -1;
+#define RESET_POWERUP_COUNTER (-1)
 static int blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
 static int next_powerup_type = POWERUP_TYPE_NONE;
 
@@ -287,9 +287,9 @@ static void load_powerup(float x, float y)
     if (next_powerup_type == POWERUP_TYPE_FLASHING) {
         dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
         dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
-    } else if (next_powerup_type == POWERUP_TYPE_LASER) {
-        dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-1.png"));
-        dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-2.png"));
+    //} else if (next_powerup_type == POWERUP_TYPE_LASER) {
+    //    dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-1.png"));
+    //    dgl_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-2.png"));
     }
     powerup->body.x = x;
     powerup->body.y = y;
@@ -1455,12 +1455,11 @@ static void collect_powerup(POWERUP *powerup)
         /* Give the hero a sparkly new bullet */
         load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
         hero.texture = ANY_TEXTURE;
-    } else if (powerup->type == POWERUP_TYPE_LASER) {
-        // YOU LEFT OFF HERE!!
-        hero.powerup_type = POWERUP_TYPE_FLASHING;
-        hero.powerup_remaining = 3;
-        load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
-        hero.texture = ANY_TEXTURE;
+    //} else if (powerup->type == POWERUP_TYPE_LASER) {
+    //    hero.powerup_type = POWERUP_TYPE_LASER;
+    //    hero.powerup_remaining = 3;
+    //    load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
+    //    hero.texture = ANY_TEXTURE;
     }
 
     /* Clear the powerup */
@@ -1583,10 +1582,10 @@ static bool update_gameplay_playing(void)
 
     /* Set the number of blocks needed to be cleared until a new powerup appears */
     if (blocks_until_powerup_appears == RESET_POWERUP_COUNTER) {
-        printf("Reset powerup!\n");
+        //printf("Reset powerup!\n");
         blocks_until_powerup_appears = dgl_random_number(5, 8);
         next_powerup_type = dgl_random_number(POWERUP_TYPE_FIRST, POWERUP_TYPE_MAX - 1);
-        printf("Next powerup is type %d after %d blocks cleared.\n", next_powerup_type, blocks_until_powerup_appears);
+        //printf("Next powerup is type %d after %d blocks cleared.\n", next_powerup_type, blocks_until_powerup_appears);
     }
 
     /* Check for level completion */

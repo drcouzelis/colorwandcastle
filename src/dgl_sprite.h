@@ -2,7 +2,7 @@
 
 #include "dgl_resources.h"
 
-#define MAX_FRAMES 32
+#define MAX_FRAMES (32)
 
 typedef struct
 {

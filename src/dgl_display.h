@@ -5,7 +5,7 @@
 /**
  * Can be used in "dgl_display_init".
  */
-#define DGL_DISPLAY_MAX_SCALE -1
+#define DGL_DISPLAY_MAX_SCALE (-1)
 
 /**
  * Create a display to draw on.

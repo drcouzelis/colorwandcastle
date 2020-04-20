@@ -4,36 +4,36 @@
 #include "dgl_sprite.h"
 #include "direction.h"
 
-#define TILE_SIZE 20
-#define COLS 16
-#define ROWS 12
+#define TILE_SIZE (20)
+#define COLS (16)
+#define ROWS (12)
 
-#define NO_TILE -1
-#define NO_TEXTURE -1
-#define ANY_TEXTURE -2
-#define NO_BLOCK -1
-#define RANDOM_BLOCK -2
-#define COLLISION 0
-#define NO_COLLISION -1
+#define NO_TILE (-1)
+#define NO_TEXTURE (-1)
+#define ANY_TEXTURE (-2)
+#define NO_BLOCK (-1)
+#define RANDOM_BLOCK (-2)
+#define COLLISION (0)
+#define NO_COLLISION (-1)
 
-#define MAX_ROOM_COLS 16
-#define MAX_ROOM_ROWS 12
+#define MAX_ROOM_COLS (16)
+#define MAX_ROOM_ROWS (12)
 #define MAX_ROOM_SIZE ((MAX_ROOM_COLS) * (MAX_ROOM_ROWS))
-#define MAX_SPRITES 4
-#define MAX_BULLETS 16
-#define MAX_ENEMIES 64
-#define MAX_EXITS 8
-#define MAX_POWERUPS 8
-#define MAX_TILES 128
-#define MAX_TEXTURES 128
-#define MAX_ROOMS 64
-#define MAX_STRING_SIZE 128
+#define MAX_SPRITES (4)
+#define MAX_BULLETS (16)
+#define MAX_ENEMIES (64)
+#define MAX_EXITS (8)
+#define MAX_POWERUPS (8)
+#define MAX_TILES (128)
+#define MAX_TEXTURES (128)
+#define MAX_ROOMS (64)
+#define MAX_STRING_SIZE (128)
 
 #define POWERUP_SPEED (TILE_SIZE)
 
 #define TYPE int
 #define SUBTYPE int
-#define UNDEFINED_TYPE -1
+#define UNDEFINED_TYPE (-1)
 
 typedef enum
 {
@@ -57,7 +57,7 @@ typedef enum
     POWERUP_TYPE_NONE = 0,
     POWERUP_TYPE_FIRST = 1,
     POWERUP_TYPE_FLASHING = 1,
-    POWERUP_TYPE_LASER,
+    //POWERUP_TYPE_LASER,
     //POWERUP_TYPE_RANDOM,
     //POWERUP_TYPE_BOOM,
     //POWERUP_TYPE_TIMESTOP,
