@@ -30,8 +30,8 @@ static bool update_gameplay_playing();
 static bool update_gameplay_dying();
 static void draw_gameplay_playing();
 static void draw_gameplay_scrolling_rooms();
-static void control_gameplay_options();
-static void control_gameplay_playing();
+static void control_gameplay_options(ALLEGRO_EVENT *event);
+static void control_gameplay_playing(ALLEGRO_EVENT *event);
 
 /* Don't do anything if the gameplay hasn't been initialized! */
 static bool is_gameplay_init = false;

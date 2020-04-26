@@ -6,7 +6,7 @@ static int dgl_init_random_numbers = 0;
 int dgl_random_number(int low, int high)
 {
     if (!dgl_init_random_numbers) {
-        srand(time(NULL));
+        srand((unsigned)time(NULL));
         dgl_init_random_numbers = 1;
     }
     
