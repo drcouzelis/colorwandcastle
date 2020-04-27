@@ -19,43 +19,117 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\levels\list-demo.dat" />
-    <None Include="data\levels\list-story.dat" />
-    <None Include="data\levels\room-demo-001.dat" />
-    <None Include="data\levels\room-demo-002.dat" />
-    <None Include="data\levels\room-demo-003.dat" />
-    <None Include="data\levels\room-demo-004.dat" />
-    <None Include="data\levels\room-demo-005.dat" />
-    <None Include="data\levels\room-demo-006.dat" />
-    <None Include="data\levels\room-demo-007.dat" />
-    <None Include="data\levels\room-demo-008.dat" />
-    <None Include="data\levels\room-demo-009.dat" />
-    <None Include="data\levels\room-demo-010.dat" />
-    <None Include="data\levels\room-demo-011.dat" />
-    <None Include="data\levels\room-hard.dat" />
-    <None Include="data\levels\room-makayla.dat" />
-    <None Include="data\levels\room-rawson-2.dat" />
-    <None Include="data\levels\room-rawson.dat" />
-    <None Include="data\levels\room-story-001.dat" />
-    <None Include="data\levels\room-story-002.dat" />
-    <None Include="data\levels\room-story-003.dat" />
-    <None Include="data\levels\room-story-004.dat" />
-    <None Include="data\levels\room-story-005.dat" />
-    <None Include="data\levels\room-story-006.dat" />
-    <None Include="data\levels\room-story-007.dat" />
-    <None Include="data\levels\room-story-008.dat" />
-    <None Include="data\levels\room-story-009.dat" />
-    <None Include="data\levels\room-story-010.dat" />
-    <None Include="data\levels\room-story-011.dat" />
-    <None Include="data\levels\room-story-012.dat" />
-    <None Include="data\levels\room-test.dat" />
-    <None Include="data\levels\texture-colored-2.dat" />
-    <None Include="data\levels\texture-colored-3.dat" />
-    <None Include="data\levels\texture-colored.dat" />
-    <None Include="data\levels\tile-bricks.dat" />
-    <None Include="data\levels\tile-castle.dat" />
-    <None Include="data\levels\tile-general.dat" />
-    <None Include="data\levels\tile-wood.dat" />
+    <None Include="data\levels\list-demo.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\list-story.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-001.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-002.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-003.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-004.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-005.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-006.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-007.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-008.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-009.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-010.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-demo-011.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-hard.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-makayla.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-rawson-2.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-rawson.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-001.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-002.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-003.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-004.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-005.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-006.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-007.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-008.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-009.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-010.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-011.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-story-012.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\room-test.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\texture-colored-2.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\texture-colored-3.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\texture-colored.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\tile-bricks.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\tile-castle.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\tile-general.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="data\levels\tile-wood.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -99,77 +173,215 @@
     <ClInclude Include="src\roomlist.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="data\images\background-bedroom.png" />
-    <Image Include="data\images\effect-poof-1.png" />
-    <Image Include="data\images\effect-poof-2.png" />
-    <Image Include="data\images\effect-poof-3.png" />
-    <Image Include="data\images\effect-poof-4.png" />
-    <Image Include="data\images\enemy-bat-1.png" />
-    <Image Include="data\images\enemy-bat-2.png" />
-    <Image Include="data\images\enemy-bat-3.png" />
-    <Image Include="data\images\enemy-blocker-1.png" />
-    <Image Include="data\images\enemy-blocker-2.png" />
-    <Image Include="data\images\enemy-ghost-1.png" />
-    <Image Include="data\images\enemy-ghost-2.png" />
-    <Image Include="data\images\enemy-ghost-3.png" />
-    <Image Include="data\images\enemy-ghost-4.png" />
-    <Image Include="data\images\enemy-spider-1.png" />
-    <Image Include="data\images\enemy-spider-2.png" />
-    <Image Include="data\images\enemy-spider-3.png" />
-    <Image Include="data\images\enemy-spider-4.png" />
-    <Image Include="data\images\enemy-spider-5.png" />
-    <Image Include="data\images\enemy-spider-6.png" />
-    <Image Include="data\images\enemy-spider-7.png" />
-    <Image Include="data\images\enemy-tracer-1.png" />
-    <Image Include="data\images\enemy-tracer-2.png" />
-    <Image Include="data\images\enemy-tracer-3.png" />
-    <Image Include="data\images\enemy-tracer-4.png" />
-    <Image Include="data\images\enemy-tracer-5.png" />
-    <Image Include="data\images\enemy-tracer-6.png" />
-    <Image Include="data\images\enemy-tracer-7.png" />
-    <Image Include="data\images\enemy-tracer-8.png" />
-    <Image Include="data\images\farground-forest.png" />
-    <Image Include="data\images\hero-daddy-01.png" />
-    <Image Include="data\images\hero-makayla-1.png" />
-    <Image Include="data\images\hero-makayla-2.png" />
-    <Image Include="data\images\hero-makayla-hurt-1.png" />
-    <Image Include="data\images\hero-makayla-hurt-2.png" />
-    <Image Include="data\images\hero-rawson-1.png" />
-    <Image Include="data\images\hero-rawson-2.png" />
-    <Image Include="data\images\hero-rawson-hurt-1.png" />
-    <Image Include="data\images\hero-rawson-hurt-2.png" />
-    <Image Include="data\images\icon.png" />
-    <Image Include="data\images\mask-block.png" />
-    <Image Include="data\images\mask-plasma-1.png" />
-    <Image Include="data\images\mask-plasma-2.png" />
-    <Image Include="data\images\mask-star-1.png" />
-    <Image Include="data\images\mask-star-2.png" />
-    <Image Include="data\images\powerup-laser-1.png" />
-    <Image Include="data\images\powerup-laser-2.png" />
-    <Image Include="data\images\powerup-rainbow-1.png" />
-    <Image Include="data\images\powerup-rainbow-2.png" />
-    <Image Include="data\images\powerup-speed-1.png" />
-    <Image Include="data\images\powerup-speed-2.png" />
-    <Image Include="data\images\texture-blue.png" />
-    <Image Include="data\images\texture-green.png" />
-    <Image Include="data\images\texture-orange.png" />
-    <Image Include="data\images\texture-purple.png" />
-    <Image Include="data\images\texture-red.png" />
-    <Image Include="data\images\texture-yellow.png" />
-    <Image Include="data\images\tile-bricks.png" />
-    <Image Include="data\images\tile-castle.png" />
-    <Image Include="data\images\tile-door.png" />
-    <Image Include="data\images\tile-general.png" />
-    <Image Include="data\images\tile-wood.png" />
+    <Image Include="data\images\background-bedroom.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\effect-poof-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\effect-poof-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\effect-poof-3.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\effect-poof-4.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-bat-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-bat-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-bat-3.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-blocker-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-blocker-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-ghost-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-ghost-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-ghost-3.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-ghost-4.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-3.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-4.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-5.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-6.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-spider-7.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-3.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-4.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-5.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-6.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-7.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\enemy-tracer-8.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\farground-forest.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-daddy-01.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-makayla-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-makayla-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-makayla-hurt-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-makayla-hurt-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-rawson-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-rawson-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-rawson-hurt-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\hero-rawson-hurt-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\icon.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\mask-block.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\mask-plasma-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\mask-plasma-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\mask-star-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\mask-star-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\powerup-laser-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\powerup-laser-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\powerup-rainbow-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\powerup-rainbow-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\powerup-speed-1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\powerup-speed-2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\texture-blue.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\texture-green.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\texture-orange.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\texture-purple.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\texture-red.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\texture-yellow.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\tile-bricks.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\tile-castle.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\tile-door.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\tile-general.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\tile-wood.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="data\sounds\block-destroyed.wav" />
-    <Media Include="data\sounds\bullet-bounce.wav" />
-    <Media Include="data\sounds\bullet-disolve.wav" />
-    <Media Include="data\sounds\bullet-shoot.wav" />
-    <Media Include="data\sounds\hero-die.wav" />
-    <Media Include="data\sounds\hero-toggle.wav" />
-    <Media Include="data\sounds\room-cleared.wav" />
+    <Media Include="data\sounds\block-destroyed.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="data\sounds\bullet-bounce.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="data\sounds\bullet-disolve.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="data\sounds\bullet-shoot.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="data\sounds\hero-die.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="data\sounds\hero-toggle.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="data\sounds\room-cleared.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
