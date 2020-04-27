@@ -26,6 +26,7 @@ Global
 		{4F04B730-3C8E-45DD-A19E-A9DE675B2633}.Debug|x64.ActiveCfg = Debug
 		{4F04B730-3C8E-45DD-A19E-A9DE675B2633}.Debug|x86.ActiveCfg = Debug
 		{4F04B730-3C8E-45DD-A19E-A9DE675B2633}.Release|x64.ActiveCfg = Release
+		{4F04B730-3C8E-45DD-A19E-A9DE675B2633}.Release|x64.Build.0 = Release
 		{4F04B730-3C8E-45DD-A19E-A9DE675B2633}.Release|x86.ActiveCfg = Release
 		{4F04B730-3C8E-45DD-A19E-A9DE675B2633}.Release|x86.Build.0 = Release
 	EndGlobalSection
