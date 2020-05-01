@@ -106,6 +106,9 @@
     <None Include="data\levels\room-story-012.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="data\levels\room-story-013.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="data\levels\room-test.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>

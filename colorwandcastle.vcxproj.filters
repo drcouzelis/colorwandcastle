@@ -112,6 +112,9 @@
     <None Include="data\levels\room-story-012.dat">
       <Filter>Data Files\Level Files</Filter>
     </None>
+    <None Include="data\levels\room-story-013.dat">
+      <Filter>Data Files\Level Files</Filter>
+    </None>
     <None Include="data\levels\room-test.dat">
       <Filter>Data Files\Level Files</Filter>
     </None>
