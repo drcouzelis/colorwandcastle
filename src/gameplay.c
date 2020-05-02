@@ -310,7 +310,12 @@ static void toggle_hero(void)
     /* Toggle the hero type */
     hero.type = hero.type == HERO_TYPE_MAKAYLA ? HERO_TYPE_RAWSON : HERO_TYPE_MAKAYLA;
 
+    /* Save the direction the hero sprite is currently facing, to restore it later */
+    bool is_mirror = hero.sprite->mirror;
+
     load_hero_sprite();
+
+    hero.sprite->mirror = is_mirror;
 
     if (hero.has_bullet) {
         load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
@@ -1284,6 +1289,21 @@ static void update_hero_player_control(void)
 
     /* Horizontal movement */
     hero.body.x += convert_pps_to_fps(hero.body.dx);
+
+    /* The hero faces the direction they're moving */
+    if (hero.body.dx > 0) {
+        hero.sprite->mirror = false;
+    } else if (hero.body.dx < 0) {
+        hero.sprite->mirror = true;
+    }
+
+    if (hero.shoot == true) {
+        if (room.direction == RIGHT) {
+            hero.sprite->mirror = false;
+        } else if (room.direction == LEFT) {
+            hero.sprite->mirror = true;
+        }
+    }
 
     /* Check for horizontal collisions */
     if (is_out_of_bounds(&hero.body) || is_board_collision(&hero.body) || is_block_collision(&hero.body)) {
