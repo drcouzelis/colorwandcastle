@@ -317,6 +317,9 @@
     <Image Include="data\images\mask-star-2.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="data\images\menu-titlescreen.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="data\images\powerup-laser-1.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>

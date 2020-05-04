@@ -9,6 +9,7 @@
 #include "dgl_sprite.h"
 #include "gamedata.h"
 #include "gameplay.h"
+#include "menu.h"
 
 /**
  * The native resolution of the game.
@@ -111,7 +112,13 @@ int main(int argc, char **argv)
     set_curr_room(room_num - 1);
 
     /* RUN THE GAME */
-    dgl_run(control_gameplay, update_gameplay, draw_gameplay, NULL);
+    if (room_num == 1) {
+        /* If starting from the beginning of the game, show the titlescreen and menu */
+        dgl_run(control_menu, update_menu, draw_menu, NULL);
+    } else {
+        /* If a level was selected from the command line, just start playing that level */
+        dgl_run(control_gameplay, update_gameplay, draw_gameplay, NULL);
+    }
  
     /* DONE, clean up */
     dgl_unlock_resources();

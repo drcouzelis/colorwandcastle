@@ -394,6 +394,9 @@
     <Image Include="data\images\mask-star-2.png">
       <Filter>Data Files\Image Files</Filter>
     </Image>
+    <Image Include="data\images\menu-titlescreen.png">
+      <Filter>Data Files\Image Files</Filter>
+    </Image>
     <Image Include="data\images\powerup-laser-1.png">
       <Filter>Data Files\Image Files</Filter>
     </Image>
