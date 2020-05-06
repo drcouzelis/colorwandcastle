@@ -157,6 +157,7 @@
     <ClCompile Include="src\dgl_run.c" />
     <ClCompile Include="src\dgl_sound.c" />
     <ClCompile Include="src\dgl_sprite.c" />
+    <ClCompile Include="src\dgl_text.c" />
     <ClCompile Include="src\direction.c" />
     <ClCompile Include="src\effects.c" />
     <ClCompile Include="src\gamedata.c" />
@@ -178,6 +179,7 @@
     <ClInclude Include="src\dgl_run.h" />
     <ClInclude Include="src\dgl_sound.h" />
     <ClInclude Include="src\dgl_sprite.h" />
+    <ClInclude Include="src\dgl_text.h" />
     <ClInclude Include="src\direction.h" />
     <ClInclude Include="src\effects.h" />
     <ClInclude Include="src\gamedata.h" />
@@ -457,6 +459,7 @@
     <Allegro_AddonImage>true</Allegro_AddonImage>
     <Allegro_AddonAudio>true</Allegro_AddonAudio>
     <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
     <Allegro_LibraryType>StaticMonolithRelease</Allegro_LibraryType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -464,6 +467,7 @@
     <Allegro_AddonImage>true</Allegro_AddonImage>
     <Allegro_AddonAudio>true</Allegro_AddonAudio>
     <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
     <Allegro_LibraryType>StaticMonolithRelease</Allegro_LibraryType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -471,6 +475,7 @@
     <Allegro_AddonImage>true</Allegro_AddonImage>
     <Allegro_AddonAudio>true</Allegro_AddonAudio>
     <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
     <Allegro_LibraryType>StaticMonolithRelease</Allegro_LibraryType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -478,6 +483,7 @@
     <Allegro_AddonImage>true</Allegro_AddonImage>
     <Allegro_AddonAudio>true</Allegro_AddonAudio>
     <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
     <Allegro_LibraryType>StaticMonolithRelease</Allegro_LibraryType>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

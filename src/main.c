@@ -7,6 +7,7 @@
 #include "dgl_run.h"
 #include "dgl_sound.h"
 #include "dgl_sprite.h"
+#include "dgl_text.h"
 #include "gamedata.h"
 #include "gameplay.h"
 #include "menu.h"
@@ -57,6 +58,9 @@ int main(int argc, char **argv)
 
     /* Create a display that will be used to draw the game on */
     assert(dgl_init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
+
+    /* Setup text drawing */
+    assert(dgl_init_text());
 
     /* So we know where to look for image and sound files... */
     dgl_add_resource_path( PKGDATADIR "/images/");
@@ -124,6 +128,7 @@ int main(int argc, char **argv)
     dgl_unlock_resources();
     dgl_free_resources();
     dgl_free_resource_paths();
+    dgl_free_text();
     dgl_free_display();
 
     /* See if we have any naughty memory leaks */

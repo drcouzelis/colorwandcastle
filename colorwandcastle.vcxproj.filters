@@ -183,6 +183,9 @@
     <ClCompile Include="src\dgl_sprite.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\dgl_text.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\direction.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -240,6 +243,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\dgl_sprite.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dgl_text.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\direction.h">

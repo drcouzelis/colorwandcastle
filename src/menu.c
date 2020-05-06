@@ -3,6 +3,7 @@
 #include "dgl_run.h"
 #include "dgl_sound.h"
 #include "dgl_sprite.h"
+#include "dgl_text.h"
 #include "gamedata.h"
 #include "gameplay.h"
 #include "menu.h"
@@ -86,5 +87,7 @@ void draw_menu(void *data)
     dgl_draw_sprite(&titlescreen_sprite, 0, 0);
     dgl_draw_sprite(&hero_makayla_sprite, TILE_SIZE * 3, TILE_SIZE * 4);
     dgl_draw_sprite(&hero_rawson_sprite, TILE_SIZE * 11, TILE_SIZE * 4);
+
+    dgl_draw_text(70, TILE_SIZE * 11, "Press SPACEBAR to start");
 }
 

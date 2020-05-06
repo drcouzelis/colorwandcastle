@@ -30,6 +30,8 @@ colorwandcastle_SOURCES = \
   src/dgl_sound.h \
   src/dgl_sprite.c \
   src/dgl_sprite.h \
+  src/dgl_text.c \
+  src/dgl_text.h \
   src/direction.c \
   src/direction.h \
   src/effects.c \
