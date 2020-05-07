@@ -1,6 +1,7 @@
 START 11 13
 
 DIRECTION DOWN
+FACING LEFT
 
 IMPORT tile-bricks.dat
 IMPORT texture-colored-2.dat
