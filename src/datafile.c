@@ -77,6 +77,16 @@ static void load_sprite_from_datafile(DGL_SPRITE *sprite, FILE *file)
             continue;
         }
 
+        if (strncmp(string, "SPEED", MAX_STRING_SIZE - 1) == 0) {
+            if (fscanf(file, "%d", &sprite->speed) != 1) {
+                fprintf(stderr, "WARNING: Looking for sprite speed, skipping %s...\n", string);
+            }
+        }
+
+        if (strncmp(string, "LOOP", MAX_STRING_SIZE - 1) == 0) {
+            sprite->loop = true;
+        }
+
         if (strncmp(string, "END", MAX_STRING_SIZE - 1) == 0) {
             break;
         }
@@ -358,6 +368,17 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
         }
 
         /* A texture name (used to color blocks and bullets) */
+        if (strncmp(string, "TEXTURE_ANIM", MAX_STRING_SIZE) == 0) {
+            if (room->num_texture_anims < MAX_TEXTURES) {
+                load_sprite_from_datafile(&room->texture_anims[room->num_texture_anims], file);
+                room->num_texture_anims++;
+            } else {
+                fprintf(stderr, "Failed to load texture, max number reached\n");
+            }
+            continue;
+        }
+
+        /* A texture name (used to color blocks and bullets) */
         if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
             if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", room->textures[room->num_textures]) == 1) {
                 room->num_textures++;
@@ -477,6 +498,13 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     for (int i = 0; i < room->num_textures; i++) {
         dgl_add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
     }
+
+    /* Add any animated textures */
+    for (int i = 0; i < room->num_texture_anims; i++) {
+        dgl_copy_sprite(&room->blocks[room->num_textures + i], &room->texture_anims[i]);
+    }
+    room->num_textures += room->num_texture_anims;
+    printf("Num textures %d\n", room->num_textures);
 
     /* Init any random blocks (any number < 0) */
     for (int i = 0; i < room->rows * room->cols; i++) {

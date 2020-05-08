@@ -1502,6 +1502,11 @@ static bool update_gameplay_playing(void)
         }
     }
 
+    /* Blocks */
+    for (int i = 0; i < room.num_textures; i++) {
+        dgl_animate(&room.blocks[i]);
+    }
+
     /* Powerups */
     for (int i = 0; i < MAX_POWERUPS; i++) {
         if (powerups[i].is_active && powerups[i].update != NULL) {

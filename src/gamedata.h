@@ -256,6 +256,10 @@ typedef struct
     /* List of textures used to make blocks and bullets in the level */
     char textures[MAX_TEXTURES][MAX_FILENAME_LEN];
     int num_textures;
+    
+    /* EXPERIMENTAL: Animated textures */
+    DGL_SPRITE texture_anims[MAX_TEXTURES];
+    int num_texture_anims;
 
     /* Blocks, that can be destroyed by the hero */
     DGL_SPRITE blocks[MAX_TEXTURES];
