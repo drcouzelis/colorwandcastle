@@ -136,6 +136,9 @@
     <None Include="data\levels\room-test.dat">
       <Filter>Data Files\Level Files</Filter>
     </None>
+    <None Include="data\levels\texture-boss-spider.dat">
+      <Filter>Data Files\Level Files</Filter>
+    </None>
     <None Include="data\levels\texture-colored.dat">
       <Filter>Data Files\Level Files</Filter>
     </None>
@@ -278,6 +281,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\images\background-bedroom.png">
+      <Filter>Data Files\Image Files</Filter>
+    </Image>
+    <Image Include="data\images\boss-spider.png">
       <Filter>Data Files\Image Files</Filter>
     </Image>
     <Image Include="data\images\effect-poof-1.png">

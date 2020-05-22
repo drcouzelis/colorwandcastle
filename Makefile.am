@@ -55,6 +55,7 @@ colorwandcastle_SOURCES = \
 imagesdatadir = $(pkgdatadir)/images
 dist_imagesdata_DATA = \
   data/images/background-bedroom.png \
+  data/images/boss-spider.png \
   data/images/effect-poof-1.png \
   data/images/effect-poof-2.png \
   data/images/effect-poof-3.png \
@@ -156,6 +157,7 @@ dist_levelsdata_DATA = \
   data/levels/room-rawson-2.dat \
   data/levels/room-hard.dat \
   data/levels/room-test.dat \
+  data/levels/texture-boss-spider.dat \
   data/levels/texture-colored.dat \
   data/levels/texture-colored-2.dat \
   data/levels/texture-colored-3.dat \

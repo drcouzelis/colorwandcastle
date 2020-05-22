@@ -127,6 +127,9 @@
     <None Include="data\levels\room-test.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="data\levels\texture-boss-spider.dat">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="data\levels\texture-colored-2.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -194,6 +197,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\images\background-bedroom.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="data\images\boss-spider.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="data\images\effect-poof-1.png">
