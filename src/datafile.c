@@ -367,7 +367,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             continue;
         }
 
-        /* A texture name (used to color blocks and bullets) */
+        /* An animated texture (used to color blocks and bullets) */
         if (strncmp(string, "TEXTURE_ANIM", MAX_STRING_SIZE) == 0) {
             if (room->num_texture_anims < MAX_TEXTURES) {
                 load_sprite_from_datafile(&room->texture_anims[room->num_texture_anims], file);

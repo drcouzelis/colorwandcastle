@@ -206,6 +206,17 @@ typedef struct
     int col;
 } EXIT;
 
+/**
+ * Used to define a texture, which will be used to create
+ * the image on a block and a bullet.
+ */
+typedef struct
+{
+    char frames[MAX_FRAMES][MAX_FILENAME_LEN];
+    int len;
+    int speed;
+} TEXTURE_DEF;
+
 typedef struct
 {
     /* Name of the room */
@@ -260,6 +271,8 @@ typedef struct
     /* EXPERIMENTAL: Animated textures */
     DGL_SPRITE texture_anims[MAX_TEXTURES];
     int num_texture_anims;
+    TEXTURE_DEF texture_defs[MAX_TEXTURES];
+    int num_texture_defs;
 
     /* Blocks, that can be destroyed by the hero */
     DGL_SPRITE blocks[MAX_TEXTURES];

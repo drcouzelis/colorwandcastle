@@ -109,11 +109,18 @@ void init_room(ROOM *room)
     /* Block list */
     for (int i = 0; i < MAX_TEXTURES; i++) {
         strncpy(room->textures[i], "", MAX_FILENAME_LEN);
+        for (int j = 0; j < MAX_FRAMES; j++) {
+            strncpy(room->texture_defs[i].frames[i], "", MAX_FILENAME_LEN);;
+        }
+        room->texture_defs[i].len = 0;
+        room->texture_defs[i].speed = 1;
         dgl_init_sprite(&room->texture_anims[i], false, 0);
+
         dgl_init_sprite(&room->blocks[i], false, 0);
     }
     room->num_textures = 0;
     room->num_texture_anims = 0;
+    room->num_texture_defs = 0;
 
     /* Enemy definitions */
     for (int i = 0; i < MAX_ENEMIES; i++) {
