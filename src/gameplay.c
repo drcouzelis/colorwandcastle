@@ -211,9 +211,13 @@ static void load_hero_bullet_sprite(DGL_SPRITE *sprite, int texture, int hero_ty
         /* Keep track of when to change to the next "rotation" of the bullet */
         int next_frame_count = 0;
         /* (If there's only one texture in the room, the bullet won't animate...) */
-        int num_textures = (room.num_textures == 1 ? 8 : room.num_textures * 4);
+        int num_textures = (room.num_texture_defs == 1 ? 8 : room.num_texture_defs * 4);
+        /* Cap the number of textures used in the flashing animation */
+        if (num_textures > 24) {
+            num_textures = 24;
+        }
         for (int i = 0; i < num_textures; i++) {
-            dgl_add_frame(sprite, get_hero_bullet_image(room.textures[i % room.num_textures], hero_type, next_frame));
+            dgl_add_frame(sprite, get_hero_bullet_image(room.texture_defs[i % room.num_texture_defs].frames[0], hero_type, next_frame));
             next_frame_count++;
             if (next_frame_count >= 4) {
                 next_frame = (next_frame == 1 ? 0 : 1);
@@ -222,8 +226,8 @@ static void load_hero_bullet_sprite(DGL_SPRITE *sprite, int texture, int hero_ty
         }
     } else {
         dgl_init_sprite(sprite, true, 4);
-        dgl_add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 0));
-        dgl_add_frame(sprite, get_hero_bullet_image(room.textures[texture], hero_type, 1));
+        dgl_add_frame(sprite, get_hero_bullet_image(room.texture_defs[texture].frames[0], hero_type, 0));
+        dgl_add_frame(sprite, get_hero_bullet_image(room.texture_defs[texture].frames[0], hero_type, 1));
     }
 
     sprite->x_offset = -5;
@@ -1503,7 +1507,7 @@ static bool update_gameplay_playing(void)
     }
 
     /* Blocks */
-    for (int i = 0; i < room.num_textures; i++) {
+    for (int i = 0; i < room.num_texture_defs; i++) {
         dgl_animate(&room.blocks[i]);
     }
 
@@ -1719,7 +1723,7 @@ static void draw_gameplay_playing(void)
 
             /* Blocks */
             n = room.block_map[(r * room.cols) + c];
-            if (n >= 0 && n < room.num_textures) {
+            if (n >= 0 && n < room.num_texture_defs) {
                 dgl_draw_sprite(&room.blocks[n], c * TILE_SIZE, r * TILE_SIZE);
             }
         }

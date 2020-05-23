@@ -93,6 +93,52 @@ static void load_sprite_from_datafile(DGL_SPRITE *sprite, FILE *file)
     }
 }
 
+static void load_texture_def_from_datafile(TEXTURE_DEF *texture_def, FILE *file)
+{
+    assert(file != NULL);
+
+    char string[MAX_STRING_SIZE];
+
+    while (fscanf(file, "%s", string) != EOF) {
+
+        /* Ignore comments (lines that begin with a hash) */
+        if (string[0] == '#') {
+            if (fgets(string, MAX_STRING_SIZE, file) == NULL) {
+                fprintf(stderr, "Failed to read comment.\n");
+            }
+            continue;
+        }
+
+        if (strncmp(string, "IMAGE", MAX_STRING_SIZE - 1) == 0) {
+            if (fscanf(file, "%s", string) != 1) {
+                fprintf(stderr, "Failed to load IMAGE for texture_def.\n");
+                continue;
+            }
+            if (texture_def->len >= MAX_FRAMES) {
+                fprintf(stderr, "ERROR: Too many frames in texture_def.\n");
+                continue;
+            }
+            strncpy(texture_def->frames[texture_def->len], string, MAX_STRING_SIZE);
+            texture_def->len++;
+            continue;
+        }
+
+        if (strncmp(string, "SPEED", MAX_STRING_SIZE - 1) == 0) {
+            if (fscanf(file, "%d", &texture_def->speed) != 1) {
+                fprintf(stderr, "WARNING: Looking for texture_def speed, skipping %s...\n", string);
+            }
+        }
+
+        //if (strncmp(string, "LOOP", MAX_STRING_SIZE - 1) == 0) {
+        //    texture_def->loop = true;
+        //}
+
+        if (strncmp(string, "END", MAX_STRING_SIZE - 1) == 0) {
+            break;
+        }
+    }
+}
+
 static bool load_next_number_from_datafile(FILE *file, int *num)
 {
     char string[MAX_STRING_SIZE];
@@ -191,10 +237,18 @@ void print_room(ROOM *room, bool is_data_file_form)
     printf("START %d %d\n", room->start_x, room->start_y);
     printf("SIZE %d %d\n", room->rows, room->cols);
     printf("TILES %d\n", room->num_tiles);
-    printf("TEXTURES %d\n", room->num_textures);
+    //printf("TEXTURES %d\n", room->num_textures);
+    printf("TEXTURE_DEFS %d\n", room->num_texture_defs);
 
-    for (int i = 0; i < room->num_textures; i++) {
-        printf("TEXTURE %s\n", room->textures[i]);
+    //for (int i = 0; i < room->num_textures; i++) {
+    //    printf("TEXTURE %s\n", room->textures[i]);
+    //}
+    for (int i = 0; i < room->num_texture_defs; i++) {
+        printf("TEXTURE %d\n", i);
+        for (int j = 0; j < room->texture_defs[i].len; j++) {
+            printf("  %s\n", room->texture_defs[i].frames[j]);
+        }
+        printf("  SPEED %d\n", room->texture_defs[i].speed);
     }
 
     if (is_data_file_form) {
@@ -367,26 +421,37 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
             continue;
         }
 
-        /* An animated texture (used to color blocks and bullets) */
-        if (strncmp(string, "TEXTURE_ANIM", MAX_STRING_SIZE) == 0) {
-            if (room->num_texture_anims < MAX_TEXTURES) {
-                load_sprite_from_datafile(&room->texture_anims[room->num_texture_anims], file);
-                room->num_texture_anims++;
+        /* A texture name (used to color blocks and bullets) */
+        if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
+            if (room->num_texture_defs < MAX_TEXTURES) {
+                load_texture_def_from_datafile(&room->texture_defs[room->num_texture_defs], file);
+                room->num_texture_defs++;
             } else {
                 fprintf(stderr, "Failed to load texture, max number reached\n");
             }
             continue;
         }
 
+        /* An animated texture (used to color blocks and bullets) */
+        //if (strncmp(string, "TEXTURE_ANIM", MAX_STRING_SIZE) == 0) {
+        //    if (room->num_texture_anims < MAX_TEXTURES) {
+        //        load_sprite_from_datafile(&room->texture_anims[room->num_texture_anims], file);
+        //        room->num_texture_anims++;
+        //    } else {
+        //        fprintf(stderr, "Failed to load texture, max number reached\n");
+        //    }
+        //    continue;
+        //}
+
         /* A texture name (used to color blocks and bullets) */
-        if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
-            if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", room->textures[room->num_textures]) == 1) {
-                room->num_textures++;
-            } else {
-                fprintf(stderr, "Failed to load texture, max number reached\n");
-            }
-            continue;
-        }
+        //if (strncmp(string, "TEXTURE", MAX_STRING_SIZE) == 0) {
+        //    if (room->num_textures < MAX_TEXTURES && fscanf(file, "%s", room->textures[room->num_textures]) == 1) {
+        //        room->num_textures++;
+        //    } else {
+        //        fprintf(stderr, "Failed to load texture, max number reached\n");
+        //    }
+        //    continue;
+        //}
 
         /* Fargound map */
         if (strncmp(string, "FARGROUND", MAX_STRING_SIZE) == 0) {
@@ -495,22 +560,33 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
      */
 
     /* Create sprites to represent each block, based on the list of textures */
-    for (int i = 0; i < room->num_textures; i++) {
-        dgl_add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
+    for (int i = 0; i < room->num_texture_defs; i++) {
+        DGL_SPRITE *block = &room->blocks[i];
+        for (int j = 0; j < room->texture_defs[i].len; j++) {
+            dgl_add_frame(block, MASKED_IMG(room->texture_defs[i].frames[j], "mask-block.png"));
+        }
+        block->speed = room->texture_defs[i].speed;
+        if (block->len > 0) {
+            block->loop = true;
+        }
     }
 
+    //for (int i = 0; i < room->num_textures; i++) {
+    //    dgl_add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
+    //}
+
     /* Add any animated textures */
-    for (int i = 0; i < room->num_texture_anims; i++) {
-        dgl_copy_sprite(&room->blocks[room->num_textures + i], &room->texture_anims[i]);
-    }
-    room->num_textures += room->num_texture_anims;
-    printf("Num textures %d\n", room->num_textures);
+    //for (int i = 0; i < room->num_texture_anims; i++) {
+    //    dgl_copy_sprite(&room->blocks[room->num_textures + i], &room->texture_anims[i]);
+    //}
+    //room->num_textures += room->num_texture_anims;
+    //printf("Num textures %d\n", room->num_textures);
 
     /* Init any random blocks (any number < 0) */
     for (int i = 0; i < room->rows * room->cols; i++) {
         if (room->block_map_orig[i] == RANDOM_BLOCK) {
             /* Set the block to a random texture */
-            room->block_map_orig[i] = dgl_random_number(0, room->num_textures - 1);
+            room->block_map_orig[i] = dgl_random_number(0, room->num_texture_defs - 1);
         }
     }
 

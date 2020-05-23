@@ -265,12 +265,12 @@ typedef struct
     int collision_map[MAX_ROOM_SIZE];
 
     /* List of textures used to make blocks and bullets in the level */
-    char textures[MAX_TEXTURES][MAX_FILENAME_LEN];
-    int num_textures;
+    //char textures[MAX_TEXTURES][MAX_FILENAME_LEN];
+    //int num_textures;
     
     /* EXPERIMENTAL: Animated textures */
-    DGL_SPRITE texture_anims[MAX_TEXTURES];
-    int num_texture_anims;
+    //DGL_SPRITE texture_anims[MAX_TEXTURES];
+    //int num_texture_anims;
     TEXTURE_DEF texture_defs[MAX_TEXTURES];
     int num_texture_defs;
 

@@ -1,2 +1,9 @@
-TEXTURE texture-red.png
-TEXTURE texture-orange.png
+# 01
+TEXTURE
+  IMAGE texture-red.png
+END
+
+# 02
+TEXTURE
+  IMAGE texture-orange.png
+END
