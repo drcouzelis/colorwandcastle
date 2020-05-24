@@ -341,7 +341,15 @@ static ALLEGRO_BITMAP *dgl_load_bitmap_with_magic_pink(const char *filename)
         if (ptr == NULL) {
             return NULL;
         }
-        if (sscanf(ptr, "%d,%d", &r, &c) != 2) {
+        
+        /**
+         * A dummy character, used to make sure there isn't more to this filename.
+         * If this is just a regular tilemap specification then this will be the
+         * end of image name. If not, for example, if it's a masked image combo
+         * name, then there will be more characters after this.
+         */
+        char char_checker = '\0';
+        if (sscanf(ptr, "%d,%d%c", &r, &c, &char_checker) != 2) {
             return NULL;
         }
 
@@ -445,7 +453,7 @@ void dgl_insert_image_resource(const char *name, ALLEGRO_BITMAP *image)
     assert(image);
 
     /* Check if the image has already been added */
-    if (dgl_get_image(name) != NULL) {
+    if (dgl_find_resource(dgl_resource_tree, name) != NULL) {
         return;
     }
 
