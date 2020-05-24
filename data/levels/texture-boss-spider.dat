@@ -130,15 +130,10 @@ END
 
 # 27 - Right pincher
 TEXTURE
-  IMAGE boss-spider.png:20x20:5,9
-END
-
-# 28 - Right pincher
-TEXTURE
   IMAGE boss-spider.png:20x20:6,9
 END
 
-# 29 - Right pincher
+# 28 - Right pincher
 TEXTURE
   IMAGE boss-spider.png:20x20:6,8
 END
