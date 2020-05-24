@@ -36,6 +36,7 @@ ALLEGRO_BITMAP *get_masked_image(const char *name, const char *mask)
     /* First, draw the original image to the canvas */
     al_set_target_bitmap(canvas);
     al_clear_to_color(al_map_rgb(255, 0, 255));
+    al_convert_mask_to_alpha(canvas, al_map_rgb(255, 0, 255));
     al_draw_bitmap(orig_img, 0, 0, 0);
 
     /* Second, add the mask */
