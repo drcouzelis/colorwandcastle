@@ -155,15 +155,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\datafile.c" />
-    <ClCompile Include="src\dgl_collision.c" />
-    <ClCompile Include="src\dgl_display.c" />
-    <ClCompile Include="src\dgl_memory.c" />
-    <ClCompile Include="src\dgl_random.c" />
-    <ClCompile Include="src\dgl_resources.c" />
-    <ClCompile Include="src\dgl_run.c" />
-    <ClCompile Include="src\dgl_sound.c" />
-    <ClCompile Include="src\dgl_sprite.c" />
-    <ClCompile Include="src\dgl_text.c" />
+    <ClCompile Include="src\drc_collision.c" />
+    <ClCompile Include="src\drc_display.c" />
+    <ClCompile Include="src\drc_memory.c" />
+    <ClCompile Include="src\drc_random.c" />
+    <ClCompile Include="src\drc_resources.c" />
+    <ClCompile Include="src\drc_run.c" />
+    <ClCompile Include="src\drc_sound.c" />
+    <ClCompile Include="src\drc_sprite.c" />
+    <ClCompile Include="src\drc_text.c" />
     <ClCompile Include="src\direction.c" />
     <ClCompile Include="src\effects.c" />
     <ClCompile Include="src\gamedata.c" />
@@ -177,15 +177,15 @@
   <ItemGroup>
     <ClInclude Include="src\compiler.h" />
     <ClInclude Include="src\datafile.h" />
-    <ClInclude Include="src\dgl_collision.h" />
-    <ClInclude Include="src\dgl_display.h" />
-    <ClInclude Include="src\dgl_memory.h" />
-    <ClInclude Include="src\dgl_random.h" />
-    <ClInclude Include="src\dgl_resources.h" />
-    <ClInclude Include="src\dgl_run.h" />
-    <ClInclude Include="src\dgl_sound.h" />
-    <ClInclude Include="src\dgl_sprite.h" />
-    <ClInclude Include="src\dgl_text.h" />
+    <ClInclude Include="src\drc_collision.h" />
+    <ClInclude Include="src\drc_display.h" />
+    <ClInclude Include="src\drc_memory.h" />
+    <ClInclude Include="src\drc_random.h" />
+    <ClInclude Include="src\drc_resources.h" />
+    <ClInclude Include="src\drc_run.h" />
+    <ClInclude Include="src\drc_sound.h" />
+    <ClInclude Include="src\drc_sprite.h" />
+    <ClInclude Include="src\drc_text.h" />
     <ClInclude Include="src\direction.h" />
     <ClInclude Include="src\effects.h" />
     <ClInclude Include="src\gamedata.h" />

@@ -1,8 +1,8 @@
 #include <ctype.h>
 #include <stdio.h>
 #include "datafile.h"
-#include "dgl_random.h"
-#include "dgl_resources.h"
+#include "drc_random.h"
+#include "drc_resources.h"
 #include "mask.h"
 
 #define MAX_DATAFILE_PATHS 4
@@ -73,7 +73,7 @@ static void load_sprite_from_datafile(DGL_SPRITE *sprite, FILE *file)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
-            dgl_add_frame(sprite, DGL_IMG(string));
+            drc_add_frame(sprite, DGL_IMG(string));
             continue;
         }
 
@@ -563,7 +563,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     for (int i = 0; i < room->num_texture_defs; i++) {
         DGL_SPRITE *block = &room->blocks[i];
         for (int j = 0; j < room->texture_defs[i].len; j++) {
-            dgl_add_frame(block, MASKED_IMG(room->texture_defs[i].frames[j], "mask-block.png"));
+            drc_add_frame(block, MASKED_IMG(room->texture_defs[i].frames[j], "mask-block.png"));
         }
         block->speed = room->texture_defs[i].speed;
         if (block->len > 0) {
@@ -572,12 +572,12 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     }
 
     //for (int i = 0; i < room->num_textures; i++) {
-    //    dgl_add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
+    //    drc_add_frame(&room->blocks[i], MASKED_IMG(room->textures[i], "mask-block.png"));
     //}
 
     /* Add any animated textures */
     //for (int i = 0; i < room->num_texture_anims; i++) {
-    //    dgl_copy_sprite(&room->blocks[room->num_textures + i], &room->texture_anims[i]);
+    //    drc_copy_sprite(&room->blocks[room->num_textures + i], &room->texture_anims[i]);
     //}
     //room->num_textures += room->num_texture_anims;
     //printf("Num textures %d\n", room->num_textures);
@@ -586,7 +586,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
     for (int i = 0; i < room->rows * room->cols; i++) {
         if (room->block_map_orig[i] == RANDOM_BLOCK) {
             /* Set the block to a random texture */
-            room->block_map_orig[i] = dgl_random_number(0, room->num_texture_defs - 1);
+            room->block_map_orig[i] = drc_random_number(0, room->num_texture_defs - 1);
         }
     }
 

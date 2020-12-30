@@ -5,8 +5,8 @@ void init_hero(HERO *hero)
 {
     hero->type = HERO_TYPE_MAKAYLA;
 
-    dgl_init_sprite(&hero->sprite_flying, false, 0);
-    dgl_init_sprite(&hero->sprite_hurting, false, 0);
+    drc_init_sprite(&hero->sprite_flying, false, 0);
+    drc_init_sprite(&hero->sprite_hurting, false, 0);
     hero->sprite = NULL;
 
     /* Set the starting position */
@@ -26,7 +26,7 @@ void init_hero(HERO *hero)
 
     hero->shoot = false;
 
-    dgl_init_sprite(&hero->bullet, true, 4);
+    drc_init_sprite(&hero->bullet, true, 4);
     hero->bullet_x = 0;
     hero->bullet_y = 0;
     hero->texture = NO_TEXTURE;
@@ -44,7 +44,7 @@ void init_enemy(ENEMY *enemy)
 {
     enemy->is_active = false;
     enemy->type = ENEMY_TYPE_NONE;
-    dgl_init_sprite(&enemy->sprite, false, 0);
+    drc_init_sprite(&enemy->sprite, false, 0);
     enemy->body.x = 0;
     enemy->body.y = 0;
     enemy->body.w = 0;
@@ -88,7 +88,7 @@ void init_room(ROOM *room)
     
     /* Tile list */
     for (int i = 0; i < MAX_TILES; i++) {
-        dgl_init_sprite(&room->tiles[i], false, 0);
+        drc_init_sprite(&room->tiles[i], false, 0);
     }
     room->num_tiles = 0;
 
@@ -114,9 +114,9 @@ void init_room(ROOM *room)
         }
         room->texture_defs[i].len = 0;
         room->texture_defs[i].speed = 1;
-        //dgl_init_sprite(&room->texture_anims[i], false, 0);
+        //drc_init_sprite(&room->texture_anims[i], false, 0);
 
-        dgl_init_sprite(&room->blocks[i], false, 0);
+        drc_init_sprite(&room->blocks[i], false, 0);
     }
     //room->num_textures = 0;
     //room->num_texture_anims = 0;
@@ -130,8 +130,8 @@ void init_room(ROOM *room)
     room->cleared = false;
 
     /* Exits */
-    dgl_init_sprite(&room->door_sprite, false, 0);
-    dgl_add_frame(&room->door_sprite, DGL_IMG("tile-door.png"));
+    drc_init_sprite(&room->door_sprite, false, 0);
+    drc_add_frame(&room->door_sprite, DGL_IMG("tile-door.png"));
     room->last_cleared_x = 0;
     room->last_cleared_y = 0;
 
@@ -147,7 +147,7 @@ void init_room(ROOM *room)
 
 void init_screenshot(SCREENSHOT *screenshot)
 {
-    dgl_init_sprite(&screenshot->sprite, false, 0);
+    drc_init_sprite(&screenshot->sprite, false, 0);
     screenshot->x = 0;
     screenshot->y = 0;
     screenshot->dx = 0;
@@ -159,7 +159,7 @@ void init_powerup(POWERUP *powerup)
 {
     powerup->is_active = false;
 
-    dgl_init_sprite(&powerup->sprite, false, 0);
+    drc_init_sprite(&powerup->sprite, false, 0);
 
     powerup->body.x = 0;
     powerup->body.y = 0;

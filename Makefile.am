@@ -14,24 +14,24 @@ colorwandcastle_SOURCES = \
   src/compiler.h \
   src/datafile.c \
   src/datafile.h \
-  src/dgl_collision.c \
-  src/dgl_collision.h \
-  src/dgl_display.c \
-  src/dgl_display.h \
-  src/dgl_memory.c \
-  src/dgl_memory.h \
-  src/dgl_random.c \
-  src/dgl_random.h \
-  src/dgl_resources.c \
-  src/dgl_resources.h \
-  src/dgl_run.c \
-  src/dgl_run.h \
-  src/dgl_sound.c \
-  src/dgl_sound.h \
-  src/dgl_sprite.c \
-  src/dgl_sprite.h \
-  src/dgl_text.c \
-  src/dgl_text.h \
+  src/drc_collision.c \
+  src/drc_collision.h \
+  src/drc_display.c \
+  src/drc_display.h \
+  src/drc_memory.c \
+  src/drc_memory.h \
+  src/drc_random.c \
+  src/drc_random.h \
+  src/drc_resources.c \
+  src/drc_resources.h \
+  src/drc_run.c \
+  src/drc_run.h \
+  src/drc_sound.c \
+  src/drc_sound.h \
+  src/drc_sprite.c \
+  src/drc_sprite.h \
+  src/drc_text.c \
+  src/drc_text.h \
   src/direction.c \
   src/direction.h \
   src/effects.c \

@@ -13,20 +13,20 @@
  *
  * This will NOT delete "locked" resources.
  */
-void dgl_free_resources(void);
+void drc_free_resources(void);
 
 /**
  * Unlock all resources.
  *
  * This will NOT delete "locked" resources.
  */
-void dgl_unlock_resources(void);
+void drc_unlock_resources(void);
 
 /**
  * A locked resource will persist, even
  * if the resources are cleared.
  */
-void dgl_lock_resource(const char *name);
+void drc_lock_resource(const char *name);
 
 /**
  * Add a directory that contains resource files.
@@ -35,12 +35,12 @@ void dgl_lock_resource(const char *name);
  * resource path by default is the current
  * directory.
  */
-void dgl_add_resource_path(const char *path);
+void drc_add_resource_path(const char *path);
 
 /**
  * Erase all of the resource paths.
  */
-void dgl_free_resource_paths(void);
+void drc_free_resource_paths(void);
 
 /**
  * Search the resource paths for the filename.
@@ -48,19 +48,19 @@ void dgl_free_resource_paths(void);
  * in order of the paths that you added. If the
  * resource isn't found it will return NULL.
  */
-ALLEGRO_BITMAP *dgl_get_image(const char *name);
-ALLEGRO_SAMPLE *dgl_get_sound(const char *name);
+ALLEGRO_BITMAP *drc_get_image(const char *name);
+ALLEGRO_SAMPLE *drc_get_sound(const char *name);
 
 /* For convenience */
-#define DGL_IMG(name) (dgl_get_image(name))
-#define DGL_SND(name) (dgl_get_sound(name))
+#define DGL_IMG(name) (drc_get_image(name))
+#define DGL_SND(name) (drc_get_sound(name))
 
 /* For convenience, load an image and lock it */
-ALLEGRO_BITMAP *dgl_get_locked_image(const char *name);
-#define DGL_IMGL(name) (dgl_get_locked_image(name))
+ALLEGRO_BITMAP *drc_get_locked_image(const char *name);
+#define DGL_IMGL(name) (drc_get_locked_image(name))
 
 /**
  * Insert your own image resource.
  * It can be retrieved by calling "get_image" with the given name.
  */
-void dgl_insert_image_resource(const char *name, ALLEGRO_BITMAP *image);
+void drc_insert_image_resource(const char *name, ALLEGRO_BITMAP *image);

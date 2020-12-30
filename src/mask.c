@@ -47,7 +47,7 @@ ALLEGRO_BITMAP *get_masked_image(const char *name, const char *mask)
     al_restore_state(&state);
 
     /* Add it to the collection of resources */
-    dgl_insert_image_resource(complete_name, canvas);
+    drc_insert_image_resource(complete_name, canvas);
 
     return canvas;
 }

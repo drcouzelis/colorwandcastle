@@ -13,9 +13,9 @@
  *
  * Note: Setting a new FPS requires you to re-run.
  */
-void dgl_set_fps(int fps);
-int dgl_get_fps(void);
+void drc_set_fps(int fps);
+int drc_get_fps(void);
 
 /* Run until "update" returns false */
-void dgl_run(void (*control)(void *data, ALLEGRO_EVENT *event),
+void drc_run(void (*control)(void *data, ALLEGRO_EVENT *event),
         bool (*update)(void *data), void (*draw)(void *data), void *data);

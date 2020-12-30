@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include "dgl_sprite.h"
+#include "drc_sprite.h"
 #include "direction.h"
 
 #define TILE_SIZE (20)

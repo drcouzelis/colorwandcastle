@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dgl_resources.h"
+#include "drc_resources.h"
 
 /**
  * Returns a newly created image, made from the two

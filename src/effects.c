@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "compiler.h"
-#include "dgl_sprite.h"
+#include "drc_sprite.h"
 #include "effects.h"
 
 static bool is_effects_init = false;
@@ -23,7 +23,7 @@ static void init_effect(EFFECT *effect)
 {
     effect->is_active = false;
     effect->update = NULL;
-    dgl_init_sprite(&effect->sprite, false, 0);
+    drc_init_sprite(&effect->sprite, false, 0);
     effect->x = 0;
     effect->y = 0;
 }
@@ -57,7 +57,7 @@ void draw_effects(void)
 {
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (effects[i].is_active) {
-            dgl_draw_sprite(&effects[i].sprite, effects[i].x, effects[i].y);
+            drc_draw_sprite(&effects[i].sprite, effects[i].x, effects[i].y);
         }
     }
 }
@@ -77,7 +77,7 @@ static void update_effect_until_done_animating(EFFECT *effect, void *data)
 {
     UNUSED(data);
 
-    dgl_animate(&effect->sprite);
+    drc_animate(&effect->sprite);
 
     if (effect->sprite.done) {
         effect->is_active = false;
@@ -93,11 +93,11 @@ void load_poof_effect(float x, float y)
         return;
     }
 
-    dgl_init_sprite(&effect->sprite, false, 15);
-    dgl_add_frame(&effect->sprite, DGL_IMG("effect-poof-1.png"));
-    dgl_add_frame(&effect->sprite, DGL_IMG("effect-poof-2.png"));
-    dgl_add_frame(&effect->sprite, DGL_IMG("effect-poof-3.png"));
-    dgl_add_frame(&effect->sprite, DGL_IMG("effect-poof-4.png"));
+    drc_init_sprite(&effect->sprite, false, 15);
+    drc_add_frame(&effect->sprite, DGL_IMG("effect-poof-1.png"));
+    drc_add_frame(&effect->sprite, DGL_IMG("effect-poof-2.png"));
+    drc_add_frame(&effect->sprite, DGL_IMG("effect-poof-3.png"));
+    drc_add_frame(&effect->sprite, DGL_IMG("effect-poof-4.png"));
     effect->sprite.x_offset = -10;
     effect->sprite.y_offset = -10;
     effect->x = x;

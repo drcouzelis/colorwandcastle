@@ -165,31 +165,31 @@
     <ClCompile Include="src\datafile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_collision.c">
+    <ClCompile Include="src\drc_collision.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_display.c">
+    <ClCompile Include="src\drc_display.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_memory.c">
+    <ClCompile Include="src\drc_memory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_random.c">
+    <ClCompile Include="src\drc_random.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_resources.c">
+    <ClCompile Include="src\drc_resources.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_run.c">
+    <ClCompile Include="src\drc_run.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_sound.c">
+    <ClCompile Include="src\drc_sound.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_sprite.c">
+    <ClCompile Include="src\drc_sprite.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\dgl_text.c">
+    <ClCompile Include="src\drc_text.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\direction.c">
@@ -227,31 +227,31 @@
     <ClInclude Include="src\datafile.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_collision.h">
+    <ClInclude Include="src\drc_collision.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_display.h">
+    <ClInclude Include="src\drc_display.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_memory.h">
+    <ClInclude Include="src\drc_memory.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_random.h">
+    <ClInclude Include="src\drc_random.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_resources.h">
+    <ClInclude Include="src\drc_resources.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_run.h">
+    <ClInclude Include="src\drc_run.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_sound.h">
+    <ClInclude Include="src\drc_sound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_sprite.h">
+    <ClInclude Include="src\drc_sprite.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dgl_text.h">
+    <ClInclude Include="src\drc_text.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\direction.h">

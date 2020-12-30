@@ -1,6 +1,6 @@
 #include <stdbool.h>
 
-bool dgl_is_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+bool drc_is_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
     /**
      * If one is to the right of two or if one is below two or
@@ -15,7 +15,7 @@ bool dgl_is_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, in
     return true;
 }
 
-bool dgl_is_inside(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+bool drc_is_inside(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
     /**
      * If one is to the right of two or if one is below two or
@@ -30,7 +30,7 @@ bool dgl_is_inside(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h
     return false;
 }
 
-bool dgl_is_point_in(int x, int y, int x1, int y1, int w1, int h1)
+bool drc_is_point_in(int x, int y, int x1, int y1, int w1, int h1)
 {
     /**
      * If one is to the right of two or if one is below two or

@@ -1,13 +1,13 @@
 #include <allegro5/allegro.h>
 #include <stdio.h>
 #include "datafile.h"
-#include "dgl_display.h"
-#include "dgl_memory.h"
-#include "dgl_resources.h"
-#include "dgl_run.h"
-#include "dgl_sound.h"
-#include "dgl_sprite.h"
-#include "dgl_text.h"
+#include "drc_display.h"
+#include "drc_memory.h"
+#include "drc_resources.h"
+#include "drc_run.h"
+#include "drc_sound.h"
+#include "drc_sprite.h"
+#include "drc_text.h"
 #include "gamedata.h"
 #include "gameplay.h"
 #include "menu.h"
@@ -57,14 +57,14 @@ int main(int argc, char **argv)
     }
 
     /* Create a display that will be used to draw the game on */
-    assert(dgl_init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
+    assert(drc_init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
 
     /* Setup text drawing */
-    assert(dgl_init_text());
+    assert(drc_init_text());
 
     /* So we know where to look for image and sound files... */
-    dgl_add_resource_path( PKGDATADIR "/images/");
-    dgl_add_resource_path( PKGDATADIR "/sounds/");
+    drc_add_resource_path( PKGDATADIR "/images/");
+    drc_add_resource_path( PKGDATADIR "/sounds/");
 
     /* So we know where to look for data / level files... */
     add_datafile_path( PKGDATADIR "/levels/");
@@ -72,8 +72,8 @@ int main(int argc, char **argv)
     add_datafile_path("");
   
     /* Set window properties */
-    al_set_window_title(dgl_get_display(), "Colorwand Castle");
-    al_set_display_icon(dgl_get_display(), DGL_IMGL("icon.png"));
+    al_set_window_title(drc_get_display(), "Colorwand Castle");
+    al_set_display_icon(drc_get_display(), DGL_IMGL("icon.png"));
 
     /* TEMP */
     /* Print some basic controls to stdout */
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
     /* TEMP */
     /* Turn off audio, I don't want to hear it during development */
-    dgl_toggle_audio();
+    drc_toggle_audio();
     printf("TEMP: Audio is off.\n");
 
     /* INIT THE GAME */
@@ -118,21 +118,21 @@ int main(int argc, char **argv)
     /* RUN THE GAME */
     if (room_num == 1) {
         /* If starting from the beginning of the game, show the titlescreen and menu */
-        dgl_run(control_menu, update_menu, draw_menu, NULL);
+        drc_run(control_menu, update_menu, draw_menu, NULL);
     } else {
         /* If a level was selected from the command line, just start playing that level */
-        dgl_run(control_gameplay, update_gameplay, draw_gameplay, NULL);
+        drc_run(control_gameplay, update_gameplay, draw_gameplay, NULL);
     }
  
     /* DONE, clean up */
-    dgl_unlock_resources();
-    dgl_free_resources();
-    dgl_free_resource_paths();
-    dgl_free_text();
-    dgl_free_display();
+    drc_unlock_resources();
+    drc_free_resources();
+    drc_free_resource_paths();
+    drc_free_text();
+    drc_free_display();
 
     /* See if we have any naughty memory leaks */
-    dgl_check_memory();
+    drc_check_memory();
 
     return EXIT_SUCCESS;
 }
