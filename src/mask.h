@@ -16,5 +16,12 @@
  */
 ALLEGRO_BITMAP *get_masked_image(const char *name, const char *mask);
 
+/**
+ * Returns a newly created image made from top
+ * image stamped onto the bottom image.
+ */
+ALLEGRO_BITMAP *get_stacked_image(const char *bottom, const char *top);
+
 /* For convenience */
 #define MASKED_IMG(name, mask) (get_masked_image(name, mask))
+#define STACKED_IMG(bottom, top) (get_stacked_image(bottom, top))

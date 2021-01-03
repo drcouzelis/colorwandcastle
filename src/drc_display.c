@@ -6,7 +6,7 @@ static ALLEGRO_DISPLAY *drc_display = NULL;
 static int drc_display_width = 0;
 static int drc_display_height = 0;
 static bool drc_display_fullscreen = false;
-static bool drc_display_scale = DGL_DISPLAY_MAX_SCALE;
+static bool drc_display_scale = DRC_DISPLAY_MAX_SCALE;
 
 /**
  * Returns the maximum resolution available on the screen.

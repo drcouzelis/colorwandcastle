@@ -3,7 +3,7 @@
 #include <allegro5/allegro.h>
 
 /* The number of times the game will update per second */
-#define DGL_DEFAULT_FPS (100)
+#define DRC_DEFAULT_FPS (100)
 
 /**
  * Control the FPS.

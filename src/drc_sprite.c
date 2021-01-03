@@ -2,7 +2,7 @@
 #include "drc_run.h"
 #include "drc_sprite.h"
 
-void drc_init_sprite(DGL_SPRITE *sprite, bool loop, int speed)
+void drc_init_sprite(DRC_SPRITE *sprite, bool loop, int speed)
 {
     assert(sprite != NULL);
     
@@ -24,7 +24,7 @@ void drc_init_sprite(DGL_SPRITE *sprite, bool loop, int speed)
     sprite->flip = false;
 }
 
-void drc_copy_sprite(DGL_SPRITE *copy, DGL_SPRITE *orig)
+void drc_copy_sprite(DRC_SPRITE *copy, DRC_SPRITE *orig)
 {
     /* We can't copy without some sprites */
     assert(copy != NULL);
@@ -45,7 +45,7 @@ void drc_copy_sprite(DGL_SPRITE *copy, DGL_SPRITE *orig)
     drc_reset_sprite(copy);
 }
 
-void drc_reset_sprite(DGL_SPRITE *sprite)
+void drc_reset_sprite(DRC_SPRITE *sprite)
 {
     if (sprite == NULL) {
         return;
@@ -56,7 +56,7 @@ void drc_reset_sprite(DGL_SPRITE *sprite)
     sprite->fudge = 0;
 }
 
-ALLEGRO_BITMAP *drc_get_frame(DGL_SPRITE *sprite)
+ALLEGRO_BITMAP *drc_get_frame(DRC_SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return NULL;
@@ -65,7 +65,7 @@ ALLEGRO_BITMAP *drc_get_frame(DGL_SPRITE *sprite)
     return sprite->frames[sprite->pos];
 }
 
-void drc_add_frame(DGL_SPRITE *sprite, ALLEGRO_BITMAP *frame)
+void drc_add_frame(DRC_SPRITE *sprite, ALLEGRO_BITMAP *frame)
 {
     assert(sprite != NULL);
     assert(frame != NULL);
@@ -75,7 +75,7 @@ void drc_add_frame(DGL_SPRITE *sprite, ALLEGRO_BITMAP *frame)
     sprite->len++;
 }
 
-void delete_frames(DGL_SPRITE *sprite)
+void delete_frames(DRC_SPRITE *sprite)
 {
     assert(sprite != NULL);
     drc_reset_sprite(sprite);
@@ -118,7 +118,7 @@ static void draw_image(ALLEGRO_BITMAP *img, float x, float y, bool rotate, bool 
     }
 }
 
-void drc_draw_sprite(DGL_SPRITE *sprite, float x, float y)
+void drc_draw_sprite(DRC_SPRITE *sprite, float x, float y)
 {
     if (sprite == NULL || sprite->len == 0) {
         return;
@@ -132,7 +132,7 @@ void drc_draw_sprite(DGL_SPRITE *sprite, float x, float y)
 }
 
 /* Animate the sprite */
-void drc_animate(DGL_SPRITE *sprite)
+void drc_animate(DRC_SPRITE *sprite)
 {
     if (sprite == NULL) {
         return;
@@ -165,7 +165,7 @@ void drc_animate(DGL_SPRITE *sprite)
     }
 }
 
-int drc_get_sprite_width(DGL_SPRITE *sprite)
+int drc_get_sprite_width(DRC_SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return 0;
@@ -174,7 +174,7 @@ int drc_get_sprite_width(DGL_SPRITE *sprite)
     return al_get_bitmap_width(drc_get_frame(sprite));
 }
 
-int drc_get_sprite_height(DGL_SPRITE *sprite)
+int drc_get_sprite_height(DRC_SPRITE *sprite)
 {
     if (sprite == NULL || sprite->len == 0) {
         return 0;

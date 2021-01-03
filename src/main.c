@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     }
 
     /* Create a display that will be used to draw the game on */
-    assert(drc_init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DGL_DISPLAY_MAX_SCALE, false));
+    assert(drc_init_display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DRC_DISPLAY_MAX_SCALE, false));
 
     /* Setup text drawing */
     assert(drc_init_text());
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
   
     /* Set window properties */
     al_set_window_title(drc_get_display(), "Colorwand Castle");
-    al_set_display_icon(drc_get_display(), DGL_IMGL("icon.png"));
+    al_set_display_icon(drc_get_display(), DRC_IMGL("icon.png"));
 
     /* TEMP */
     /* Print some basic controls to stdout */

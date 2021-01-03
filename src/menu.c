@@ -11,22 +11,22 @@
 static bool menu_init = false;
 static bool end_menu = false;
 
-static DGL_SPRITE titlescreen_sprite;
-static DGL_SPRITE hero_makayla_sprite;
-static DGL_SPRITE hero_rawson_sprite;
+static DRC_SPRITE titlescreen_sprite;
+static DRC_SPRITE hero_makayla_sprite;
+static DRC_SPRITE hero_rawson_sprite;
 
 static void init_menu(void)
 {
     drc_init_sprite(&titlescreen_sprite, false, 0);
-    drc_add_frame(&titlescreen_sprite, DGL_IMGL("menu-titlescreen.png"));
+    drc_add_frame(&titlescreen_sprite, DRC_IMGL("menu-titlescreen.png"));
 
     drc_init_sprite(&hero_makayla_sprite, true, 10);
-    drc_add_frame(&hero_makayla_sprite, DGL_IMGL("hero-makayla-1.png"));
-    drc_add_frame(&hero_makayla_sprite, DGL_IMGL("hero-makayla-2.png"));
+    drc_add_frame(&hero_makayla_sprite, DRC_IMGL("hero-makayla-1.png"));
+    drc_add_frame(&hero_makayla_sprite, DRC_IMGL("hero-makayla-2.png"));
 
     drc_init_sprite(&hero_rawson_sprite, true, 10);
-    drc_add_frame(&hero_rawson_sprite, DGL_IMGL("hero-rawson-1.png"));
-    drc_add_frame(&hero_rawson_sprite, DGL_IMGL("hero-rawson-2.png"));
+    drc_add_frame(&hero_rawson_sprite, DRC_IMGL("hero-rawson-1.png"));
+    drc_add_frame(&hero_rawson_sprite, DRC_IMGL("hero-rawson-2.png"));
     hero_rawson_sprite.mirror = true;
 
     menu_init = true;

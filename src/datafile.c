@@ -53,7 +53,7 @@ void close_data_file(FILE *file)
     fclose(file);
 }
 
-static void load_sprite_from_datafile(DGL_SPRITE *sprite, FILE *file)
+static void load_sprite_from_datafile(DRC_SPRITE *sprite, FILE *file)
 {
     assert(file != NULL);
 
@@ -73,7 +73,7 @@ static void load_sprite_from_datafile(DGL_SPRITE *sprite, FILE *file)
             if (fscanf(file, "%s", string) != 1) {
                 fprintf(stderr, "Failed to load IMAGE.\n");
             }
-            drc_add_frame(sprite, DGL_IMG(string));
+            drc_add_frame(sprite, DRC_IMG(string));
             continue;
         }
 
@@ -561,7 +561,7 @@ bool load_room_from_datafile_with_filename(const char *filename, ROOM *room)
 
     /* Create sprites to represent each block, based on the list of textures */
     for (int i = 0; i < room->num_texture_defs; i++) {
-        DGL_SPRITE *block = &room->blocks[i];
+        DRC_SPRITE *block = &room->blocks[i];
         for (int j = 0; j < room->texture_defs[i].len; j++) {
             drc_add_frame(block, MASKED_IMG(room->texture_defs[i].frames[j], "mask-block.png"));
         }

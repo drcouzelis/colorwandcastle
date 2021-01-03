@@ -201,29 +201,42 @@ static ALLEGRO_BITMAP *get_hero_bullet_image(char *texture_name, int hero_type, 
     return MASKED_IMG(texture_name, bullet_mask_names[hero_type][frame]);
 }
 
-static void load_hero_bullet_sprite(DGL_SPRITE *sprite, int texture, int hero_type)
+static void load_hero_bullet_sprite(DRC_SPRITE *sprite, int texture, int hero_type)
 {
     if (hero.powerup_type == POWERUP_TYPE_FLASHING) {
-        /* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
-        drc_init_sprite(sprite, true, 16);
-        /* Keep track of which "rotation" of the bullet you're on */
-        int next_frame = 0;
-        /* Keep track of when to change to the next "rotation" of the bullet */
-        int next_frame_count = 0;
-        /* (If there's only one texture in the room, the bullet won't animate...) */
-        int num_textures = (room.num_texture_defs == 1 ? 8 : room.num_texture_defs * 4);
-        /* Cap the number of textures used in the flashing animation */
-        if (num_textures > 24) {
-            num_textures = 24;
-        }
-        for (int i = 0; i < num_textures; i++) {
-            drc_add_frame(sprite, get_hero_bullet_image(room.texture_defs[i % room.num_texture_defs].frames[0], hero_type, next_frame));
-            next_frame_count++;
-            if (next_frame_count >= 4) {
-                next_frame = (next_frame == 1 ? 0 : 1);
-                next_frame_count = 0;
-            }
-        }
+        drc_init_sprite(sprite, true, 12);
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,0", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,1", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,2", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,3", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,4", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,5", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,0", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,1", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,2", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,3", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,4", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,5", hero_type, 1));
+        ///* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
+        //drc_init_sprite(sprite, true, 16);
+        ///* Keep track of which "rotation" of the bullet you're on */
+        //int next_frame = 0;
+        ///* Keep track of when to change to the next "rotation" of the bullet */
+        //int next_frame_count = 0;
+        ///* (If there's only one texture in the room, the bullet won't animate...) */
+        //int num_textures = (room.num_texture_defs == 1 ? 8 : room.num_texture_defs * 4);
+        ///* Cap the number of textures used in the flashing animation */
+        //if (num_textures > 24) {
+        //    num_textures = 24;
+        //}
+        //for (int i = 0; i < num_textures; i++) {
+        //    drc_add_frame(sprite, get_hero_bullet_image(room.texture_defs[i % room.num_texture_defs].frames[0], hero_type, next_frame));
+        //    next_frame_count++;
+        //    if (next_frame_count >= 4) {
+        //        next_frame = (next_frame == 1 ? 0 : 1);
+        //        next_frame_count = 0;
+        //    }
+        //}
     } else {
         drc_init_sprite(sprite, true, 4);
         drc_add_frame(sprite, get_hero_bullet_image(room.texture_defs[texture].frames[0], hero_type, 0));
@@ -250,15 +263,15 @@ static void load_hero_sprite(void)
     }
 
     if (hero.type == HERO_TYPE_MAKAYLA) {
-        drc_add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-1.png"));
-        drc_add_frame(&hero.sprite_flying, DGL_IMGL("hero-makayla-2.png"));
-        drc_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-1.png"));
-        drc_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-makayla-hurt-2.png"));
+        drc_add_frame(&hero.sprite_flying, DRC_IMGL("hero-makayla-1.png"));
+        drc_add_frame(&hero.sprite_flying, DRC_IMGL("hero-makayla-2.png"));
+        drc_add_frame(&hero.sprite_hurting, DRC_IMGL("hero-makayla-hurt-1.png"));
+        drc_add_frame(&hero.sprite_hurting, DRC_IMGL("hero-makayla-hurt-2.png"));
     } else if (hero.type == HERO_TYPE_RAWSON) {
-        drc_add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-1.png"));
-        drc_add_frame(&hero.sprite_flying, DGL_IMGL("hero-rawson-2.png"));
-        drc_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-1.png"));
-        drc_add_frame(&hero.sprite_hurting, DGL_IMGL("hero-rawson-hurt-2.png"));
+        drc_add_frame(&hero.sprite_flying, DRC_IMGL("hero-rawson-1.png"));
+        drc_add_frame(&hero.sprite_flying, DRC_IMGL("hero-rawson-2.png"));
+        drc_add_frame(&hero.sprite_hurting, DRC_IMGL("hero-rawson-hurt-1.png"));
+        drc_add_frame(&hero.sprite_hurting, DRC_IMGL("hero-rawson-hurt-2.png"));
     }
 }
 
@@ -289,11 +302,15 @@ static void load_powerup(float x, float y)
 
     drc_init_sprite(&powerup->sprite, true, 6);
     if (next_powerup_type == POWERUP_TYPE_FLASHING) {
-        drc_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-1.png"));
-        drc_add_frame(&powerup->sprite, DGL_IMG("powerup-rainbow-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,0", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,1", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,2", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,3", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,4", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,5", "powerup-frame-2.png"));
     //} else if (next_powerup_type == POWERUP_TYPE_LASER) {
-    //    drc_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-1.png"));
-    //    drc_add_frame(&powerup->sprite, DGL_IMG("powerup-laser-2.png"));
+    //    drc_add_frame(&powerup->sprite, DRC_IMG("powerup-laser-1.png"));
+    //    drc_add_frame(&powerup->sprite, DRC_IMG("powerup-laser-2.png"));
     }
     powerup->body.x = x;
     powerup->body.y = y;
@@ -326,7 +343,7 @@ static void toggle_hero(void)
     }
 
     load_poof_effect(hero.body.x - 5, hero.body.y - 5);
-    drc_play_sound(DGL_SND("hero-toggle.wav"));
+    drc_play_sound(DRC_SND("hero-toggle.wav"));
 }
 
 static void control_hero_from_keyboard(HERO *hero, void *data)
@@ -417,7 +434,7 @@ static void load_screenshot(SCREENSHOT *screenshot, const char *name)
     drc_insert_image_resource(name, canvas);
     drc_lock_resource(name);
 
-    drc_add_frame(&screenshot->sprite, DGL_IMG(name));
+    drc_add_frame(&screenshot->sprite, DRC_IMG(name));
 }
 
 static void init_enemies(void)
@@ -491,7 +508,7 @@ static void reset_hero(int x, int y)
     hero.powerup_type = POWERUP_TYPE_NONE;
 }
 
-static bool is_offscreen(BODY *body, DGL_SPRITE *sprite)
+static bool is_offscreen(BODY *body, DRC_SPRITE *sprite)
 {
     int room_w = room.cols * TILE_SIZE;
     int room_h = room.rows * TILE_SIZE;
@@ -656,11 +673,11 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
 
     if (enemy->type == ENEMY_TYPE_LEFTRIGHT) {
         drc_init_sprite(&enemy->sprite, true, 20);
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-1.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-2.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-bat-3.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-bat-1.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-bat-2.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-bat-2.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-bat-3.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-bat-3.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -671,14 +688,14 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_UPDOWN) {
         drc_init_sprite(&enemy->sprite, true, 8);
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-1.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-2.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-4.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-5.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-6.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-3.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-spider-7.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-1.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-2.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-3.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-4.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-5.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-6.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-3.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-spider-7.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -689,10 +706,10 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_DIAGONAL) {
         drc_init_sprite(&enemy->sprite, true, 10);
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-1.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-2.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-3.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-ghost-4.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-ghost-1.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-ghost-2.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-ghost-3.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-ghost-4.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -704,24 +721,24 @@ static void load_enemy_from_definition(ENEMY *enemy, ENEMY_DEFINITION *definitio
         enemy->update = update_enemy_movement;
     } else if (enemy->type == ENEMY_TYPE_BLOCKER) {
         drc_init_sprite(&enemy->sprite, true, 1);
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-1.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-blocker-2.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-blocker-1.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-blocker-2.png"));
         enemy->body.w = 19;
         enemy->body.h = 19;
         enemy->update = update_enemy_animation;
     } else if (enemy->type == ENEMY_TYPE_TRACER) {
         drc_init_sprite(&enemy->sprite, true, 10);
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-1.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-2.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-3.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-4.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-5.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-6.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-7.png"));
-        drc_add_frame(&enemy->sprite, DGL_IMG("enemy-tracer-8.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-1.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-2.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-3.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-4.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-5.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-5.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-5.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-5.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-6.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-7.png"));
+        drc_add_frame(&enemy->sprite, DRC_IMG("enemy-tracer-8.png"));
         enemy->sprite.x_offset = -10;
         enemy->sprite.y_offset = -10;
         enemy->body.x += 5; /* Fix the initial position */
@@ -1110,7 +1127,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Matching textures! */
             /* Remove the bullet and the block */
             bullet->hits = 0;
-            drc_play_sound(DGL_SND("block-destroyed.wav"));
+            drc_play_sound(DRC_SND("block-destroyed.wav"));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
 
@@ -1129,7 +1146,7 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             /* Bounce */
             bullet->body.dx *= -1;
             bullet->body.dy *= -1;
-            drc_play_sound(DGL_SND("bullet-bounce.wav"));
+            drc_play_sound(DRC_SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1145,12 +1162,12 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
         /* Just bounce */
         bullet->hits--;
         if (bullet->hits <= 0) {
-            drc_play_sound(DGL_SND("bullet-disolve.wav"));
+            drc_play_sound(DRC_SND("bullet-disolve.wav"));
         } else {
             /* Bounce */
             bullet->body.dx *= -1;
             bullet->body.dy *= -1;
-            drc_play_sound(DGL_SND("bullet-bounce.wav"));
+            drc_play_sound(DRC_SND("bullet-bounce.wav"));
         }
 
         return false;
@@ -1218,7 +1235,7 @@ static void shoot_bullet(int texture, float x, float y)
         }
     }
 
-    drc_play_sound(DGL_SND("bullet-shoot.wav"));
+    drc_play_sound(DRC_SND("bullet-shoot.wav"));
 
     /**
      * Do some fancy footwork to find out if this bullet
@@ -1397,7 +1414,7 @@ static void set_hero_death(void)
     /* A dead hero doesn't need a bullet */
     hero.has_bullet = false;
 
-    drc_play_sound(DGL_SND("hero-die.wav"));
+    drc_play_sound(DRC_SND("hero-die.wav"));
 
     hero.control = NULL;
 }
@@ -1572,7 +1589,7 @@ static bool update_gameplay_playing(void)
             for (int c = 0; c < room.cols; c++) {
                 if (room.block_map_orig[(r * room.cols) + c] >= 0) {
                     /* At least one block has been found! */
-                    drc_play_sound(DGL_SND("room-cleared.wav"));
+                    drc_play_sound(DRC_SND("room-cleared.wav"));
                     /* Break out of the loop */
                     r = room.rows;
                     c = room.cols;
@@ -1611,10 +1628,8 @@ static bool update_gameplay_playing(void)
 
     /* Set the number of blocks needed to be cleared until a new powerup appears */
     if (blocks_until_powerup_appears == RESET_POWERUP_COUNTER) {
-        //printf("Reset powerup!\n");
         blocks_until_powerup_appears = drc_random_number(5, 8);
         next_powerup_type = drc_random_number(POWERUP_TYPE_FIRST, POWERUP_TYPE_MAX - 1);
-        //printf("Next powerup is type %d after %d blocks cleared.\n", next_powerup_type, blocks_until_powerup_appears);
     }
 
     /* Check for level completion */

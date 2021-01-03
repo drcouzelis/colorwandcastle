@@ -5,13 +5,13 @@
 /**
  * Can be used in "drc_display_init".
  */
-#define DGL_DISPLAY_MAX_SCALE (-1)
+#define DRC_DISPLAY_MAX_SCALE (-1)
 
 /**
  * Create a display to draw on.
  *
  * Set "scale" to any int, 1 for no scaling, or
- * "DGL_DISPLAY_MAX_SCALE" to scale
+ * "DRC_DISPLAY_MAX_SCALE" to scale
  * the display as big as possible while still
  * fitting entirely on the screen. This scale is
  * used for both windowed and fullscreen modes.

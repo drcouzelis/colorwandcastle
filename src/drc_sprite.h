@@ -23,7 +23,7 @@ typedef struct
     bool rotate;
     bool mirror;
     bool flip;
-} DGL_SPRITE;
+} DRC_SPRITE;
 
 /**
  * The FPS must be greater than 0.
@@ -36,48 +36,48 @@ void drc_set_animation_fps(int fps);
  * It will have no frames of animation by default.
  * Speed is in frames per second.
  */
-void drc_init_sprite(DGL_SPRITE *sprite, bool loop, int speed);
+void drc_init_sprite(DRC_SPRITE *sprite, bool loop, int speed);
 
 /**
  * Copy an existing sprite.
  * Useful when you want the same sprite but rotated.
  */
-void drc_copy_sprite(DGL_SPRITE *copy, DGL_SPRITE *orig);
+void drc_copy_sprite(DRC_SPRITE *copy, DRC_SPRITE *orig);
 
 /**
  * Animate a sprite.
  */
-void drc_animate(DGL_SPRITE *sprite);
+void drc_animate(DRC_SPRITE *sprite);
 
 /**
  * Returns a pointer to the current frame of animation.
  */
-ALLEGRO_BITMAP *drc_get_frame(DGL_SPRITE *sprite);
+ALLEGRO_BITMAP *drc_get_frame(DRC_SPRITE *sprite);
 
 /**
  * Add a frame to the sprite.
  */
-void drc_add_frame(DGL_SPRITE *sprite, ALLEGRO_BITMAP *frame);
+void drc_add_frame(DRC_SPRITE *sprite, ALLEGRO_BITMAP *frame);
 
 /**
  * Delete all frames.
  */
-void drc_delete_frames(DGL_SPRITE *sprite);
+void drc_delete_frames(DRC_SPRITE *sprite);
 
 /**
  * Reset a sprite to the beginning of its
  * animation sequence.
  */
-void drc_reset_sprite(DGL_SPRITE *sprite);
+void drc_reset_sprite(DRC_SPRITE *sprite);
 
 /**
  * Draw the sprite at location x and y,
  * taking into account the offsets.
  */
-void drc_draw_sprite(DGL_SPRITE *sprite, float x, float y);
+void drc_draw_sprite(DRC_SPRITE *sprite, float x, float y);
 
 /**
  * Width and height.
  */
-int drc_get_sprite_width(DGL_SPRITE *sprite);
-int drc_get_sprite_height(DGL_SPRITE *sprite);
+int drc_get_sprite_width(DRC_SPRITE *sprite);
+int drc_get_sprite_height(DRC_SPRITE *sprite);

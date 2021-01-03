@@ -96,7 +96,7 @@ typedef struct POWERUP
 {
     bool is_active;
 
-    DGL_SPRITE sprite;
+    DRC_SPRITE sprite;
 
     BODY body;
 
@@ -109,7 +109,7 @@ typedef struct POWERUP
 
 typedef struct
 {
-    DGL_SPRITE sprite;
+    DRC_SPRITE sprite;
     float x;
     float y;
 
@@ -125,7 +125,7 @@ typedef struct
     /* If false, this bullet data is not used */
     bool is_active;
 
-    DGL_SPRITE sprite;
+    DRC_SPRITE sprite;
     int texture;
 
     /* If this bullet has no more hits, get rid of it */
@@ -138,9 +138,9 @@ typedef struct HERO
 {
     HERO_TYPE type;
 
-    DGL_SPRITE sprite_flying;
-    DGL_SPRITE sprite_hurting;
-    DGL_SPRITE *sprite; /* The current active sprite */
+    DRC_SPRITE sprite_flying;
+    DRC_SPRITE sprite_hurting;
+    DRC_SPRITE *sprite; /* The current active sprite */
 
     BODY body;
 
@@ -156,7 +156,7 @@ typedef struct HERO
 
     /* The picture of the bullet that follows the hero around */
     bool has_bullet;
-    DGL_SPRITE bullet;
+    DRC_SPRITE bullet;
     float bullet_x;
     float bullet_y;
     int texture;
@@ -176,7 +176,7 @@ typedef struct ENEMY
     /* Not sure if I'm actually going to use this variable... */
     ENEMY_TYPE type;
 
-    DGL_SPRITE sprite;
+    DRC_SPRITE sprite;
 
     BODY body;
 
@@ -239,7 +239,7 @@ typedef struct
 
     /* List of tiles used in the room */
     /* Tiles define the play area */
-    DGL_SPRITE tiles[MAX_TILES];
+    DRC_SPRITE tiles[MAX_TILES];
     int num_tiles;
 
     /* The farground is drawn below everything else, and never "scrolls" */
@@ -269,13 +269,13 @@ typedef struct
     //int num_textures;
     
     /* EXPERIMENTAL: Animated textures */
-    //DGL_SPRITE texture_anims[MAX_TEXTURES];
+    //DRC_SPRITE texture_anims[MAX_TEXTURES];
     //int num_texture_anims;
     TEXTURE_DEF texture_defs[MAX_TEXTURES];
     int num_texture_defs;
 
     /* Blocks, that can be destroyed by the hero */
-    DGL_SPRITE blocks[MAX_TEXTURES];
+    DRC_SPRITE blocks[MAX_TEXTURES];
 
     /* The position of blocks */
     /* Each entry is an index number for the list of blocks */
@@ -291,7 +291,7 @@ typedef struct
     bool cleared;
 
     /* The door representing the exit, appears when all blocks are gone AND there are no other exits */
-    DGL_SPRITE door_sprite;
+    DRC_SPRITE door_sprite;
     int last_cleared_x;
     int last_cleared_y;
 

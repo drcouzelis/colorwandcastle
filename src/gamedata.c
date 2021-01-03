@@ -131,7 +131,7 @@ void init_room(ROOM *room)
 
     /* Exits */
     drc_init_sprite(&room->door_sprite, false, 0);
-    drc_add_frame(&room->door_sprite, DGL_IMG("tile-door.png"));
+    drc_add_frame(&room->door_sprite, DRC_IMG("tile-door.png"));
     room->last_cleared_x = 0;
     room->last_cleared_y = 0;
 

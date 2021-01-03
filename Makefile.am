@@ -100,6 +100,8 @@ dist_imagesdata_DATA = \
   data/images/mask-star-1.png \
   data/images/mask-star-2.png \
   data/images/menu-titlescreen.png \
+  data/images/powerup-frame-1.png \
+  data/images/powerup-frame-2.png \
   data/images/powerup-laser-1.png \
   data/images/powerup-laser-2.png \
   data/images/powerup-rainbow-1.png \
@@ -112,6 +114,7 @@ dist_imagesdata_DATA = \
   data/images/texture-purple.png \
   data/images/texture-red.png \
   data/images/texture-yellow.png \
+  data/images/texture-strobe-square.png \
   data/images/tile-bricks.png \
   data/images/tile-castle.png \
   data/images/tile-door.png \

@@ -2,7 +2,7 @@
 #include "drc_display.h"
 #include "drc_run.h"
 
-static int drc_run_fps = DGL_DEFAULT_FPS;
+static int drc_run_fps = DRC_DEFAULT_FPS;
 
 void drc_set_fps(int fps)
 {

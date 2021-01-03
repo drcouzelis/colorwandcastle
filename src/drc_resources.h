@@ -52,12 +52,12 @@ ALLEGRO_BITMAP *drc_get_image(const char *name);
 ALLEGRO_SAMPLE *drc_get_sound(const char *name);
 
 /* For convenience */
-#define DGL_IMG(name) (drc_get_image(name))
-#define DGL_SND(name) (drc_get_sound(name))
+#define DRC_IMG(name) (drc_get_image(name))
+#define DRC_SND(name) (drc_get_sound(name))
 
 /* For convenience, load an image and lock it */
 ALLEGRO_BITMAP *drc_get_locked_image(const char *name);
-#define DGL_IMGL(name) (drc_get_locked_image(name))
+#define DRC_IMGL(name) (drc_get_locked_image(name))
 
 /**
  * Insert your own image resource.
