@@ -56,6 +56,7 @@ imagesdatadir = $(pkgdatadir)/images
 dist_imagesdata_DATA = \
   data/images/background-bedroom.png \
   data/images/boss-spider.png \
+  data/images/dot.png \
   data/images/effect-poof-1.png \
   data/images/effect-poof-2.png \
   data/images/effect-poof-3.png \

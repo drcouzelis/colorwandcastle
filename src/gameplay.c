@@ -61,6 +61,7 @@ static HERO hero;
 static ENEMY enemies[MAX_ENEMIES];
 static BULLET bullets[MAX_BULLETS];
 static POWERUP powerups[MAX_POWERUPS];
+static DRC_SPRITE powerup_dot;
 
 static GAMEPLAY_DIFFICULTY gameplay_difficulty = GAMEPLAY_DIFFICULTY_EASY;
 
@@ -468,6 +469,10 @@ void init_gameplay(void)
     /* Screenshots */
     load_screenshot(&screenshot1, "screenshot1");
     load_screenshot(&screenshot2, "screenshot2");
+
+    /* Init powerup dots */
+    drc_init_sprite(&powerup_dot, false, 0);
+    drc_add_frame(&powerup_dot, DRC_IMG("dot.png"));
 
     update = NULL;
     control = NULL;
@@ -1779,6 +1784,11 @@ static void draw_gameplay_playing(void)
     /* Draw the hero's bullet */
     if (hero.has_bullet) {
         drc_draw_sprite(&hero.bullet, hero.bullet_x, hero.bullet_y);
+    }
+
+    /* Draw a dot for every powerup shot left (if any) */
+    for (int i = 0; i < hero.powerup_remaining; i++) {
+        drc_draw_sprite(&powerup_dot, hero.bullet_x - 1 + (i * 5), hero.bullet_y - 10);
     }
 
     draw_effects();
