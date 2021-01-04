@@ -19,55 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\levels\list-demo.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="data\levels\list-story.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-001.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-002.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-003.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-004.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-005.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-006.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-007.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-008.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-009.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-010.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-demo-011.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-hard.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-makayla.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-rawson-2.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\room-rawson.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="data\levels\room-story-001.dat">
@@ -124,37 +76,29 @@
     <None Include="data\levels\room-story-018-boss.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="data\levels\room-test.dat">
+    <None Include="data\levels\room-story-019.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="data\levels\texture-boss-spider.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="data\levels\texture-colored-2.dat">
+    <None Include="data\levels\texture-colors-2.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="data\levels\texture-colored-3.dat">
+    <None Include="data\levels\texture-colors-3.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="data\levels\texture-colored.dat">
+    <None Include="data\levels\texture-color-6.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="data\levels\tile-bricks.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\tile-castle.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\tile-general.dat">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="data\levels\tile-wood.dat">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\datafile.c" />
+    <ClCompile Include="src\direction.c" />
     <ClCompile Include="src\drc_collision.c" />
     <ClCompile Include="src\drc_display.c" />
     <ClCompile Include="src\drc_memory.c" />
@@ -164,7 +108,6 @@
     <ClCompile Include="src\drc_sound.c" />
     <ClCompile Include="src\drc_sprite.c" />
     <ClCompile Include="src\drc_text.c" />
-    <ClCompile Include="src\direction.c" />
     <ClCompile Include="src\effects.c" />
     <ClCompile Include="src\gamedata.c" />
     <ClCompile Include="src\gameplay.c" />
@@ -177,6 +120,7 @@
   <ItemGroup>
     <ClInclude Include="src\compiler.h" />
     <ClInclude Include="src\datafile.h" />
+    <ClInclude Include="src\direction.h" />
     <ClInclude Include="src\drc_collision.h" />
     <ClInclude Include="src\drc_display.h" />
     <ClInclude Include="src\drc_memory.h" />
@@ -186,7 +130,6 @@
     <ClInclude Include="src\drc_sound.h" />
     <ClInclude Include="src\drc_sprite.h" />
     <ClInclude Include="src\drc_text.h" />
-    <ClInclude Include="src\direction.h" />
     <ClInclude Include="src\effects.h" />
     <ClInclude Include="src\gamedata.h" />
     <ClInclude Include="src\gameplay.h" />
@@ -289,9 +232,6 @@
     <Image Include="data\images\farground-forest.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="data\images\hero-daddy-01.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
     <Image Include="data\images\hero-makayla-1.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -337,22 +277,13 @@
     <Image Include="data\images\menu-titlescreen.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="data\images\powerup-laser-1.png">
+    <Image Include="data\images\powerup-dot.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="data\images\powerup-laser-2.png">
+    <Image Include="data\images\powerup-frame-1.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="data\images\powerup-rainbow-1.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="data\images\powerup-rainbow-2.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="data\images\powerup-speed-1.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="data\images\powerup-speed-2.png">
+    <Image Include="data\images\powerup-frame-2.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="data\images\texture-blue.png">
@@ -370,22 +301,16 @@
     <Image Include="data\images\texture-red.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="data\images\texture-strobe-square.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="data\images\texture-yellow.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="data\images\tile-bricks.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="data\images\tile-castle.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
     <Image Include="data\images\tile-door.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="data\images\tile-general.png">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="data\images\tile-wood.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
   </ItemGroup>
