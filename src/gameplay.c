@@ -92,6 +92,116 @@ static float convert_pps_to_fps(int pps)
     return pps / (float)(drc_get_fps());
 }
 
+static bool is_offscreen(BODY *body, DRC_SPRITE *sprite)
+{
+    int room_w = room.cols * TILE_SIZE;
+    int room_h = room.rows * TILE_SIZE;
+
+    int body_u = body->y + sprite->y_offset;
+    int body_l = body->x + sprite->x_offset;
+    int body_d = body_u + drc_get_sprite_height(sprite);
+    int body_r = body_l + drc_get_sprite_width(sprite);
+
+    if (body_d < 0 || body_r < 0 || body_u >= room_h || body_l >= room_w) {
+        return true;
+    }
+ 
+    return false;
+}
+
+static bool is_out_of_bounds(BODY *body)
+{
+    /* Level bounds! */
+    int room_w = room.cols * TILE_SIZE;
+    int room_h = room.rows * TILE_SIZE;
+
+    if (body->y < 0 || body->x < 0 || body->y + body->h >= room_h || body->x + body->w >= room_w) {
+        return true;
+    }
+ 
+    return false;
+}
+
+static bool is_board_collision(BODY *body)
+{
+    if (is_out_of_bounds(body)) {
+        return false;
+    }
+ 
+    int r1 = (int)(body->y / TILE_SIZE);
+    int c1 = (int)(body->x / TILE_SIZE);
+    int r2 = (int)((body->y + body->h) / TILE_SIZE);
+    int c2 = (int)((body->x + body->w) / TILE_SIZE);
+
+    /* Check the collision map */
+
+    if (room.collision_map[(r1 * room.cols) + c1] == COLLISION) {
+        return true;
+    }
+    
+    if (room.collision_map[(r1 * room.cols) + c2] == COLLISION) {
+        return true;
+    }
+    
+    if (room.collision_map[(r2 * room.cols) + c1] == COLLISION) {
+        return true;
+    }
+    
+    if (room.collision_map[(r2 * room.cols) + c2] == COLLISION) {
+        return true;
+    }
+    
+    return false;
+}
+
+static bool get_colliding_block(BODY *body, int *row, int *col)
+{
+    int r1 = (int)(body->y / TILE_SIZE);
+    int c1 = (int)(body->x / TILE_SIZE);
+    int r2 = (int)((body->y + body->h) / TILE_SIZE);
+    int c2 = (int)((body->x + body->w) / TILE_SIZE);
+
+    /* Level bounds! */
+    if (r1 < 0 || c1 < 0 || r2 >= room.rows || c2 >= room.cols) {
+        return false;
+    }
+    
+    /* Check the block map for any blocks */
+
+    if (room.block_map[(r1 * room.cols) + c1] != NO_BLOCK) {
+        *row = r1;
+        *col = c1;
+        return true;
+    }
+    
+    if (room.block_map[(r1 * room.cols) + c2] != NO_BLOCK) {
+        *row = r1;
+        *col = c2;
+        return true;
+    }
+    
+    if (room.block_map[(r2 * room.cols) + c1] != NO_BLOCK) {
+        *row = r2;
+        *col = c1;
+        return true;
+    }
+    
+    if (room.block_map[(r2 * room.cols) + c2] != NO_BLOCK) {
+        *row = r2;
+        *col = c2;
+        return true;
+    }
+    
+    return false;
+}
+
+static bool is_block_collision(BODY *body)
+{
+    int r = 0;
+    int c = 0;
+    return get_colliding_block(body, &r, &c);
+}
+
 static void update_powerup(POWERUP *powerup)
 {
     /* Powerup moves accross the screen */
@@ -99,6 +209,11 @@ static void update_powerup(POWERUP *powerup)
     powerup->body.y += convert_pps_to_fps(powerup->body.dy);
 
     drc_animate(&powerup->sprite);
+
+    /* If the powerup is off screen then destroy it */
+    if (is_out_of_bounds(&powerup->body)) {
+        powerup->is_active = false;
+    }
 }
 
 static int get_next_bullet_texture(void)
@@ -472,7 +587,7 @@ void init_gameplay(void)
 
     /* Init powerup dots */
     drc_init_sprite(&powerup_dot, false, 0);
-    drc_add_frame(&powerup_dot, DRC_IMG("dot.png"));
+    drc_add_frame(&powerup_dot, DRC_IMG("powerup-dot.png"));
 
     update = NULL;
     control = NULL;
@@ -511,116 +626,7 @@ static void reset_hero(int x, int y)
 
     /* Clear any powerup */
     hero.powerup_type = POWERUP_TYPE_NONE;
-}
-
-static bool is_offscreen(BODY *body, DRC_SPRITE *sprite)
-{
-    int room_w = room.cols * TILE_SIZE;
-    int room_h = room.rows * TILE_SIZE;
-
-    int body_u = body->y + sprite->y_offset;
-    int body_l = body->x + sprite->x_offset;
-    int body_d = body_u + drc_get_sprite_height(sprite);
-    int body_r = body_l + drc_get_sprite_width(sprite);
-
-    if (body_d < 0 || body_r < 0 || body_u >= room_h || body_l >= room_w) {
-        return true;
-    }
- 
-    return false;
-}
-
-static bool is_out_of_bounds(BODY *body)
-{
-    /* Level bounds! */
-    int room_w = room.cols * TILE_SIZE;
-    int room_h = room.rows * TILE_SIZE;
-
-    if (body->y < 0 || body->x < 0 || body->y + body->h >= room_h || body->x + body->w >= room_w) {
-        return true;
-    }
- 
-    return false;
-}
-
-static bool is_board_collision(BODY *body)
-{
-    if (is_out_of_bounds(body)) {
-        return false;
-    }
- 
-    int r1 = (int)(body->y / TILE_SIZE);
-    int c1 = (int)(body->x / TILE_SIZE);
-    int r2 = (int)((body->y + body->h) / TILE_SIZE);
-    int c2 = (int)((body->x + body->w) / TILE_SIZE);
-
-    /* Check the collision map */
-
-    if (room.collision_map[(r1 * room.cols) + c1] == COLLISION) {
-        return true;
-    }
-    
-    if (room.collision_map[(r1 * room.cols) + c2] == COLLISION) {
-        return true;
-    }
-    
-    if (room.collision_map[(r2 * room.cols) + c1] == COLLISION) {
-        return true;
-    }
-    
-    if (room.collision_map[(r2 * room.cols) + c2] == COLLISION) {
-        return true;
-    }
-    
-    return false;
-}
-
-static bool get_colliding_block(BODY *body, int *row, int *col)
-{
-    int r1 = (int)(body->y / TILE_SIZE);
-    int c1 = (int)(body->x / TILE_SIZE);
-    int r2 = (int)((body->y + body->h) / TILE_SIZE);
-    int c2 = (int)((body->x + body->w) / TILE_SIZE);
-
-    /* Level bounds! */
-    if (r1 < 0 || c1 < 0 || r2 >= room.rows || c2 >= room.cols) {
-        return false;
-    }
-    
-    /* Check the block map for any blocks */
-
-    if (room.block_map[(r1 * room.cols) + c1] != NO_BLOCK) {
-        *row = r1;
-        *col = c1;
-        return true;
-    }
-    
-    if (room.block_map[(r1 * room.cols) + c2] != NO_BLOCK) {
-        *row = r1;
-        *col = c2;
-        return true;
-    }
-    
-    if (room.block_map[(r2 * room.cols) + c1] != NO_BLOCK) {
-        *row = r2;
-        *col = c1;
-        return true;
-    }
-    
-    if (room.block_map[(r2 * room.cols) + c2] != NO_BLOCK) {
-        *row = r2;
-        *col = c2;
-        return true;
-    }
-    
-    return false;
-}
-
-static bool is_block_collision(BODY *body)
-{
-    int r = 0;
-    int c = 0;
-    return get_colliding_block(body, &r, &c);
+    hero.powerup_remaining = 0;
 }
 
 static void update_enemy_animation(ENEMY *enemy, void *data)
@@ -1634,6 +1640,7 @@ static bool update_gameplay_playing(void)
     /* Set the number of blocks needed to be cleared until a new powerup appears */
     if (blocks_until_powerup_appears == RESET_POWERUP_COUNTER) {
         blocks_until_powerup_appears = drc_random_number(5, 8);
+        //blocks_until_powerup_appears = 1; /* TEMP, for testing powerups */
         next_powerup_type = drc_random_number(POWERUP_TYPE_FIRST, POWERUP_TYPE_MAX - 1);
     }
 
@@ -1784,13 +1791,26 @@ static void draw_gameplay_playing(void)
     /* Draw the hero's bullet */
     if (hero.has_bullet) {
         drc_draw_sprite(&hero.bullet, hero.bullet_x, hero.bullet_y);
+
+        /* Draw a dot for every powerup shot left (if any) */
+        for (int i = 0; i < hero.powerup_remaining; i++) {
+            if (room.direction == UP) {
+                /* Draw dots to the right */
+                drc_draw_sprite(&powerup_dot, hero.bullet_x + 16, hero.bullet_y - 2 + (i * 5));
+            } else if (room.direction == DOWN) {
+                /* Draw dots to the right */
+                drc_draw_sprite(&powerup_dot, hero.bullet_x + 16, hero.bullet_y - 1 + (i * 5));
+            } else if (room.direction == LEFT) {
+                /* Draw dots above */
+                drc_draw_sprite(&powerup_dot, hero.bullet_x - 2 + (i * 5), hero.bullet_y - 10);
+            } else {
+                /* Draw dots above */
+                drc_draw_sprite(&powerup_dot, hero.bullet_x - 1 + (i * 5), hero.bullet_y - 10);
+            }
+        }
     }
 
-    /* Draw a dot for every powerup shot left (if any) */
-    for (int i = 0; i < hero.powerup_remaining; i++) {
-        drc_draw_sprite(&powerup_dot, hero.bullet_x - 1 + (i * 5), hero.bullet_y - 10);
-    }
-
+    /* Draw the special effects */
     draw_effects();
 }
 

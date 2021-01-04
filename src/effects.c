@@ -43,8 +43,9 @@ static void init_effects(void)
 
 void update_effects(void)
 {
-    // TODO: Put this in a better, less used spot
-    init_effects();
+    if (!is_effects_init) {
+        init_effects();
+    }
 
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (effects[i].is_active && effects[i].update != NULL) {

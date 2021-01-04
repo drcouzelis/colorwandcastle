@@ -56,7 +56,6 @@ imagesdatadir = $(pkgdatadir)/images
 dist_imagesdata_DATA = \
   data/images/background-bedroom.png \
   data/images/boss-spider.png \
-  data/images/dot.png \
   data/images/effect-poof-1.png \
   data/images/effect-poof-2.png \
   data/images/effect-poof-3.png \
@@ -101,42 +100,22 @@ dist_imagesdata_DATA = \
   data/images/mask-star-1.png \
   data/images/mask-star-2.png \
   data/images/menu-titlescreen.png \
+  data/images/powerup-dot.png \
   data/images/powerup-frame-1.png \
   data/images/powerup-frame-2.png \
-  data/images/powerup-laser-1.png \
-  data/images/powerup-laser-2.png \
-  data/images/powerup-rainbow-1.png \
-  data/images/powerup-rainbow-2.png \
-  data/images/powerup-speed-1.png \
-  data/images/powerup-speed-2.png \
   data/images/texture-blue.png \
   data/images/texture-green.png \
   data/images/texture-orange.png \
   data/images/texture-purple.png \
   data/images/texture-red.png \
-  data/images/texture-yellow.png \
   data/images/texture-strobe-square.png \
+  data/images/texture-yellow.png \
   data/images/tile-bricks.png \
-  data/images/tile-castle.png \
-  data/images/tile-door.png \
-  data/images/tile-general.png \
-  data/images/tile-wood.png
+  data/images/tile-door.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels
 dist_levelsdata_DATA = \
-  data/levels/list-demo.dat \
-  data/levels/room-demo-001.dat \
-  data/levels/room-demo-002.dat \
-  data/levels/room-demo-003.dat \
-  data/levels/room-demo-004.dat \
-  data/levels/room-demo-005.dat \
-  data/levels/room-demo-006.dat \
-  data/levels/room-demo-007.dat \
-  data/levels/room-demo-008.dat \
-  data/levels/room-demo-009.dat \
-  data/levels/room-demo-010.dat \
-  data/levels/room-demo-011.dat \
   data/levels/list-story.dat \
   data/levels/room-story-001.dat \
   data/levels/room-story-002.dat \
@@ -157,19 +136,11 @@ dist_levelsdata_DATA = \
   data/levels/room-story-017.dat \
   data/levels/room-story-018-boss.dat \
   data/levels/room-story-019.dat \
-  data/levels/room-makayla.dat \
-  data/levels/room-rawson.dat \
-  data/levels/room-rawson-2.dat \
-  data/levels/room-hard.dat \
-  data/levels/room-test.dat \
   data/levels/texture-boss-spider.dat \
-  data/levels/texture-colored.dat \
-  data/levels/texture-colored-2.dat \
-  data/levels/texture-colored-3.dat \
-  data/levels/tile-bricks.dat \
-  data/levels/tile-castle.dat \
-  data/levels/tile-general.dat \
-  data/levels/tile-wood.dat
+  data/levels/texture-colors-2.dat \
+  data/levels/texture-colors-3.dat \
+  data/levels/texture-colors-6.dat \
+  data/levels/tile-bricks.dat
 
 # Data - Sounds
 soundsdatadir = $(pkgdatadir)/sounds
