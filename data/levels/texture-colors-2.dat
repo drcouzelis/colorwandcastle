@@ -1,9 +1,9 @@
-# 01
+# 01 - Red
 TEXTURE
-  IMAGE texture-red.png
+  IMAGE texture-colors.png:20x20:0,0
 END
 
-# 02
+# 02 - Orange
 TEXTURE
-  IMAGE texture-orange.png
+  IMAGE texture-colors.png:20x20:0,1
 END

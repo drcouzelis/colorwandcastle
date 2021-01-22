@@ -56,7 +56,7 @@ typedef enum
     POWERUP_TYPE_NONE = 0,
     POWERUP_TYPE_FIRST = 1,
     POWERUP_TYPE_FLASHING = 1,
-    //POWERUP_TYPE_LASER,
+    POWERUP_TYPE_LASER,
     //POWERUP_TYPE_RANDOM,
     //POWERUP_TYPE_BOOM,
     //POWERUP_TYPE_TIMESTOP,
@@ -129,6 +129,9 @@ typedef struct
 
     /* If this bullet has no more hits, get rid of it */
     int hits;
+
+    /* If true (the default) the block is destroyed when it hits a block */
+    bool destroy_on_block;
 
     BODY body;
 } BULLET;

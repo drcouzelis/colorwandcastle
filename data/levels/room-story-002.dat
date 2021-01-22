@@ -6,8 +6,9 @@ TILE
   IMAGE farground-forest.png:320x240:0,0
 END
 
+# 01 - Red
 TEXTURE
-  IMAGE texture-red.png
+  IMAGE texture-colors.png:20x20:0,0
 END
 
 FARGROUND

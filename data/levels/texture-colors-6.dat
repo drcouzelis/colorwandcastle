@@ -1,29 +1,29 @@
-# 01
+# 01 - Red
 TEXTURE
-  IMAGE texture-red.png
+  IMAGE texture-colors.png:20x20:0,0
 END
 
-# 02
+# 02 - Orange
 TEXTURE
-  IMAGE texture-orange.png
+  IMAGE texture-colors.png:20x20:0,1
 END
 
-# 03
+# 03 - Yellow
 TEXTURE
-  IMAGE texture-yellow.png
+  IMAGE texture-colors.png:20x20:0,2
 END
 
-# 04
+# 04 - Green
 TEXTURE
-  IMAGE texture-green.png
+  IMAGE texture-colors.png:20x20:0,3
 END
 
-# 05
+# 05 - Blue
 TEXTURE
-  IMAGE texture-blue.png
+  IMAGE texture-colors.png:20x20:0,4
 END
 
-# 06
+# 06 - Purple
 TEXTURE
-  IMAGE texture-purple.png
+  IMAGE texture-colors.png:20x20:0,5
 END

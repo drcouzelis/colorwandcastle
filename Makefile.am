@@ -103,13 +103,9 @@ dist_imagesdata_DATA = \
   data/images/powerup-dot.png \
   data/images/powerup-frame-1.png \
   data/images/powerup-frame-2.png \
-  data/images/texture-blue.png \
-  data/images/texture-green.png \
-  data/images/texture-orange.png \
-  data/images/texture-purple.png \
-  data/images/texture-red.png \
-  data/images/texture-strobe-square.png \
-  data/images/texture-yellow.png \
+  data/images/texture-colors.png \
+  data/images/texture-laser.png \
+  data/images/texture-strobe.png \
   data/images/tile-bricks.png \
   data/images/tile-door.png
 

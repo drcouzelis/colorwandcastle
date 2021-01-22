@@ -289,6 +289,11 @@ static int get_next_bullet_texture(void)
          * can destroy any texture.
          */
         return ANY_TEXTURE;
+    } else if (hero.powerup_type == POWERUP_TYPE_LASER) {
+        /**
+         * A laser powerup can also destroy any texture.
+         */
+        return ANY_TEXTURE;
     } else {
         return textures[drc_random_number(0, num_textures - 1)];
     }
@@ -321,38 +326,32 @@ static void load_hero_bullet_sprite(DRC_SPRITE *sprite, int texture, int hero_ty
 {
     if (hero.powerup_type == POWERUP_TYPE_FLASHING) {
         drc_init_sprite(sprite, true, 12);
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,0", hero_type, 0));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,1", hero_type, 0));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,2", hero_type, 0));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,3", hero_type, 1));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,4", hero_type, 1));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,5", hero_type, 1));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,0", hero_type, 0));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,1", hero_type, 0));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,2", hero_type, 0));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,3", hero_type, 1));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,4", hero_type, 1));
-        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe-square.png:20x20:0,5", hero_type, 1));
-        ///* A flashing bullet animates four times as fast as normal, to allow the colors to change more quickly */
-        //drc_init_sprite(sprite, true, 16);
-        ///* Keep track of which "rotation" of the bullet you're on */
-        //int next_frame = 0;
-        ///* Keep track of when to change to the next "rotation" of the bullet */
-        //int next_frame_count = 0;
-        ///* (If there's only one texture in the room, the bullet won't animate...) */
-        //int num_textures = (room.num_texture_defs == 1 ? 8 : room.num_texture_defs * 4);
-        ///* Cap the number of textures used in the flashing animation */
-        //if (num_textures > 24) {
-        //    num_textures = 24;
-        //}
-        //for (int i = 0; i < num_textures; i++) {
-        //    drc_add_frame(sprite, get_hero_bullet_image(room.texture_defs[i % room.num_texture_defs].frames[0], hero_type, next_frame));
-        //    next_frame_count++;
-        //    if (next_frame_count >= 4) {
-        //        next_frame = (next_frame == 1 ? 0 : 1);
-        //        next_frame_count = 0;
-        //    }
-        //}
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,0", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,1", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,2", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,3", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,4", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,5", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,0", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,1", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,2", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,3", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,4", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-strobe.png:20x20:0,5", hero_type, 1));
+    } else if (hero.powerup_type == POWERUP_TYPE_LASER) {
+        drc_init_sprite(sprite, true, 12);
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,0", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,1", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,2", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,3", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,4", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,5", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,6", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,7", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,8", hero_type, 0));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,9", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,10", hero_type, 1));
+        drc_add_frame(sprite, get_hero_bullet_image("texture-laser.png:20x20:0,11", hero_type, 1));
     } else {
         drc_init_sprite(sprite, true, 4);
         drc_add_frame(sprite, get_hero_bullet_image(room.texture_defs[texture].frames[0], hero_type, 0));
@@ -424,9 +423,19 @@ static void load_powerup(float x, float y)
         drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,3", "powerup-frame-2.png"));
         drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,4", "powerup-frame-1.png"));
         drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,5", "powerup-frame-2.png"));
-    //} else if (next_powerup_type == POWERUP_TYPE_LASER) {
-    //    drc_add_frame(&powerup->sprite, DRC_IMG("powerup-laser-1.png"));
-    //    drc_add_frame(&powerup->sprite, DRC_IMG("powerup-laser-2.png"));
+    } else if (next_powerup_type == POWERUP_TYPE_LASER) {
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,0", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,1", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,2", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,3", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,4", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,5", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,6", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,7", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,8", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,9", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,10", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,11", "powerup-frame-2.png"));
     }
     powerup->body.x = x;
     powerup->body.y = y;
@@ -1137,7 +1146,9 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
 
             /* Matching textures! */
             /* Remove the bullet and the block */
-            bullet->hits = 0;
+            if (bullet->destroy_on_block) {
+                bullet->hits = 0;
+            }
             drc_play_sound(DRC_SND("block-destroyed.wav"));
             load_poof_effect(c * TILE_SIZE, r * TILE_SIZE);
             room.block_map[(r * room.cols) + c] = NO_BLOCK;
@@ -1222,6 +1233,7 @@ static void shoot_bullet(int texture, float x, float y)
     load_hero_bullet_sprite(&bullet->sprite, texture, hero.type);
     bullet->texture = texture;
     bullet->hits = 2;
+    bullet->destroy_on_block = true;
     bullet->body.x = x;
     bullet->body.y = y;
     bullet->body.w = 10;
@@ -1236,6 +1248,13 @@ static void shoot_bullet(int texture, float x, float y)
     bullet->body.dy = speed * directions[room.direction].y_offset;
 
     bullet->is_active = true;
+
+    /* The laser powerup bullet is configured to dissolve when hitting a wall */
+    /* Do NOT destroy it when it hits a block */
+    if (hero.powerup_type == POWERUP_TYPE_LASER) {
+        bullet->hits = 1;
+        bullet->destroy_on_block = false;
+    }
 
     /* Are you using a powerup? */
     /* Don't let the hero keep the powerup forever */
@@ -1507,11 +1526,11 @@ static void collect_powerup(POWERUP *powerup)
         /* Give the hero a sparkly new bullet */
         load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
         hero.texture = ANY_TEXTURE;
-    //} else if (powerup->type == POWERUP_TYPE_LASER) {
-    //    hero.powerup_type = POWERUP_TYPE_LASER;
-    //    hero.powerup_remaining = 3;
-    //    load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
-    //    hero.texture = ANY_TEXTURE;
+    } else if (powerup->type == POWERUP_TYPE_LASER) {
+        hero.powerup_type = POWERUP_TYPE_LASER;
+        hero.powerup_remaining = 3;
+        load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
+        hero.texture = ANY_TEXTURE;
     }
 
     /* Clear the powerup */
