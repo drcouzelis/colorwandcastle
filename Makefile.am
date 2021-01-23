@@ -107,7 +107,8 @@ dist_imagesdata_DATA = \
   data/images/texture-laser.png \
   data/images/texture-strobe.png \
   data/images/tile-bricks.png \
-  data/images/tile-door.png
+  data/images/tile-door.png \
+  data/images/tile-stones.png
 
 # Data - Levels
 levelsdatadir = $(pkgdatadir)/levels
@@ -136,7 +137,8 @@ dist_levelsdata_DATA = \
   data/levels/texture-colors-2.dat \
   data/levels/texture-colors-3.dat \
   data/levels/texture-colors-6.dat \
-  data/levels/tile-bricks.dat
+  data/levels/tile-bricks.dat \
+  data/levels/tile-stones.dat
 
 # Data - Sounds
 soundsdatadir = $(pkgdatadir)/sounds

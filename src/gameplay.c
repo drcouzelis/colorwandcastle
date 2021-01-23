@@ -417,12 +417,12 @@ static void load_powerup(float x, float y)
 
     drc_init_sprite(&powerup->sprite, true, 6);
     if (next_powerup_type == POWERUP_TYPE_FLASHING) {
-        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,0", "powerup-frame-1.png"));
-        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,1", "powerup-frame-2.png"));
-        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,2", "powerup-frame-1.png"));
-        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,3", "powerup-frame-2.png"));
-        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,4", "powerup-frame-1.png"));
-        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe-square.png:20x20:0,5", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe.png:20x20:0,0", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe.png:20x20:0,1", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe.png:20x20:0,2", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe.png:20x20:0,3", "powerup-frame-2.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe.png:20x20:0,4", "powerup-frame-1.png"));
+        drc_add_frame(&powerup->sprite, STACKED_IMG("texture-strobe.png:20x20:0,5", "powerup-frame-2.png"));
     } else if (next_powerup_type == POWERUP_TYPE_LASER) {
         drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,0", "powerup-frame-1.png"));
         drc_add_frame(&powerup->sprite, STACKED_IMG("texture-laser.png:20x20:0,1", "powerup-frame-2.png"));
