@@ -88,8 +88,43 @@ TILE
   IMAGE tile-stones.png:20x20:4,1
 END
 
-# 019 Dark unseen stones
+# 019 Window, left
 TILE
   IMAGE tile-stones.png:20x20:4,2
+END
+
+# 020 Window, right
+TILE
+  IMAGE tile-stones.png:20x20:4,3
+END
+
+# 021 Window, top left corner
+TILE
+  IMAGE tile-stones.png:20x20:5,0
+END
+
+# 022 Window, top right corner
+TILE
+  IMAGE tile-stones.png:20x20:5,1
+END
+
+# 023 Window, top
+TILE
+  IMAGE tile-stones.png:20x20:5,2
+END
+
+# 024 Window, bottom
+TILE
+  IMAGE tile-stones.png:20x20:5,3
+END
+
+# 025 Window, bottom left corner
+TILE
+  IMAGE tile-stones.png:20x20:6,0
+END
+
+# 026 Window, bottom right corner
+TILE
+  IMAGE tile-stones.png:20x20:6,1
 END
 

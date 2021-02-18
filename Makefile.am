@@ -134,6 +134,7 @@ dist_levelsdata_DATA = \
   data/levels/room-story-018-boss.dat \
   data/levels/room-story-019.dat \
   data/levels/room-story-020.dat \
+  data/levels/room-story-021.dat \
   data/levels/texture-boss-spider.dat \
   data/levels/texture-colors-2.dat \
   data/levels/texture-colors-3.dat \
