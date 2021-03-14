@@ -1651,7 +1651,6 @@ static bool update_gameplay_playing(void)
 
     /* Give the player a powerup? */
     if (blocks_until_powerup_appears == 0 && !room.cleared && num_blocks() > 0) {
-        /* Create a dummy test powerup */
         load_powerup(room.last_cleared_x, room.last_cleared_y);
         blocks_until_powerup_appears = RESET_POWERUP_COUNTER;
     }
