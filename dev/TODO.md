@@ -17,6 +17,10 @@
 - The player has an unlimited number of tries to complete a level.
 - The number and position of the blocks varies from room to room.
 
+## Bugs
+
+- [ ] Game glitches when completing the last room
+
 ## TODO
 
 - [x] Player is in a room.
@@ -39,14 +43,15 @@
 - [x] Allow for clearing resources at the end of a level
 - [x] New exit style: EXIT 15 9 R 1
 - [x] Simplify and unify the color scheme
-- [ ] Two types of rooms - NORMAL and BOSS
+- [x] Two types of rooms - NORMAL and BOSS
+- [ ] Preload graphics / load graphics before room transition
 - [ ] Gamepad support
 - [ ] Background music
 
 ## Room Theme Ideas
 
-- [ ] Bedroom x 1
-- [ ] Hallways x many
+- [x] Bedroom x 1
+- [x] Hallways x many
 - [ ] Outdoor hallways x many
 - [ ] Dining area x 2
 - [ ] Kitchen x 3
@@ -57,11 +62,11 @@
 
 ## Room Progression
 
-- [ ] Room 1 - Movement, no blocks
-- [ ] Room 2 - 1 color
-- [ ] Room 3 - 2 colors
-- [ ] Room 4 - Random colors, 1 simple enemy
-- [ ] Boss about every 30 rooms
+- [x] Room 1 - Movement, no blocks
+- [x] Room 2 - 1 color
+- [x] Room 3 - 2 colors
+- [x] Room 4 - Random colors, 1 simple enemy
+- [x] Boss about every 30 rooms
 
 ## Enemies
 
@@ -75,8 +80,8 @@
 ## Powerups
 
 - [x] Randomize each time the room is started / restarted
-- [x] Flashing star, clears any color block (rainbow pattern)
-- [ ] Laser star, 5 shots, clear all stars in path to wall (fast throb animation, color cycle)
+- [x] Flashing star, 3 shots, clears any color block (rainbow pattern)
+- [x] Laser star, 1 shot, clear all stars in path to wall
 - [ ] Boom star, 5 shots, clear all adjacent blocks (constant poof behind bullet)
 - [ ] Time stop, Freeze all enemies for 5 shots
 - [ ] Random, 3 shots, unknown color until shot (cycle colors)
@@ -107,9 +112,10 @@
 - Rooms that you "come back" to, such as one hallway above another, or going down stairs that you saw previously
 
 ## David Game Library
-- [ ] Resource management (directories)
-- [ ] Sound / music management
-- [ ] Image management
-- [ ] Animated sprites
+- [x] Image management
+- [x] Animated sprites
+- [x] Resource management (directories)
+- [x] Sound management
+- [ ] Music management
 - [ ] Camera control
 - [ ] Maps (load, draw)

@@ -1158,7 +1158,8 @@ static bool move_bullet(BULLET *bullet, float new_x, float new_y)
             room.last_cleared_y = r * TILE_SIZE;
 
             /* It could be time to give the player a powerup */
-            if (blocks_until_powerup_appears > 0) {
+            /* Only decrement if the hero doesn't currently have a powerup */
+            if (hero.powerup_remaining <= 0 && blocks_until_powerup_appears > 0) {
                 blocks_until_powerup_appears--;
             }
 
@@ -1528,7 +1529,7 @@ static void collect_powerup(POWERUP *powerup)
         hero.texture = ANY_TEXTURE;
     } else if (powerup->type == POWERUP_TYPE_LASER) {
         hero.powerup_type = POWERUP_TYPE_LASER;
-        hero.powerup_remaining = 3;
+        hero.powerup_remaining = 1;
         load_hero_bullet_sprite(&hero.bullet, hero.texture, hero.type);
         hero.texture = ANY_TEXTURE;
     }
