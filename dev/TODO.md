@@ -20,6 +20,7 @@
 ## Bugs
 
 - [ ] Game glitches when completing the last room
+- [ ] The farground fails to scroll correctly in area 2
 
 ## TODO
 
