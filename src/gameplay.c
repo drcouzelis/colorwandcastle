@@ -952,7 +952,9 @@ static void to_gameplay_state_scroll_rooms(void)
     }
 
     /* Take a screenshot of the current room */
+    /* Clear the screenshot then draw the room */
     al_set_target_bitmap(drc_get_frame(&screenshot1.sprite));
+    al_clear_to_color(al_map_rgba(0, 0, 0, 0));
     draw_gameplay_playing();
 
     /* Clear all resources before loading the new room */
@@ -1009,7 +1011,9 @@ static void to_gameplay_state_scroll_rooms(void)
     }
     
     /* Take a screenshot of the next room */
+    /* Clear the screenshot then draw the room */
     al_set_target_bitmap(drc_get_frame(&screenshot2.sprite));
+    al_clear_to_color(al_map_rgba(0, 0, 0, 0));
     draw_gameplay_playing();
 
     al_restore_state(&state);
